@@ -1,8 +1,8 @@
-# Creative Technologists - Web Application
+# Noshop - Web Application
 
-Next.js 15 web application for the Creative Technologist community membership platform.
+Next.js 15 web application for the Noshop community membership platform.
 
-This repository contains the **web frontend** for the membership platform. The Discord bot backend is maintained in a separate repository: [creative-technologists-bot](https://github.com/0xdesign/daily-digest-bot)
+This repository contains the **web frontend** for the membership platform. The Discord bot backend is maintained in a separate repository: [ns-bot](https://github.com/0xdesign/ns-bot)
 
 ## Features
 
@@ -39,7 +39,7 @@ Discord Bot (Python) → Supabase (Postgres) → Web App (Next.js)
 ```
 
 **Related Repositories:**
-- **Bot**: [creative-technologists-bot](https://github.com/0xdesign/daily-digest-bot) - Python Discord bot with message collection, member tracking, daily digest
+- **Bot**: [ns-bot](https://github.com/0xdesign/ns-bot) - Python Discord bot with message collection, member tracking, daily digest
 - **Web**: This repository - Next.js membership platform
 
 ## Getting Started
@@ -91,7 +91,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ## Project Structure
 
 ```
-creative-technologists-web/
+noshop/ns-web/
 ├── app/                    # Next.js App Router pages
 │   ├── layout.tsx         # Root layout
 │   ├── page.tsx           # Landing page
@@ -253,7 +253,7 @@ This web app communicates with the Discord bot via:
 - `POST /api/sync-role` - Daily role sync
 
 **Local Development Setup:**
-1. Run bot: `cd ../creative-technologists-bot && python src/bot.py`
+1. Run bot: `cd ../ns-bot && python src/bot.py`
 2. Run web: `npm run dev`
 3. Bot API available at `http://localhost:8000`
 4. Web app available at `http://localhost:3000`
@@ -307,7 +307,7 @@ If you see database connection errors:
 
 ## Related Documentation
 
-- **Bot Repository**: [creative-technologists-bot](https://github.com/0xdesign/daily-digest-bot)
+- **Bot Repository**: [ns-bot](https://github.com/0xdesign/ns-bot)
 - **Supabase Schema**: See bot repo's `SUPABASE_SCHEMA.md`
 - **Phase Reports**: See `PHASE_*_COMPLETE.md` files for detailed phase completion reports
 

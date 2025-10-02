@@ -319,9 +319,9 @@ export default async function Home() {
                   </div>
 
                   {/* Summary */}
-                  {member.summary && (
+                  {member.status_summary && (
                     <p className="text-sm text-neutral-600 dark:text-neutral-400 line-clamp-2 mb-4">
-                      {member.summary}
+                      {member.status_summary}
                     </p>
                   )}
 
@@ -341,7 +341,7 @@ export default async function Home() {
                           d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                         />
                       </svg>
-                      <span>{member.message_count} messages</span>
+                      <span>{member.messages_7d + member.messages_30d} messages</span>
                     </div>
                   </div>
                 </div>

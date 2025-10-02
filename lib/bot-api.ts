@@ -4,11 +4,13 @@
  * Provides functions to interact with the Discord bot API for role management.
  */
 
+import { logger } from './logger'
+
 const BOT_API_URL = process.env.BOT_API_URL || 'http://localhost:8000'
 const BOT_API_KEY = process.env.BOT_API_KEY
 
 if (!BOT_API_KEY) {
-  console.warn('Warning: BOT_API_KEY not configured')
+  logger.warn('BOT_API_KEY not configured', { service: 'bot-api' })
 }
 
 interface RoleResponse {
@@ -181,7 +183,7 @@ function transformMemberAPI(apiMember: MemberStatusAPI): MemberStatus {
 export async function getMembers(): Promise<MembersResponse> {
   // Return empty data if BOT_API_URL is not configured
   if (!BOT_API_URL) {
-    console.log('Bot API URL not configured - returning empty data')
+    logger.warn('Bot API URL not configured', { service: 'bot-api' })
     return {
       members: [],
       total: 0,
@@ -189,6 +191,8 @@ export async function getMembers(): Promise<MembersResponse> {
   }
 
   try {
+    logger.apiRequest('GET', `${BOT_API_URL}/api/members`)
+
     const response = await fetch(`${BOT_API_URL}/api/members`, {
       method: 'GET',
       headers: {
@@ -200,8 +204,13 @@ export async function getMembers(): Promise<MembersResponse> {
       signal: AbortSignal.timeout(5000),
     })
 
+    logger.apiResponse('GET', `${BOT_API_URL}/api/members`, response.status)
+
     if (!response.ok) {
-      console.error(`Bot API returned ${response.status}`)
+      logger.error('Bot API returned error', undefined, {
+        status: response.status,
+        url: `${BOT_API_URL}/api/members`,
+      })
       return {
         members: [],
         total: 0,
@@ -211,17 +220,18 @@ export async function getMembers(): Promise<MembersResponse> {
     const apiMembers: MemberStatusAPI[] = await response.json()
     const members = apiMembers.map(transformMemberAPI)
 
+    logger.info('Successfully fetched members from bot API', { count: members.length })
+
     return {
       members,
       total: members.length,
     }
   } catch (error) {
     // Log error but don't fail the page
-    if (error instanceof Error) {
-      console.error('Bot API fetch error:', error.message)
-    } else {
-      console.error('Bot API fetch error:', error)
-    }
+    logger.error('Bot API fetch failed', error as Error, {
+      service: 'bot-api',
+      operation: 'getMembers',
+    })
 
     // Return empty response if bot API is not available
     return {

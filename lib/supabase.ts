@@ -5,6 +5,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js'
+import { logger } from './logger'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -40,6 +41,8 @@ export interface MembersResponse {
  */
 export async function getMembers(): Promise<MembersResponse> {
   try {
+    logger.dbQuery('SELECT', 'member_status', { filter: 'exclude GHOST' })
+
     const { data, error } = await supabase
       .from('member_status')
       .select('*')
@@ -47,16 +50,22 @@ export async function getMembers(): Promise<MembersResponse> {
       .order('messages_7d', { ascending: false })
 
     if (error) {
-      console.error('Supabase query error:', error)
+      logger.error('Failed to fetch members from Supabase', error as Error, {
+        operation: 'getMembers',
+      })
       return { members: [], total: 0 }
     }
+
+    logger.info('Successfully fetched members', { count: data?.length || 0 })
 
     return {
       members: data || [],
       total: (data || []).length,
     }
   } catch (error) {
-    console.error('Error fetching members from Supabase:', error)
+    logger.error('Unexpected error fetching members', error as Error, {
+      operation: 'getMembers',
+    })
     return { members: [], total: 0 }
   }
 }
@@ -66,6 +75,8 @@ export async function getMembers(): Promise<MembersResponse> {
  */
 export async function getMember(userId: string): Promise<MemberStatus | null> {
   try {
+    logger.dbQuery('SELECT', 'member_status', { userId })
+
     const { data, error } = await supabase
       .from('member_status')
       .select('*')
@@ -73,13 +84,19 @@ export async function getMember(userId: string): Promise<MemberStatus | null> {
       .single()
 
     if (error) {
-      console.error('Supabase query error:', error)
+      logger.error('Failed to fetch member', error as Error, {
+        operation: 'getMember',
+        userId,
+      })
       return null
     }
 
     return data
   } catch (error) {
-    console.error(`Error fetching member ${userId}:`, error)
+    logger.error('Unexpected error fetching member', error as Error, {
+      operation: 'getMember',
+      userId,
+    })
     return null
   }
 }
