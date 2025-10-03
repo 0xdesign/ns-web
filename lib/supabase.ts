@@ -27,6 +27,7 @@ export interface MemberStatus {
   conversation_topics: string[]
   status_summary: string | null
   last_message_at: string | null
+  avatar_url: string | null
   updated_at: string
   created_at: string
 }
@@ -187,9 +188,18 @@ export function getStatusBadge(status: MemberStatus['activity_status']): {
 
 /**
  * Generate Discord avatar URL from user ID
+ *
+ * @param userId - Discord user ID
+ * @param avatarUrl - Optional avatar URL from database
+ * @returns Avatar URL (custom or default)
  */
-export function getAvatarUrl(userId: string): string {
-  // Use default Discord avatar based on user ID
+export function getAvatarUrl(userId: string, avatarUrl?: string | null): string {
+  // Use stored avatar URL if available
+  if (avatarUrl) {
+    return avatarUrl
+  }
+
+  // Fallback to default Discord avatar based on user ID
   const avatarIndex = Number(BigInt(userId) % 6n)
   return `https://cdn.discordapp.com/embed/avatars/${avatarIndex}.png`
 }

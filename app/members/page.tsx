@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { getMembers } from '@/lib/supabase'
+import Image from 'next/image'
+import { getMembers, getAvatarUrl } from '@/lib/supabase'
 
 export default async function MembersPage() {
   const { members } = await getMembers()
@@ -57,12 +58,25 @@ export default async function MembersPage() {
                 key={member.user_id}
                 className="bg-white dark:bg-gray-800 rounded-lg shadow p-6"
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <div className="flex items-start gap-4">
+                  {/* Avatar */}
+                  <div className="flex-shrink-0">
+                    <Image
+                      src={getAvatarUrl(member.user_id, member.avatar_url)}
+                      alt={`${member.display_name || member.username}'s avatar`}
+                      width={64}
+                      height={64}
+                      className="rounded-full w-12 h-12 md:w-16 md:h-16"
+                      unoptimized
+                    />
+                  </div>
+
+                  {/* Member Info */}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                       {member.display_name || member.username}
                     </h3>
-                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 truncate">
                       @{member.username}
                     </p>
                     <div className="mt-2">
