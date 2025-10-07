@@ -53,7 +53,16 @@ export async function GET(request: NextRequest) {
     })
 
     // Redirect to intended destination (from state param) or default to application form
-    const redirectPath = state || '/apply/form'
+    // Validate state is a safe relative path to prevent open redirect attacks
+    let redirectPath = '/apply/form'
+    if (state) {
+      // Only accept relative paths starting with "/" (no protocol, no leading "//", no path traversal)
+      if (state.startsWith('/') && !state.startsWith('//') && !state.includes('..')) {
+        redirectPath = state
+      } else {
+        console.warn(`⚠️  Invalid redirect path in state parameter: ${state}`)
+      }
+    }
     return NextResponse.redirect(new URL(redirectPath, request.url))
   } catch (error) {
     console.error('Discord OAuth error:', error)
