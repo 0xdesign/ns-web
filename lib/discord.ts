@@ -164,6 +164,11 @@ export async function addUserToGuild(params: {
     }
   )
 
+  if (!response.ok) {
+    const errorText = await response.text()
+    console.error(`Discord API error (${response.status}):`, errorText)
+  }
+
   return response.ok
 }
 

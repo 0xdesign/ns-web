@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
     if (!customer) {
       return NextResponse.redirect(new URL('/success?joined=0&error=no_customer', appUrl))
     }
-    const sub = await getLatestSubscriptionForCustomer(customer.stripe_customer_id)
+    const sub = await getLatestSubscriptionForCustomer(customer.id) // Use database customer ID, not Stripe ID
     if (!sub) {
       return NextResponse.redirect(new URL('/success?joined=0&error=no_subscription', appUrl))
     }
@@ -88,8 +88,17 @@ export async function GET(request: NextRequest) {
         userAccessToken: token.access_token,
         roleId: roleId || undefined,
       })
+
+      if (!ok) {
+        console.warn(`⚠️  Failed to add user ${user.id} to guild ${guildId}`)
+        console.warn('   → User may already be in guild, or bot lacks permissions')
+        console.warn('   → Required bot permissions: Manage Server, Manage Roles')
+      } else {
+        console.log(`✅ Successfully added user ${user.id} to guild with role`)
+      }
     } catch (e) {
-      console.error('guilds.join failed:', e)
+      console.error(`❌ guilds.join API error for user ${user.id}:`, e)
+      console.error('   → Check bot permissions and OAuth scopes')
     }
 
     // Ensure role assignment via bot as fallback

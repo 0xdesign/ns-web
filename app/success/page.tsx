@@ -14,12 +14,16 @@ export default async function SuccessPage({
   const error = params.error
 
   let joinUrl: string | null = null
+  let joinConfigError: string | null = null
   try {
     const state = generateJoinState({ appId: appId || 'unknown' })
     joinUrl = getJoinDiscordAuthUrl(state)
   } catch (e) {
     // join not configured; hide the button
     joinUrl = null
+    joinConfigError = e instanceof Error ? e.message : 'Discord join OAuth not configured'
+    console.warn('⚠️  Discord join button unavailable:', joinConfigError)
+    console.warn('   → Set DISCORD_JOIN_REDIRECT_URI and DISCORD_BOT_TOKEN in .env')
   }
 
   const inviteUrl = process.env.NEXT_PUBLIC_DISCORD_INVITE_URL || ''
@@ -46,15 +50,30 @@ export default async function SuccessPage({
         )}
 
         <div className="mt-10 flex flex-col items-center gap-4">
-          {joinUrl && (
+          {joinUrl ? (
             <a
               href={joinUrl}
               className="inline-flex items-center justify-center rounded-md bg-[#5865F2] px-6 py-3 text-white font-semibold shadow hover:bg-[#4752C4]"
             >
               Join Discord (1‑click)
             </a>
+          ) : inviteUrl ? (
+            <a
+              href={inviteUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center rounded-md bg-[#5865F2] px-6 py-3 text-white font-semibold shadow hover:bg-[#4752C4]"
+            >
+              Join Discord Server
+            </a>
+          ) : (
+            <div className="rounded-md bg-yellow-50 dark:bg-yellow-900/20 p-4 text-sm text-yellow-800 dark:text-yellow-200">
+              <p className="font-medium">Discord join link unavailable</p>
+              <p className="mt-1 text-xs">Contact an admin for an invite</p>
+            </div>
           )}
-          {inviteUrl && (
+
+          {joinUrl && inviteUrl && (
             <a
               href={inviteUrl}
               target="_blank"
@@ -63,6 +82,12 @@ export default async function SuccessPage({
             >
               Or open the invite link
             </a>
+          )}
+
+          {!joinUrl && joinConfigError && (
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {joinConfigError}
+            </p>
           )}
 
           <Link
