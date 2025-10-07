@@ -128,17 +128,40 @@ export default async function AdminPage() {
                           Social Links
                         </h4>
                         <div className="flex flex-wrap gap-2">
-                          {JSON.parse(app.social_links).map((link: string, i: number) => (
-                            <a
-                              key={i}
-                              href={link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 underline"
-                            >
-                              {new URL(link).hostname}
-                            </a>
-                          ))}
+                          {(() => {
+                            try {
+                              const rawLinks = JSON.parse(app.social_links ?? '[]')
+                              if (!Array.isArray(rawLinks)) return null
+
+                              const urls = rawLinks
+                                .map((value: unknown) => {
+                                  if (typeof value !== 'string') return null
+                                  try {
+                                    const url = new URL(value)
+                                    return ['http:', 'https:'].includes(url.protocol) ? url : null
+                                  } catch {
+                                    return null
+                                  }
+                                })
+                                .filter((url): url is URL => url !== null)
+
+                              if (!urls.length) return null
+
+                              return urls.map((url, i) => (
+                                <a
+                                  key={i}
+                                  href={url.toString()}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 underline"
+                                >
+                                  {url.hostname || url.href}
+                                </a>
+                              ))
+                            } catch {
+                              return null
+                            }
+                          })()}
                         </div>
                       </div>
 

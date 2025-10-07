@@ -147,7 +147,9 @@ const GradualBlur = (props: GradualBlurProps) => {
 
   const blurDivs = useMemo(() => {
     const divs = [];
-    const increment = 100 / config.divCount;
+    // Cap divCount to prevent excessive DOM/backdrop-filter performance issues
+    const count = Math.max(1, Math.min(config.divCount ?? 1, 24));
+    const increment = 100 / count;
     const currentStrength =
       isHovered && config.hoverIntensity
         ? config.strength * config.hoverIntensity
@@ -155,15 +157,15 @@ const GradualBlur = (props: GradualBlurProps) => {
 
     const curveFunc = CURVE_FUNCTIONS[config.curve as keyof typeof CURVE_FUNCTIONS] || CURVE_FUNCTIONS.linear;
 
-    for (let i = 1; i <= config.divCount; i++) {
-      let progress = i / config.divCount;
+    for (let i = 1; i <= count; i++) {
+      let progress = i / count;
       progress = curveFunc(progress);
 
       let blurValue: number;
       if (config.exponential) {
         blurValue = Number(math.pow(2, progress * 4)) * 0.0625 * currentStrength;
       } else {
-        blurValue = 0.0625 * (progress * config.divCount + 1) * currentStrength;
+        blurValue = 0.0625 * (progress * count + 1) * currentStrength;
       }
       const p1 = Number(math.round((increment * i - increment) * 10)) / 10;
       const p2 = Number(math.round(increment * i * 10)) / 10;
@@ -239,6 +241,8 @@ const GradualBlur = (props: GradualBlurProps) => {
       ref={containerRef}
       className={`gradual-blur ${config.target === 'page' ? 'gradual-blur-page' : 'gradual-blur-parent'} ${config.className}`}
       style={containerStyle}
+      aria-hidden="true"
+      role="presentation"
       onMouseEnter={hoverIntensity ? () => setIsHovered(true) : undefined}
       onMouseLeave={hoverIntensity ? () => setIsHovered(false) : undefined}
     >

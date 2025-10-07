@@ -59,7 +59,10 @@ const Prism = ({
     const RSX = 1;
     const RSY = 1;
     const RSZ = 1;
-    const TS = Math.max(0, timeScale || 1);
+
+    // Respect reduced motion preference for accessibility
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const TS = prefersReducedMotion ? 0 : Math.max(0, timeScale || 1);
     const HOVSTR = Math.max(0, hoverStrength || 1);
     const INERT = Math.max(0, Math.min(1, inertia || 0.12));
 

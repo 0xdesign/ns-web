@@ -187,7 +187,7 @@ export async function sendWaitlistEmail({
     )
   }
 
-  const subject = 'Update on Your Creative Technologists Application'
+  const subject = '⏳ Your Creative Technologists Application is Waitlisted'
 
   const text = `Hi ${username},
 

@@ -15,15 +15,19 @@ export default async function SuccessPage({
 
   let joinUrl: string | null = null
   let joinConfigError: string | null = null
-  try {
-    const state = generateJoinState({ appId: appId || 'unknown' })
-    joinUrl = getJoinDiscordAuthUrl(state)
-  } catch (e) {
-    // join not configured; hide the button
-    joinUrl = null
-    joinConfigError = e instanceof Error ? e.message : 'Discord join OAuth not configured'
-    console.warn('⚠️  Discord join button unavailable:', joinConfigError)
-    console.warn('   → Set DISCORD_JOIN_REDIRECT_URI and DISCORD_BOT_TOKEN in .env')
+
+  // Only generate join URL if appId is provided
+  if (appId) {
+    try {
+      const state = generateJoinState({ appId })
+      joinUrl = getJoinDiscordAuthUrl(state)
+    } catch (e) {
+      // join not configured; hide the button
+      joinUrl = null
+      joinConfigError = e instanceof Error ? e.message : 'Discord join OAuth not configured'
+      console.warn('⚠️  Discord join button unavailable:', joinConfigError)
+      console.warn('   → Set DISCORD_JOIN_REDIRECT_URI and DISCORD_BOT_TOKEN in .env')
+    }
   }
 
   const inviteUrl = process.env.NEXT_PUBLIC_DISCORD_INVITE_URL || ''

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAllSubscriptions, getApplicationByDiscordId } from '@/lib/db'
-import { stripe } from '@/lib/stripe'
 import { assignRoleWithRetry, removeRole } from '@/lib/bot-api'
 
 export const dynamic = 'force-dynamic'
@@ -26,9 +25,8 @@ export async function GET(request: NextRequest) {
 
     for (const s of subs) {
       try {
-        // Retrieve customer to get discord_user_id
-        const customer = await stripe.customers.retrieve(s.customer.stripe_customer_id)
-        const discordUserId = (customer as any).metadata?.discord_user_id as string | undefined
+        // Use discord_user_id from local customer data (no Stripe round-trip)
+        const discordUserId = s.customer.discord_user_id
         if (!discordUserId) continue
 
         // Only act on approved applications
