@@ -115,6 +115,40 @@ Web App → Supabase (SQL) ← Discord Bot (member data)
 - `markWebhookProcessed()` inserts event ID (ignores duplicate key errors)
 - Prevents duplicate role assignments and database writes
 
+### Subscription Lifecycle Management
+
+**Stripe Webhook Events** (`./app/api/webhooks/stripe/route.ts`):
+- `checkout.session.completed` - Create customer/subscription, assign role
+- `invoice.payment_succeeded` - Reinforce role for active members
+- `customer.subscription.updated` - Handle status changes, grace periods
+- `customer.subscription.deleted` - Remove role when subscription ends
+
+**Role Assignment Logic**:
+- Active/past_due subscriptions: Keep role (grace period)
+- Canceled subscriptions: Keep role until `current_period_end`
+- Expired subscriptions: Remove role automatically
+
+### Discord Auto-Join Flow
+
+**1-Click OAuth** (`./app/api/discord/join/callback/route.ts`):
+1. Success page shows "Join Discord" button
+2. OAuth with `identify` + `guilds.join` scopes
+3. Bot API adds user to guild with member role
+4. Fallback to manual invite link if OAuth fails
+
+**Requirements**:
+- `DISCORD_BOT_TOKEN` - Bot token for guilds.join API
+- Bot permissions: "Manage Server", "Create Invite", "Manage Roles"
+- Bot role must be above member role in hierarchy
+
+### Cron Job Architecture
+
+**Daily Role Synchronization** (`/api/cron/sync-roles`):
+- Runs daily at 3 AM UTC (configured via `vercel.json`)
+- Syncs all subscriptions: assigns/removes roles based on status
+- Handles edge cases: manual Discord removals, expired subscriptions, data drift
+- Optional `CRON_SECRET` for authentication
+
 ### Data Layer Organization
 
 All database operations are centralized in `./lib/db.ts`:
@@ -130,11 +164,13 @@ const { data } = await supabase.from('applications').select()
 ```
 
 **Key Helpers**:
-- Application management: `getApplication()`, `createApplication()`, `updateApplicationStatus()`
-- Customer/subscription: `getCustomerByDiscordId()`, `upsertCustomer()`, `upsertSubscription()`
+- Application management: `getApplication()`, `createApplication()`, `updateApplicationStatus()`, `getApplicationsByStatus()`
+- Customer/subscription: `getCustomerByDiscordId()`, `getCustomerByStripeId()`, `upsertCustomer()`, `upsertSubscription()`, `getAllSubscriptions()`
 - Payment tokens: `createPaymentToken()`, `validatePaymentToken()`, `markTokenUsed()`
 - Webhook idempotency: `isWebhookProcessed()`, `markWebhookProcessed()`
 - Admin auth: `isAdmin()`
+
+**Note**: Application status now includes `'waitlisted'` in addition to `'pending' | 'approved' | 'rejected'`
 
 ## API Route Patterns
 
@@ -215,6 +251,8 @@ NEXT_PUBLIC_SUPABASE_URL=https://[project].supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=[anon-key]
 DISCORD_CLIENT_ID=[client-id]
 DISCORD_CLIENT_SECRET=[client-secret]
+DISCORD_JOIN_REDIRECT_URI=http://localhost:3000/api/discord/join/callback
+DISCORD_BOT_TOKEN=[bot-token]  # Required for guilds.join API
 STRIPE_SECRET_KEY=sk_test_[key]
 STRIPE_PRICE_ID=price_[id]
 BOT_API_URL=http://localhost:8000
@@ -226,6 +264,8 @@ BOT_API_KEY=[shared-with-bot]
 - `TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` - CAPTCHA
 - `RESEND_API_KEY` - Email notifications
 - `STRIPE_WEBHOOK_SECRET` - Webhook verification
+- `NEXT_PUBLIC_DISCORD_INVITE_URL` - Fallback Discord invite link
+- `CRON_SECRET` - Cron job authentication (production)
 
 **Validation**: Most services will fail loudly if keys are missing. Check terminal output on `npm run dev`.
 
@@ -271,6 +311,37 @@ stripe listen --forward-to localhost:3000/api/webhooks/stripe
 4. Check member directory: `http://localhost:3000/members`
 
 **Troubleshooting**: If members don't appear, check bot is writing to Supabase and RLS policies allow public read.
+
+### Testing Subscription & Discord Integration
+
+**Subscription Lifecycle (Local)**:
+```bash
+# Terminal 1: Start web app
+npm run dev
+
+# Terminal 2: Forward Stripe webhooks
+stripe listen --forward-to localhost:3000/api/webhooks/stripe
+
+# Test subscription events in Stripe Dashboard or with test cards
+```
+
+**Discord Auto-Join (Local)**:
+1. Set `DISCORD_BOT_TOKEN` and `DISCORD_JOIN_REDIRECT_URI` in `.env.local`
+2. Complete a test payment → Visit `/success` page
+3. Click "Join Discord (1-click)" button
+4. Verify user added to Discord server with role
+
+**Cron Job (Manual)**:
+```bash
+# Test role synchronization endpoint
+curl http://localhost:3000/api/cron/sync-roles
+
+# With CRON_SECRET (if configured)
+curl -H "Authorization: Bearer your_cron_secret" \
+  http://localhost:3000/api/cron/sync-roles
+```
+
+**Complete Testing**: See `NEXT_STEPS.md` for comprehensive edge case scenarios (subscription cancellation, expiration, payment failures, etc.)
 
 ## Key Implementation Details
 
@@ -392,6 +463,39 @@ See `./DEPLOYMENT.md` for complete deployment guide.
 
 User has already submitted an application. This is rate limiting working correctly. Check `applications` table for duplicate `discord_user_id`.
 
+### "Discord auto-join fails"
+
+**Check**:
+1. `DISCORD_BOT_TOKEN` is set correctly
+2. Bot has "Manage Server", "Create Invite", and "Manage Roles" permissions
+3. Bot role is **above** member role in server hierarchy
+4. OAuth redirect URI includes `/api/discord/join/callback`
+5. Verify subscription is active (check `subscriptions` table)
+
+**Fallback**: User can use manual invite link if configured via `NEXT_PUBLIC_DISCORD_INVITE_URL`
+
+### "Cron job not running"
+
+**Check**:
+1. `vercel.json` exists and includes cron configuration
+2. File is committed and deployed to Vercel
+3. Check Vercel dashboard → Functions → Cron Jobs
+4. Test manually: `curl https://yourdomain.com/api/cron/sync-roles`
+5. Check Vercel logs for cron execution history
+
+**Note**: Cron jobs don't run in local development. Use manual curl for local testing.
+
+### "Subscription webhook not processing"
+
+**Check**:
+1. `STRIPE_WEBHOOK_SECRET` matches Stripe dashboard webhook secret
+2. Webhook signature verification passes (check logs)
+3. Idempotency check isn't blocking legitimate events
+4. Customer has `discord_user_id` in metadata
+5. Test locally with `stripe listen --forward-to localhost:3000/api/webhooks/stripe`
+
+**See also**: `NEXT_STEPS.md` for complete edge case testing scenarios
+
 ## File Reference
 
 **Core Libraries**:
@@ -407,15 +511,20 @@ User has already submitted an application. This is rate limiting working correct
 - `./app/api/applications/route.ts` - Application submission
 - `./app/api/admin/applications/[id]/approve/route.ts` - Approve application
 - `./app/api/admin/applications/[id]/reject/route.ts` - Reject application
-- `./app/api/webhooks/stripe/route.ts` - Stripe webhook handler
+- `./app/api/admin/applications/[id]/waitlist/route.ts` - Waitlist application
+- `./app/api/webhooks/stripe/route.ts` - Stripe webhook handler (subscription lifecycle)
+- `./app/api/cron/sync-roles/route.ts` - Daily role synchronization
+- `./app/api/discord/join/callback/route.ts` - Discord auto-join OAuth callback
 
 **Pages**:
 - `./app/page.tsx` - Landing page
 - `./app/members/page.tsx` - Public member directory
 - `./app/apply/page.tsx` - Application start (Discord OAuth)
 - `./app/apply/form/page.tsx` - Application form
-- `./app/admin/page.tsx` - Admin dashboard
+- `./app/admin/page.tsx` - Admin dashboard (multiple views)
+- `./app/admin/login/page.tsx` - Admin login page
 - `./app/pay/[token]/page.tsx` - Payment page
+- `./app/success/page.tsx` - Post-payment success page (Discord join)
 
 ## Related Documentation
 
@@ -424,3 +533,11 @@ User has already submitted an application. This is rate limiting working correct
 - **Database Schema**: `../ns-bot/SUPABASE_SCHEMA.md`
 - **Web README**: `./README.md`
 - **Deployment Guide**: `./DEPLOYMENT.md`
+- **Production Deployment & Testing**: `./NEXT_STEPS.md`
+
+## Documentation Workflow
+
+When completing items in `NEXT_STEPS.md`:
+1. Mark the item complete (✅) in `NEXT_STEPS.md`
+2. Update relevant sections in `CLAUDE.md` (architecture, workflows, environment variables)
+3. Keep documentation in sync with implemented features
