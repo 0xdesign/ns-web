@@ -29,7 +29,7 @@ export interface Application {
   why_join: string
   what_building: string
   social_links: string // JSON array
-  status: 'pending' | 'approved' | 'rejected'
+  status: 'pending' | 'approved' | 'rejected' | 'waitlisted'
   reviewed_by: string | null
   reviewed_at: string | null
   created_at: string
@@ -187,7 +187,7 @@ export async function createApplication(data: {
  */
 export async function updateApplicationStatus(
   id: string,
-  status: 'approved' | 'rejected',
+  status: 'approved' | 'rejected' | 'waitlisted',
   reviewedBy: string
 ): Promise<Application> {
   const { data, error } = await supabase
@@ -204,6 +204,22 @@ export async function updateApplicationStatus(
 
   if (error) throw error
   return data
+}
+
+/**
+ * Get applications by status
+ */
+export async function getApplicationsByStatus(
+  status: Application['status']
+): Promise<Application[]> {
+  const { data, error } = await supabase
+    .from('applications')
+    .select('*')
+    .eq('status', status)
+    .order('created_at', { ascending: false })
+
+  if (error) throw error
+  return data || []
 }
 
 /**
@@ -230,6 +246,26 @@ export async function getCustomerByDiscordId(
     .from('customers')
     .select('*')
     .eq('discord_user_id', discordUserId)
+    .single()
+
+  if (error) {
+    if (error.code === 'PGRST116') return null
+    throw error
+  }
+
+  return data
+}
+
+/**
+ * Get customer by Stripe customer ID
+ */
+export async function getCustomerByStripeId(
+  stripeCustomerId: string
+): Promise<Customer | null> {
+  const { data, error } = await supabase
+    .from('customers')
+    .select('*')
+    .eq('stripe_customer_id', stripeCustomerId)
     .single()
 
   if (error) {

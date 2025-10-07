@@ -52,8 +52,9 @@ export async function GET(request: NextRequest) {
       path: '/',
     })
 
-    // Redirect to application form
-    return NextResponse.redirect(new URL('/apply/form', request.url))
+    // Redirect to intended destination (from state param) or default to application form
+    const redirectPath = state || '/apply/form'
+    return NextResponse.redirect(new URL(redirectPath, request.url))
   } catch (error) {
     console.error('Discord OAuth error:', error)
     return NextResponse.redirect(

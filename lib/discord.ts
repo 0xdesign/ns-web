@@ -43,7 +43,10 @@ export function getDiscordAuthUrl(state?: string): string {
 /**
  * Exchange OAuth code for access token
  */
-export async function exchangeCode(code: string): Promise<{
+export async function exchangeCode(
+  code: string,
+  redirectUriOverride?: string
+): Promise<{
   access_token: string
   token_type: string
   expires_in: number
@@ -52,7 +55,7 @@ export async function exchangeCode(code: string): Promise<{
 }> {
   const clientId = process.env.DISCORD_CLIENT_ID
   const clientSecret = process.env.DISCORD_CLIENT_SECRET
-  const redirectUri = process.env.DISCORD_REDIRECT_URI
+  const redirectUri = redirectUriOverride || process.env.DISCORD_REDIRECT_URI
 
   if (!clientId || !clientSecret || !redirectUri) {
     throw new Error('Discord OAuth not configured')
@@ -131,6 +134,109 @@ export async function getGuildMember(
   }
 
   return response.json()
+}
+
+/**
+ * Add a user to a guild using OAuth access token
+ * Requires: Bot in guild with necessary permissions. User authorized with scope 'guilds.join'.
+ */
+export async function addUserToGuild(params: {
+  guildId: string
+  userId: string
+  userAccessToken: string
+  roleId?: string
+}): Promise<boolean> {
+  const botToken = process.env.DISCORD_BOT_TOKEN
+  if (!botToken) throw new Error('Discord bot token not configured')
+
+  const body: any = { access_token: params.userAccessToken }
+  if (params.roleId) body.roles = [params.roleId]
+
+  const response = await fetch(
+    `${DISCORD_API_BASE}/guilds/${params.guildId}/members/${params.userId}`,
+    {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bot ${botToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    }
+  )
+
+  return response.ok
+}
+
+/**
+ * Build Discord OAuth URL for joining the guild (identify + guilds.join)
+ */
+export function getJoinDiscordAuthUrl(state: string): string {
+  const clientId = process.env.DISCORD_CLIENT_ID
+  const redirectUri = process.env.DISCORD_JOIN_REDIRECT_URI
+
+  if (!clientId || !redirectUri) {
+    throw new Error('Discord join OAuth not configured')
+  }
+
+  const params = new URLSearchParams({
+    client_id: clientId,
+    redirect_uri: redirectUri,
+    response_type: 'code',
+    scope: 'identify guilds.join',
+    state,
+  })
+
+  return `https://discord.com/oauth2/authorize?${params.toString()}`
+}
+
+/**
+ * Minimal HMAC-signed state helpers for join flow
+ */
+function b64u(input: string) {
+  return Buffer.from(input)
+    .toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '')
+}
+
+function b64uJson(obj: any) {
+  return b64u(JSON.stringify(obj))
+}
+
+import crypto from 'crypto'
+
+export function generateJoinState(payload: { appId: string; ts?: number }) {
+  const secret = process.env.NEXTAUTH_SECRET || process.env.DISCORD_CLIENT_SECRET
+  if (!secret) throw new Error('Missing secret for join state')
+  const data = { ...payload, ts: payload.ts || Date.now() }
+  const dataB64 = b64uJson(data)
+  const sig = crypto
+    .createHmac('sha256', secret)
+    .update(dataB64)
+    .digest('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '')
+  return `${dataB64}.${sig}`
+}
+
+export function verifyJoinState(state: string, maxAgeMs: number = 15 * 60 * 1000) {
+  const secret = process.env.NEXTAUTH_SECRET || process.env.DISCORD_CLIENT_SECRET
+  if (!secret) throw new Error('Missing secret for join state')
+  const [dataB64, sig] = state.split('.')
+  if (!dataB64 || !sig) return null
+  const expected = crypto
+    .createHmac('sha256', secret)
+    .update(dataB64)
+    .digest('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '')
+  if (expected !== sig) return null
+  const json = JSON.parse(Buffer.from(dataB64, 'base64').toString('utf8'))
+  if (!json.ts || Date.now() - json.ts > maxAgeMs) return null
+  return json as { appId: string; ts: number }
 }
 
 /**
