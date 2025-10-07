@@ -170,3 +170,63 @@ The Creative Technologists Team`
     html,
   })
 }
+
+/**
+ * Send waitlist email
+ */
+export async function sendWaitlistEmail({
+  to,
+  username,
+}: {
+  to: string
+  username: string
+}) {
+  if (!isResendConfigured()) {
+    throw new Error(
+      'Resend is not configured. Please set RESEND_API_KEY and FROM_EMAIL environment variables.'
+    )
+  }
+
+  const subject = '⏳ Your Creative Technologists Application is Waitlisted'
+
+  const text = `Hi ${username},
+
+Thank you for applying to Creative Technologists. We've reviewed your application and placed it on our waitlist.
+
+We review the waitlist regularly and will notify you if a spot opens up. In the meantime, keep building — reapplying with updates can help your chances.
+
+Best,
+The Creative Technologists Team`
+
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <div style=\"background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center; border-radius: 8px 8px 0 0;\">
+    <h1 style=\"color: white; margin: 0; font-size: 28px;\">Application Update</h1>
+  </div>
+
+  <div style=\"background: #ffffff; padding: 40px 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px;\">
+    <p style=\"font-size: 16px; margin-bottom: 20px;\">Hi ${username},</p>
+    <p style=\"font-size: 16px; margin-bottom: 20px;\">Thanks for applying to <strong>Creative Technologists</strong>. We've reviewed your application and placed it on our waitlist.</p>
+    <p style=\"font-size: 16px; margin-bottom: 20px;\">We review the waitlist regularly and will notify you if a spot opens up. In the meantime, keep building — reapplying with updates can help your chances.</p>
+    <p style=\"font-size: 16px; margin-top: 40px;\">Best regards,<br><strong>The Creative Technologists Team</strong></p>
+  </div>
+
+  <div style=\"text-align: center; margin-top: 20px; padding: 20px; color: #9ca3af; font-size: 14px;\">
+    <p>This is an automated message. Please do not reply to this email.</p>
+  </div>
+</body>
+</html>`
+
+  return resend.emails.send({
+    from: FROM_EMAIL,
+    to,
+    subject,
+    text,
+    html,
+  })
+}
