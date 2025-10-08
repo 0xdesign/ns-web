@@ -4,6 +4,7 @@ import { Navigation } from '@/components/Navigation'
 import { MemberSidebar } from '@/components/MemberSidebar'
 import Prism from '@/components/ui/prism'
 import GradualBlur from '@/components/ui/gradual-blur'
+import { LiquidButton } from '@/components/ui/liquid-glass-button'
 
 export default async function Home() {
   const membersData = await getMembers()
@@ -19,18 +20,22 @@ export default async function Home() {
           <Prism
             height={3.5}
             baseWidth={5.5}
-            animationType="3drotate"
+            animationType="scroll"
             glow={1.5}
             noise={0.1}
             transparent={true}
             scale={2.5}
+            mobileScale={1.8}
             colorFrequency={1.2}
-            timeScale={0.3}
             bloom={1.2}
+            scrollSensitivity={1.5}
           />
         </div>
         {/* Subtle noise texture */}
         <div className="absolute inset-0 opacity-[0.02] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxwYXRoIGQ9Ik0wIDBoMzAwdjMwMEgweiIgZmlsdGVyPSJ1cmwoI2EpIiBvcGFjaXR5PSIuMDUiLz48L3N2Zz4=')]" />
+        {/* Darkening overlays for better legibility (cheap composite) */}
+        <div className="absolute inset-0 pointer-events-none bg-black/20" />
+        <div className="absolute inset-0 pointer-events-none bg-black/10" />
       </div>
 
       {/* Navigation */}
@@ -55,20 +60,9 @@ export default async function Home() {
               <h1 className="heading-1-responsive text-white mb-6">
                 A home for next-gen creators
               </h1>
-              <Link
-                href="/apply"
-                className="
-                  inline-block
-                  backdrop-blur-[3px] bg-white/10 hover:bg-white/20
-                  border-[1.33px] border-white rounded-[48px]
-                  px-8 py-4
-                  text-sm font-medium text-white tracking-tight
-                  transition-all duration-200
-                  hover:scale-105
-                "
-              >
-                Apply to join
-              </Link>
+              <LiquidButton asChild size="xxl" className="text-white font-medium tracking-tight">
+                <Link href="/apply">Apply to join</Link>
+              </LiquidButton>
             </div>
           </section>
 
