@@ -29,7 +29,7 @@ export function BlurIn({
       },
       {
         threshold,
-        rootMargin: '0px 0px -10% 0px' // Trigger blur-out slightly before element leaves viewport
+        rootMargin: '-10% 0px -10% 0px' // Keep content in focus in the middle 80% of viewport, blur only in top/bottom 10%
       }
     )
 

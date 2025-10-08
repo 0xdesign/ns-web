@@ -86,31 +86,31 @@ export function HomeClient({ membersData }: HomeClientProps) {
               <div className="max-w-[600px]">
                 <div className="h-16 md:h-24" /> {/* Spacer */}
                 <div className="body-1 text-white space-y-5 md:space-y-6">
-                  <BlurIn delay={0} duration={1200} amount={10}>
+                  <BlurIn delay={0} duration={800} amount={10}>
                     <p>Before the Renaissance, craft lived in crowded workshops—the bottegas.</p>
                   </BlurIn>
 
-                  <BlurIn delay={100} duration={1200} amount={10}>
+                  <BlurIn delay={30} duration={800} amount={10}>
                     <p>Paintings were collaborative efforts. The master sketched compositions. Assistants and apprentices ground pigments and painted backgrounds.</p>
                   </BlurIn>
 
-                  <BlurIn delay={200} duration={1200} amount={10}>
+                  <BlurIn delay={60} duration={800} amount={10}>
                     <p>Then everything changed. Renaissance artists broke free from the workshop model and became complete creators—studying anatomy, writing poetry, designing machines.</p>
                   </BlurIn>
 
-                  <BlurIn delay={300} duration={1200} amount={10}>
+                  <BlurIn delay={90} duration={800} amount={10}>
                     <p>They claimed authorship. The center shifted from collective output to the singular creator.</p>
                   </BlurIn>
 
-                  <BlurIn delay={400} duration={1200} amount={10}>
+                  <BlurIn delay={120} duration={800} amount={10}>
                     <p>The same shift is happening now. Code is the marble. The prompt is the chisel. The tools are moving the center again from teams of specialists to single creators.</p>
                   </BlurIn>
 
-                  <BlurIn delay={500} duration={1200} amount={10}>
+                  <BlurIn delay={150} duration={800} amount={10}>
                     <p>One person can build a game, cut a film, build a business, create art, ship an app and publish a book.</p>
                   </BlurIn>
 
-                  <BlurIn delay={600} duration={1200} amount={10}>
+                  <BlurIn delay={180} duration={800} amount={10}>
                     <p>This is not a bottega. It&apos;s a commons for those discovering the ultimate ways of creating and expressing with AI.</p>
                   </BlurIn>
                 </div>
@@ -121,7 +121,7 @@ export function HomeClient({ membersData }: HomeClientProps) {
             <section className="min-h-screen flex flex-col justify-center px-4 sm:px-6 md:px-8 lg:px-12 py-20 md:py-32 lg:py-40">
               <div className="max-w-[600px]">
                 {/* Heading */}
-                <BlurIn delay={0} duration={1000} amount={15}>
+                <BlurIn delay={0} duration={800} amount={15}>
                   <div className="mb-12 md:mb-16">
                     <h2 className="heading-3 text-white">
                       Transform how<br />your business<br />moves money
@@ -132,7 +132,7 @@ export function HomeClient({ membersData }: HomeClientProps) {
                 {/* Feature list */}
                 <div className="space-y-0">
                   {/* Feature 1 */}
-                  <BlurIn delay={100} duration={1000} amount={8}>
+                  <BlurIn delay={30} duration={800} amount={8}>
                     <div className="border-b border-dashed border-white/30 py-3">
                     <div className="relative mb-3">
                       <span className="absolute -left-7 md:-left-8 top-1/2 -translate-y-1/2 text-xs tracking-tight text-white/70">
@@ -149,7 +149,7 @@ export function HomeClient({ membersData }: HomeClientProps) {
                   </BlurIn>
 
                   {/* Feature 2 */}
-                  <BlurIn delay={200} duration={1000} amount={8}>
+                  <BlurIn delay={60} duration={800} amount={8}>
                     <div className="border-b border-dashed border-white/30 py-3">
                     <div className="relative mb-3">
                       <span className="absolute -left-7 md:-left-8 top-1/2 -translate-y-1/2 text-xs tracking-tight text-white/70">
@@ -166,7 +166,7 @@ export function HomeClient({ membersData }: HomeClientProps) {
                   </BlurIn>
 
                   {/* Feature 3 */}
-                  <BlurIn delay={300} duration={1000} amount={8}>
+                  <BlurIn delay={90} duration={800} amount={8}>
                     <div className="border-b border-dashed border-white/30 py-3">
                     <div className="relative mb-3">
                       <span className="absolute -left-7 md:-left-8 top-1/2 -translate-y-1/2 text-xs tracking-tight text-white/70">
@@ -183,7 +183,7 @@ export function HomeClient({ membersData }: HomeClientProps) {
                   </BlurIn>
 
                   {/* Feature 4 */}
-                  <BlurIn delay={400} duration={1000} amount={8}>
+                  <BlurIn delay={120} duration={800} amount={8}>
                     <div className="border-b border-dashed border-white/30 py-3">
                     <div className="relative mb-3">
                       <span className="absolute -left-7 md:-left-8 top-1/2 -translate-y-1/2 text-xs tracking-tight text-white/70">
@@ -206,7 +206,7 @@ export function HomeClient({ membersData }: HomeClientProps) {
             <section className="min-h-screen flex flex-col justify-center px-4 sm:px-6 md:px-8 lg:px-12 py-20 md:py-32 lg:py-40">
               <div className="max-w-[600px]">
                 {/* Heading */}
-                <BlurIn delay={0} duration={1000} amount={15}>
+                <BlurIn delay={0} duration={800} amount={15}>
                   <div className="mb-12 md:mb-16">
                     <h2 className="heading-3 text-white">
                       Frequently<br />asked questions
@@ -217,7 +217,7 @@ export function HomeClient({ membersData }: HomeClientProps) {
                 {/* FAQ list */}
                 <div className="space-y-0">
                   {/* Q1 */}
-                  <BlurIn delay={100} duration={1000} amount={8}>
+                  <BlurIn delay={30} duration={800} amount={8}>
                     <div className="border-b border-dashed border-white/30 py-3">
                       <div className="relative mb-3">
                         <span className="absolute -left-7 md:-left-8 top-1/2 -translate-y-1/2 text-xs tracking-tight text-white/70">
@@ -234,7 +234,7 @@ export function HomeClient({ membersData }: HomeClientProps) {
                   </BlurIn>
 
                   {/* Q2 */}
-                  <BlurIn delay={200} duration={1000} amount={8}>
+                  <BlurIn delay={60} duration={800} amount={8}>
                     <div className="border-b border-dashed border-white/30 py-3">
                       <div className="relative mb-3">
                         <span className="absolute -left-7 md:-left-8 top-1/2 -translate-y-1/2 text-xs tracking-tight text-white/70">
@@ -251,7 +251,7 @@ export function HomeClient({ membersData }: HomeClientProps) {
                   </BlurIn>
 
                   {/* Q3 */}
-                  <BlurIn delay={300} duration={1000} amount={8}>
+                  <BlurIn delay={90} duration={800} amount={8}>
                     <div className="border-b border-dashed border-white/30 py-3">
                       <div className="relative mb-3">
                         <span className="absolute -left-7 md:-left-8 top-1/2 -translate-y-1/2 text-xs tracking-tight text-white/70">
@@ -268,7 +268,7 @@ export function HomeClient({ membersData }: HomeClientProps) {
                   </BlurIn>
 
                   {/* Q4 */}
-                  <BlurIn delay={400} duration={1000} amount={8}>
+                  <BlurIn delay={120} duration={800} amount={8}>
                     <div className="border-b border-dashed border-white/30 py-3">
                       <div className="relative mb-3">
                         <span className="absolute -left-7 md:-left-8 top-1/2 -translate-y-1/2 text-xs tracking-tight text-white/70">
@@ -290,7 +290,7 @@ export function HomeClient({ membersData }: HomeClientProps) {
             {/* Bottom CTA */}
             <section className="px-4 sm:px-6 md:px-8 lg:px-12 py-20 md:py-32 lg:py-40">
               <div className="max-w-[600px]">
-                <BlurIn delay={0} duration={1200} amount={12}>
+                <BlurIn delay={0} duration={800} amount={12}>
                   <Link
                     href="/apply"
                     className="
