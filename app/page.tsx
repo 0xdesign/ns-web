@@ -3,12 +3,15 @@ import { getMembers } from '@/lib/supabase'
 import { Navigation } from '@/components/Navigation'
 import { MemberSidebar } from '@/components/MemberSidebar'
 import Prism from '@/components/ui/prism'
+import GradualBlur from '@/components/ui/gradual-blur'
 
 export default async function Home() {
   const membersData = await getMembers()
 
   return (
     <div className="relative min-h-screen bg-neutral-950 text-white overflow-x-hidden">
+      {/* Bottom-of-page blur (default settings) */}
+      <GradualBlur target="page" position="bottom" zIndex={-70} />
       {/* Fixed background with prism */}
       <div className="fixed inset-0 z-0">
         {/* Prism background */}
@@ -49,7 +52,7 @@ export default async function Home() {
           {/* Hero Section */}
           <section className="min-h-screen flex flex-col justify-center px-4 sm:px-6 md:px-8 lg:px-12 py-20 md:py-32 lg:py-40">
             <div className="max-w-[600px]">
-              <h1 className="text-[42px] leading-tight font-normal tracking-[-2.94px] text-white mb-6">
+              <h1 className="heading-1-responsive text-white mb-6">
                 A home for next-gen creators
               </h1>
               <Link
@@ -73,7 +76,7 @@ export default async function Home() {
           <section className="min-h-screen flex flex-col justify-center px-4 sm:px-6 md:px-8 lg:px-12 py-20 md:py-32 lg:py-40">
             <div className="max-w-[600px]">
               <div className="h-16 md:h-24" /> {/* Spacer */}
-              <div className="text-base leading-relaxed tracking-tight text-white space-y-5 md:text-lg md:leading-relaxed md:space-y-6">
+              <div className="body-1 text-white space-y-5 md:space-y-6">
                 <p>Before the Renaissance, craft lived in crowded workshops—the bottegas.</p>
 
                 <p>Paintings were collaborative efforts. The master sketched compositions. Assistants and apprentices ground pigments and painted backgrounds.</p>
@@ -96,7 +99,7 @@ export default async function Home() {
             <div className="max-w-[600px]">
               {/* Heading */}
               <div className="mb-12 md:mb-16">
-                <h2 className="text-4xl leading-tight font-normal tracking-[-2.8px] text-white">
+                <h2 className="heading-3 text-white">
                   Transform how<br />your business<br />moves money
                 </h2>
               </div>
@@ -171,7 +174,7 @@ export default async function Home() {
             <div className="max-w-[600px]">
               {/* Heading */}
               <div className="mb-12 md:mb-16">
-                <h2 className="text-4xl leading-tight font-normal tracking-[-2.8px] text-white">
+                <h2 className="heading-3 text-white">
                   Frequently<br />asked questions
                 </h2>
               </div>
@@ -251,7 +254,7 @@ export default async function Home() {
                   border border-dashed border-white rounded-[20px]
                   py-16 md:py-20 lg:py-24
                   text-center
-                  text-4xl leading-tight font-normal tracking-[-2.8px] text-white
+                  heading-3 text-white
                   hover:bg-white/5
                   transition-colors duration-200
                 "
