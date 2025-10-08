@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { MemberStatus, getAvatarUrl } from '@/lib/supabase'
+import { ProgressiveBlur } from '@/components/ui/progressive-blur'
 
 interface MemberSidebarProps {
   members: MemberStatus[]
@@ -48,79 +49,100 @@ export function MemberSidebar({ members, totalCount }: MemberSidebarProps) {
         />
       )}
 
-      {/* Sidebar / Drawer */}
+      {/* Floating sidebar pane */}
       <aside
         data-member-sidebar
         className={`
-          fixed top-0 right-0 h-full w-[280px]
-          bg-neutral-950 border-l border-white/30
-          z-50 overflow-hidden
+          fixed top-6 right-6 bottom-6 h-[calc(100vh-3rem)] w-[300px]
+          z-50 overflow-hidden rounded-[28px]
           transition-transform duration-300 ease-out
-          ${isOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'}
+          ${isOpen ? 'translate-x-0 opacity-100' : 'translate-x-[calc(100%+2rem)] opacity-0 md:translate-x-0 md:opacity-100'}
         `}
+        style={{
+          boxShadow: '0 30px 80px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.25)'
+        }}
       >
-        {/* Glassmorphism overlay */}
-        <div className="absolute inset-0 backdrop-blur-sm bg-neutral-950/80" />
+        {/* Glass layers */}
+        <div
+          className="absolute inset-0 rounded-[28px] border border-white/20 pointer-events-none"
+          style={{
+            background: 'linear-gradient(160deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.04) 45%, rgba(30,30,40,0.18) 80%)',
+            backdropFilter: 'blur(28px) saturate(140%)'
+          }}
+        />
+        <div className="absolute inset-0 rounded-[28px] pointer-events-none overflow-hidden">
+          <div className="absolute inset-0" style={{ backgroundImage: 'url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9Im5vbmUiLz48Y2lyY2xlIGN4PSIwLjUiIGN5PSIwLjUiIHI9IjAuMSIgZmlsbD0iI2ZmZiIgZmlsbC1vcGFjaXR5PSIwLjAzIi8+PC9zdmc+")', opacity: 0.22 }} />
+        </div>
 
         {/* Content */}
-        <div className="relative h-full flex flex-col">
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-6 border-b border-white/10">
-            <div className="text-white">
-              <h3 className="text-sm font-medium text-white/70">Active members</h3>
-              <p className="text-2xl font-bold">{totalCount}</p>
-            </div>
-            {/* Close button (mobile only) */}
-            <button
-              onClick={() => setIsOpen(false)}
-              className="md:hidden p-2 rounded-lg hover:bg-white/10 transition-colors text-white/70 hover:text-white"
-              aria-label="Close members sidebar"
-            >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-
-          {/* Members list (scrollable) */}
-          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-            {members.slice(0, 50).map((member) => (
-              <div
-                key={member.user_id}
-                className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors group"
-              >
-                {/* Avatar */}
-                <div className="relative flex-shrink-0">
-                  <div className="w-10 h-10 rounded-full border border-white overflow-hidden bg-neutral-800">
-                    <img
-                      src={getAvatarUrl(member.user_id, member.avatar_url)}
-                      alt={member.display_name || member.username}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  {/* Active indicator */}
-                  {member.activity_status === 'ACTIVE' && (
-                    <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 ring-2 ring-neutral-950" />
-                  )}
-                </div>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white truncate">
-                    {member.display_name || member.username}
-                  </p>
-                  <p className="text-xs text-white/50 truncate">
-                    @{member.username}
-                  </p>
-                </div>
+        <div className="relative z-10 h-full px-2 overflow-hidden">
+          <div
+            className="h-full overflow-y-auto pr-2 member-list-scroll"
+            style={{
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+            }}
+          >
+            <div className="flex items-start justify-between gap-3 px-3.5 pt-6 pb-3">
+              <div className="text-white/90">
+                <p className="text-sm font-medium tracking-tight text-white/90">
+                  Members — {totalCount}
+                </p>
               </div>
-            ))}
+              <button
+                onClick={() => setIsOpen(false)}
+                className="md:hidden flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-white/80 transition hover:bg-white/25 hover:text-white"
+                style={{ boxShadow: '0 8px 18px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.4)' }}
+                aria-label="Close members sidebar"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="mt-2 space-y-2.5 pb-12">
+              {members.slice(0, 50).map((member) => (
+                <div
+                  key={member.user_id}
+                  className="group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 transition-colors hover:bg-white/10"
+                >
+                  <div className="relative flex-shrink-0">
+                    <div className="h-11 w-11 overflow-hidden rounded-full border border-white/30 bg-white/10">
+                      <img
+                        src={getAvatarUrl(member.user_id, member.avatar_url)}
+                        alt={member.display_name || member.username}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                    {member.activity_status === 'ACTIVE' && (
+                      <div className="absolute -bottom-1 -right-0.5 h-4 w-4 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.45)] ring-2 ring-black/70" />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-white/90">{member.display_name || member.username}</p>
+                    <p className="truncate text-xs text-white/55">@{member.username}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
+
+          {/* Bottom blur - absolutely positioned, contained within sidebar */}
+          <ProgressiveBlur
+            position="bottom"
+            backgroundColor="rgba(4,5,10,0.9)"
+            height="160px"
+            blurAmount="28px"
+            zIndex={5}
+            fixed={false}
+            className="rounded-b-[28px]"
+          />
         </div>
       </aside>
 
-      {/* Affordance peek (mobile only) */}
-      <div className="md:hidden fixed top-0 right-0 h-full w-2 bg-gradient-to-l from-white/10 to-transparent pointer-events-none z-30" />
+      {/* Affordance indicator (mobile) */}
+      <div className="md:hidden fixed top-10 right-3 h-16 w-1 rounded-full bg-gradient-to-b from-white/40 via-white/20 to-transparent pointer-events-none z-30" />
 
       {/* Hidden toggle function (exposed for nav button) */}
       <button
