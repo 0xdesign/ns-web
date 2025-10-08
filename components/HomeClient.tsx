@@ -6,8 +6,8 @@ import { LoadingOverlay } from '@/components/ui/loading-overlay'
 import { Navigation } from '@/components/Navigation'
 import { MemberSidebar } from '@/components/MemberSidebar'
 import Prism from '@/components/ui/prism'
-import { ProgressiveBlur } from '@/components/ui/progressive-blur'
 import { LiquidButton } from '@/components/ui/liquid-glass-button'
+import { BlurIn } from '@/components/ui/blur-in'
 import type { MembersResponse } from '@/lib/supabase'
 
 interface HomeClientProps {
@@ -28,8 +28,6 @@ export function HomeClient({ membersData }: HomeClientProps) {
           transition: "opacity 0.6s ease-out",
         }}
       >
-        {/* Bottom-of-page blur */}
-        <ProgressiveBlur position="bottom" backgroundColor="#09090b" height="200px" blurAmount="8px" zIndex={50} fixed />
         {/* Fixed background with prism */}
         <div className="fixed inset-0 z-0">
           {/* Prism background */}
@@ -88,19 +86,33 @@ export function HomeClient({ membersData }: HomeClientProps) {
               <div className="max-w-[600px]">
                 <div className="h-16 md:h-24" /> {/* Spacer */}
                 <div className="body-1 text-white space-y-5 md:space-y-6">
-                  <p>Before the Renaissance, craft lived in crowded workshops—the bottegas.</p>
+                  <BlurIn delay={0} duration={1200} amount={10}>
+                    <p>Before the Renaissance, craft lived in crowded workshops—the bottegas.</p>
+                  </BlurIn>
 
-                  <p>Paintings were collaborative efforts. The master sketched compositions. Assistants and apprentices ground pigments and painted backgrounds.</p>
+                  <BlurIn delay={100} duration={1200} amount={10}>
+                    <p>Paintings were collaborative efforts. The master sketched compositions. Assistants and apprentices ground pigments and painted backgrounds.</p>
+                  </BlurIn>
 
-                  <p>Then everything changed. Renaissance artists broke free from the workshop model and became complete creators—studying anatomy, writing poetry, designing machines.</p>
+                  <BlurIn delay={200} duration={1200} amount={10}>
+                    <p>Then everything changed. Renaissance artists broke free from the workshop model and became complete creators—studying anatomy, writing poetry, designing machines.</p>
+                  </BlurIn>
 
-                  <p>They claimed authorship. The center shifted from collective output to the singular creator.</p>
+                  <BlurIn delay={300} duration={1200} amount={10}>
+                    <p>They claimed authorship. The center shifted from collective output to the singular creator.</p>
+                  </BlurIn>
 
-                  <p>The same shift is happening now. Code is the marble. The prompt is the chisel. The tools are moving the center again from teams of specialists to single creators.</p>
+                  <BlurIn delay={400} duration={1200} amount={10}>
+                    <p>The same shift is happening now. Code is the marble. The prompt is the chisel. The tools are moving the center again from teams of specialists to single creators.</p>
+                  </BlurIn>
 
-                  <p>One person can build a game, cut a film, build a business, create art, ship an app and publish a book.</p>
+                  <BlurIn delay={500} duration={1200} amount={10}>
+                    <p>One person can build a game, cut a film, build a business, create art, ship an app and publish a book.</p>
+                  </BlurIn>
 
-                  <p>This is not a bottega. It&apos;s a commons for those discovering the ultimate ways of creating and expressing with AI.</p>
+                  <BlurIn delay={600} duration={1200} amount={10}>
+                    <p>This is not a bottega. It&apos;s a commons for those discovering the ultimate ways of creating and expressing with AI.</p>
+                  </BlurIn>
                 </div>
               </div>
             </section>
@@ -109,16 +121,19 @@ export function HomeClient({ membersData }: HomeClientProps) {
             <section className="min-h-screen flex flex-col justify-center px-4 sm:px-6 md:px-8 lg:px-12 py-20 md:py-32 lg:py-40">
               <div className="max-w-[600px]">
                 {/* Heading */}
-                <div className="mb-12 md:mb-16">
-                  <h2 className="heading-3 text-white">
-                    Transform how<br />your business<br />moves money
-                  </h2>
-                </div>
+                <BlurIn delay={0} duration={1000} amount={15}>
+                  <div className="mb-12 md:mb-16">
+                    <h2 className="heading-3 text-white">
+                      Transform how<br />your business<br />moves money
+                    </h2>
+                  </div>
+                </BlurIn>
 
                 {/* Feature list */}
                 <div className="space-y-0">
                   {/* Feature 1 */}
-                  <div className="border-b border-dashed border-white/30 py-3">
+                  <BlurIn delay={100} duration={1000} amount={8}>
+                    <div className="border-b border-dashed border-white/30 py-3">
                     <div className="relative mb-3">
                       <span className="absolute -left-7 md:-left-8 top-1/2 -translate-y-1/2 text-xs tracking-tight text-white/70">
                         01 ::
@@ -130,10 +145,12 @@ export function HomeClient({ membersData }: HomeClientProps) {
                     <p className="text-sm leading-normal tracking-tight text-white md:text-base md:leading-relaxed">
                       Your starting point for finding and sharing new tools, new workflows and new ways of thinking.
                     </p>
-                  </div>
+                    </div>
+                  </BlurIn>
 
                   {/* Feature 2 */}
-                  <div className="border-b border-dashed border-white/30 py-3">
+                  <BlurIn delay={200} duration={1000} amount={8}>
+                    <div className="border-b border-dashed border-white/30 py-3">
                     <div className="relative mb-3">
                       <span className="absolute -left-7 md:-left-8 top-1/2 -translate-y-1/2 text-xs tracking-tight text-white/70">
                         02 ::
@@ -145,10 +162,12 @@ export function HomeClient({ membersData }: HomeClientProps) {
                     <p className="text-sm leading-normal tracking-tight text-white md:text-base md:leading-relaxed">
                       Everyone wants to build, create and express at the bleeding edge.
                     </p>
-                  </div>
+                    </div>
+                  </BlurIn>
 
                   {/* Feature 3 */}
-                  <div className="border-b border-dashed border-white/30 py-3">
+                  <BlurIn delay={300} duration={1000} amount={8}>
+                    <div className="border-b border-dashed border-white/30 py-3">
                     <div className="relative mb-3">
                       <span className="absolute -left-7 md:-left-8 top-1/2 -translate-y-1/2 text-xs tracking-tight text-white/70">
                         03 ::
@@ -160,10 +179,12 @@ export function HomeClient({ membersData }: HomeClientProps) {
                     <p className="text-sm leading-normal tracking-tight text-white md:text-base md:leading-relaxed">
                       A safe place to show work‑in‑progress without performative Twitter energy. The messy stuff is the good stuff.
                     </p>
-                  </div>
+                    </div>
+                  </BlurIn>
 
                   {/* Feature 4 */}
-                  <div className="border-b border-dashed border-white/30 py-3">
+                  <BlurIn delay={400} duration={1000} amount={8}>
+                    <div className="border-b border-dashed border-white/30 py-3">
                     <div className="relative mb-3">
                       <span className="absolute -left-7 md:-left-8 top-1/2 -translate-y-1/2 text-xs tracking-tight text-white/70">
                         04 ::
@@ -175,7 +196,8 @@ export function HomeClient({ membersData }: HomeClientProps) {
                     <p className="text-sm leading-normal tracking-tight text-white md:text-base md:leading-relaxed">
                       The space moves fast. Skills accrue because the only way to learn is by doing.
                     </p>
-                  </div>
+                    </div>
+                  </BlurIn>
                 </div>
               </div>
             </section>
@@ -184,73 +206,83 @@ export function HomeClient({ membersData }: HomeClientProps) {
             <section className="min-h-screen flex flex-col justify-center px-4 sm:px-6 md:px-8 lg:px-12 py-20 md:py-32 lg:py-40">
               <div className="max-w-[600px]">
                 {/* Heading */}
-                <div className="mb-12 md:mb-16">
-                  <h2 className="heading-3 text-white">
-                    Frequently<br />asked questions
-                  </h2>
-                </div>
+                <BlurIn delay={0} duration={1000} amount={15}>
+                  <div className="mb-12 md:mb-16">
+                    <h2 className="heading-3 text-white">
+                      Frequently<br />asked questions
+                    </h2>
+                  </div>
+                </BlurIn>
 
                 {/* FAQ list */}
                 <div className="space-y-0">
                   {/* Q1 */}
-                  <div className="border-b border-dashed border-white/30 py-3">
-                    <div className="relative mb-3">
-                      <span className="absolute -left-7 md:-left-8 top-1/2 -translate-y-1/2 text-xs tracking-tight text-white/70">
-                        01 ::
-                      </span>
-                      <h3 className="text-sm font-bold leading-tight tracking-tight text-white md:text-base">
-                        How is Tempo different from other<br />blockchains?
-                      </h3>
+                  <BlurIn delay={100} duration={1000} amount={8}>
+                    <div className="border-b border-dashed border-white/30 py-3">
+                      <div className="relative mb-3">
+                        <span className="absolute -left-7 md:-left-8 top-1/2 -translate-y-1/2 text-xs tracking-tight text-white/70">
+                          01 ::
+                        </span>
+                        <h3 className="text-sm font-bold leading-tight tracking-tight text-white md:text-base">
+                          How is Tempo different from other<br />blockchains?
+                        </h3>
+                      </div>
+                      <p className="text-sm leading-normal tracking-tight text-white md:text-base md:leading-relaxed">
+                        Tempo is an EVM-compatible L1 blockchain, purpose-built for payments. It doesn&apos;t displace other general-purpose blockchains; rather, it incorporates design choices that meet the needs of high-volume payment use cases. These include predictable low fees in a dedicated payments lane, stablecoin neutrality, a built-in stablecoin exchange, high throughput, low latency, private transactions, payment memos compatible with standards like ISO 20022, compliance hooks, and more.
+                      </p>
                     </div>
-                    <p className="text-sm leading-normal tracking-tight text-white md:text-base md:leading-relaxed">
-                      Tempo is an EVM-compatible L1 blockchain, purpose-built for payments. It doesn&apos;t displace other general-purpose blockchains; rather, it incorporates design choices that meet the needs of high-volume payment use cases. These include predictable low fees in a dedicated payments lane, stablecoin neutrality, a built-in stablecoin exchange, high throughput, low latency, private transactions, payment memos compatible with standards like ISO 20022, compliance hooks, and more.
-                    </p>
-                  </div>
+                  </BlurIn>
 
                   {/* Q2 */}
-                  <div className="border-b border-dashed border-white/30 py-3">
-                    <div className="relative mb-3">
-                      <span className="absolute -left-7 md:-left-8 top-1/2 -translate-y-1/2 text-xs tracking-tight text-white/70">
-                        02 ::
-                      </span>
-                      <h3 className="text-sm font-bold leading-tight tracking-tight text-white md:text-base">
-                        Who can build on Tempo?
-                      </h3>
+                  <BlurIn delay={200} duration={1000} amount={8}>
+                    <div className="border-b border-dashed border-white/30 py-3">
+                      <div className="relative mb-3">
+                        <span className="absolute -left-7 md:-left-8 top-1/2 -translate-y-1/2 text-xs tracking-tight text-white/70">
+                          02 ::
+                        </span>
+                        <h3 className="text-sm font-bold leading-tight tracking-tight text-white md:text-base">
+                          Who can build on Tempo?
+                        </h3>
+                      </div>
+                      <p className="text-sm leading-normal tracking-tight text-white md:text-base md:leading-relaxed">
+                        Tempo is a neutral, permissionless blockchain open for anyone to build on. We&apos;re currently collaborating with global partners to test various use cases, including cross-border payouts, B2B payments, remittances, and ecommerce. Interested in working with Tempo? Request access to our private testnet <a href="#" className="underline">here</a>.
+                      </p>
                     </div>
-                    <p className="text-sm leading-normal tracking-tight text-white md:text-base md:leading-relaxed">
-                      Tempo is a neutral, permissionless blockchain open for anyone to build on. We&apos;re currently collaborating with global partners to test various use cases, including cross-border payouts, B2B payments, remittances, and ecommerce. Interested in working with Tempo? Request access to our private testnet <a href="#" className="underline">here</a>.
-                    </p>
-                  </div>
+                  </BlurIn>
 
                   {/* Q3 */}
-                  <div className="border-b border-dashed border-white/30 py-3">
-                    <div className="relative mb-3">
-                      <span className="absolute -left-7 md:-left-8 top-1/2 -translate-y-1/2 text-xs tracking-tight text-white/70">
-                        03 ::
-                      </span>
-                      <h3 className="text-sm font-bold leading-tight tracking-tight text-white md:text-base">
-                        When will Tempo launch?
-                      </h3>
+                  <BlurIn delay={300} duration={1000} amount={8}>
+                    <div className="border-b border-dashed border-white/30 py-3">
+                      <div className="relative mb-3">
+                        <span className="absolute -left-7 md:-left-8 top-1/2 -translate-y-1/2 text-xs tracking-tight text-white/70">
+                          03 ::
+                        </span>
+                        <h3 className="text-sm font-bold leading-tight tracking-tight text-white md:text-base">
+                          When will Tempo launch?
+                        </h3>
+                      </div>
+                      <p className="text-sm leading-normal tracking-tight text-white md:text-base md:leading-relaxed">
+                        We&apos;re providing select partners with priority access to our testnet now. Contact us <a href="#" className="underline">here</a> if you&apos;re interested.
+                      </p>
                     </div>
-                    <p className="text-sm leading-normal tracking-tight text-white md:text-base md:leading-relaxed">
-                      We&apos;re providing select partners with priority access to our testnet now. Contact us <a href="#" className="underline">here</a> if you&apos;re interested.
-                    </p>
-                  </div>
+                  </BlurIn>
 
                   {/* Q4 */}
-                  <div className="border-b border-dashed border-white/30 py-3">
-                    <div className="relative mb-3">
-                      <span className="absolute -left-7 md:-left-8 top-1/2 -translate-y-1/2 text-xs tracking-tight text-white/70">
-                        04 ::
-                      </span>
-                      <h3 className="text-sm font-bold leading-tight tracking-tight text-white md:text-base">
-                        Who will run validator nodes?
-                      </h3>
+                  <BlurIn delay={400} duration={1000} amount={8}>
+                    <div className="border-b border-dashed border-white/30 py-3">
+                      <div className="relative mb-3">
+                        <span className="absolute -left-7 md:-left-8 top-1/2 -translate-y-1/2 text-xs tracking-tight text-white/70">
+                          04 ::
+                        </span>
+                        <h3 className="text-sm font-bold leading-tight tracking-tight text-white md:text-base">
+                          Who will run validator nodes?
+                        </h3>
+                      </div>
+                      <p className="text-sm leading-normal tracking-tight text-white md:text-base md:leading-relaxed">
+                        A diverse group of independent entities, including some of Tempo&apos;s design partners, will run validator nodes initially before we transition to a permissionless model.
+                      </p>
                     </div>
-                    <p className="text-sm leading-normal tracking-tight text-white md:text-base md:leading-relaxed">
-                      A diverse group of independent entities, including some of Tempo&apos;s design partners, will run validator nodes initially before we transition to a permissionless model.
-                    </p>
-                  </div>
+                  </BlurIn>
                 </div>
               </div>
             </section>
@@ -258,20 +290,22 @@ export function HomeClient({ membersData }: HomeClientProps) {
             {/* Bottom CTA */}
             <section className="px-4 sm:px-6 md:px-8 lg:px-12 py-20 md:py-32 lg:py-40">
               <div className="max-w-[600px]">
-                <Link
-                  href="/apply"
-                  className="
-                    block
-                    border border-dashed border-white rounded-[20px]
-                    py-16 md:py-20 lg:py-24
-                    text-center
-                    heading-3 text-white
-                    hover:bg-white/5
-                    transition-colors duration-200
-                  "
-                >
-                  Apply to join
-                </Link>
+                <BlurIn delay={0} duration={1200} amount={12}>
+                  <Link
+                    href="/apply"
+                    className="
+                      block
+                      border border-dashed border-white rounded-[20px]
+                      py-16 md:py-20 lg:py-24
+                      text-center
+                      heading-3 text-white
+                      hover:bg-white/5
+                      transition-colors duration-200
+                    "
+                  >
+                    Apply to join
+                  </Link>
+                </BlurIn>
               </div>
             </section>
           </div>
