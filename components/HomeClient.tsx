@@ -6,26 +6,12 @@ import { LoadingOverlay } from '@/components/ui/loading-overlay'
 import { Navigation } from '@/components/Navigation'
 import { MemberSidebar } from '@/components/MemberSidebar'
 import Prism from '@/components/ui/prism'
-import GradualBlur from '@/components/ui/gradual-blur'
+import { ProgressiveBlur } from '@/components/ui/progressive-blur'
 import { LiquidButton } from '@/components/ui/liquid-glass-button'
-
-interface MemberData {
-  total: number
-  members: Array<{
-    discord_user_id: string
-    discord_username: string
-    display_name: string | null
-    avatar_url: string | null
-    activity_status: string
-    status_summary: string | null
-    messages_7d: number
-    messages_30d: number
-    last_active: string | null
-  }>
-}
+import type { MembersResponse } from '@/lib/supabase'
 
 interface HomeClientProps {
-  membersData: MemberData
+  membersData: MembersResponse
 }
 
 export function HomeClient({ membersData }: HomeClientProps) {
@@ -42,8 +28,8 @@ export function HomeClient({ membersData }: HomeClientProps) {
           transition: "opacity 0.6s ease-out",
         }}
       >
-        {/* Bottom-of-page blur (default settings) */}
-        <GradualBlur target="page" position="bottom" zIndex={-70} />
+        {/* Bottom-of-page blur */}
+        <ProgressiveBlur position="bottom" backgroundColor="#09090b" height="200px" blurAmount="8px" zIndex={50} fixed />
         {/* Fixed background with prism */}
         <div className="fixed inset-0 z-0">
           {/* Prism background */}

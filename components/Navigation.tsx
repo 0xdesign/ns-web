@@ -1,7 +1,7 @@
 'use client'
 
 import { MemberStatus, getAvatarUrl } from '@/lib/supabase'
-import GradualBlur from '@/components/ui/gradual-blur'
+import { ProgressiveBlur } from '@/components/ui/progressive-blur'
 
 interface NavigationProps {
   memberCount: number
@@ -16,20 +16,14 @@ export function Navigation({ memberCount, topMembers }: NavigationProps) {
 
   return (
     <>
-      {/* Use GradualBlur as the nav bar (page-level fixed overlay) */}
-      <GradualBlur
-        target="page"
+      {/* Progressive blur at top for nav bar */}
+      <ProgressiveBlur
         position="top"
-        height="160px"
-        divCount={14}
-        strength={2.6}
-        curve="bezier"
-        exponential
-        zIndex={-70} // effective z-index: 30 (config + 100); above main (z-10), below nav (z-40)
-        style={{
-          background:
-            'linear-gradient(to bottom, rgba(12,12,12,0.06) 0%, rgba(12,12,12,0.035) 55%, rgba(12,12,12,0.01) 92%, rgba(12,12,12,0) 100%)'
-        }}
+        backgroundColor="#09090b"
+        height="100px"
+        blurAmount="4px"
+        zIndex={30}
+        fixed
       />
 
       {/* Nav content above blur; no background fill */}

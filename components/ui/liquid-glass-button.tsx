@@ -120,16 +120,17 @@ function LiquidButton({
 
   if (asChild && React.isValidElement(children)) {
     // Clone the child element and merge props
+    const childProps = children.props as any
     return (
       <>
         {React.cloneElement(children, {
           ...props,
-          className: cn(buttonClasses, children.props.className),
+          className: cn(buttonClasses, childProps.className),
           children: (
             <>
               {glassEffects}
               <div className="pointer-events-none z-10">
-                {children.props.children}
+                {childProps.children}
               </div>
             </>
           )
