@@ -121,7 +121,9 @@ export function MemberSidebar({ members, totalCount }: MemberSidebarProps) {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-white/90">{member.display_name || member.username}</p>
-                    <p className="truncate text-xs text-white/55">@{member.username}</p>
+                    <p className="line-clamp-2 text-xs text-white/55 leading-relaxed">
+                      {member.status_summary || 'No recent activity'}
+                    </p>
                   </div>
                 </div>
               ))}
