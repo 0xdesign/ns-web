@@ -71,8 +71,8 @@ export function HomeClient({ membersData }: HomeClientProps) {
           <div className="md:mr-[280px]">
             {/* Hero Section */}
             <section className="min-h-screen flex flex-col justify-center px-4 sm:px-6 md:px-8 lg:px-12 py-20 md:py-32 lg:py-40">
-              <div className="max-w-[600px]">
-                <h1 className="heading-1-responsive text-white mb-6">
+              <div className="content-container">
+                <h1 className="display text-white mb-6">
                   A home for next-gen creators
                 </h1>
                 <LiquidButton asChild size="xxl" className="text-white font-medium tracking-tight">
@@ -83,9 +83,9 @@ export function HomeClient({ membersData }: HomeClientProps) {
 
             {/* Editorial Section */}
             <section className="min-h-screen flex flex-col justify-center px-4 sm:px-6 md:px-8 lg:px-12 py-20 md:py-32 lg:py-40">
-              <div className="max-w-[600px]">
+              <div className="content-container">
                 <div className="h-16 md:h-24" /> {/* Spacer */}
-                <div className="body-1 text-white space-y-5 md:space-y-6">
+                <div className="body text-white space-y-5 md:space-y-6">
                   <BlurIn delay={0} duration={800} amount={10}>
                     <p>Before the Renaissance, craft lived in crowded workshops—the bottegas.</p>
                   </BlurIn>
@@ -119,30 +119,18 @@ export function HomeClient({ membersData }: HomeClientProps) {
 
             {/* Features Section */}
             <section className="min-h-screen flex flex-col justify-center px-4 sm:px-6 md:px-8 lg:px-12 py-20 md:py-32 lg:py-40">
-              <div className="max-w-[600px]">
-                {/* Heading */}
-                <BlurIn delay={0} duration={800} amount={15}>
-                  <div className="mb-12 md:mb-16">
-                    <h2 className="heading-3 text-white">
-                      Transform how<br />your business<br />moves money
-                    </h2>
-                  </div>
-                </BlurIn>
-
+              <div className="content-container">
                 {/* Feature list */}
                 <div className="space-y-0">
                   {/* Feature 1 */}
                   <BlurIn delay={30} duration={800} amount={8}>
-                    <div className="border-b border-dashed border-white/30 py-3">
-                    <div className="relative mb-3">
-                      <span className="absolute -left-7 md:-left-8 top-1/2 -translate-y-1/2 text-xs tracking-tight text-white/70">
-                        01 ::
-                      </span>
-                      <h3 className="text-sm font-bold leading-tight tracking-tight text-white md:text-base">
+                    <div className="py-3">
+                    <div className="mb-3">
+                      <h3 className="heading text-white">
                         High-signal chat
                       </h3>
                     </div>
-                    <p className="text-sm leading-normal tracking-tight text-white md:text-base md:leading-relaxed">
+                    <p className="body text-white">
                       Your starting point for finding and sharing new tools, new workflows and new ways of thinking.
                     </p>
                     </div>
@@ -150,16 +138,13 @@ export function HomeClient({ membersData }: HomeClientProps) {
 
                   {/* Feature 2 */}
                   <BlurIn delay={60} duration={800} amount={8}>
-                    <div className="border-b border-dashed border-white/30 py-3">
-                    <div className="relative mb-3">
-                      <span className="absolute -left-7 md:-left-8 top-1/2 -translate-y-1/2 text-xs tracking-tight text-white/70">
-                        02 ::
-                      </span>
-                      <h3 className="text-sm font-bold leading-tight tracking-tight text-white md:text-base">
+                    <div className="py-3">
+                    <div className="mb-3">
+                      <h3 className="heading text-white">
                         Shared goals and ambitions
                       </h3>
                     </div>
-                    <p className="text-sm leading-normal tracking-tight text-white md:text-base md:leading-relaxed">
+                    <p className="body text-white">
                       Everyone wants to build, create and express at the bleeding edge.
                     </p>
                     </div>
@@ -167,16 +152,13 @@ export function HomeClient({ membersData }: HomeClientProps) {
 
                   {/* Feature 3 */}
                   <BlurIn delay={90} duration={800} amount={8}>
-                    <div className="border-b border-dashed border-white/30 py-3">
-                    <div className="relative mb-3">
-                      <span className="absolute -left-7 md:-left-8 top-1/2 -translate-y-1/2 text-xs tracking-tight text-white/70">
-                        03 ::
-                      </span>
-                      <h3 className="text-sm font-bold leading-tight tracking-tight text-white md:text-base">
+                    <div className="py-3">
+                    <div className="mb-3">
+                      <h3 className="heading text-white">
                         Non-performative
                       </h3>
                     </div>
-                    <p className="text-sm leading-normal tracking-tight text-white md:text-base md:leading-relaxed">
+                    <p className="body text-white">
                       A safe place to show work‑in‑progress without performative Twitter energy. The messy stuff is the good stuff.
                     </p>
                     </div>
@@ -184,16 +166,13 @@ export function HomeClient({ membersData }: HomeClientProps) {
 
                   {/* Feature 4 */}
                   <BlurIn delay={120} duration={800} amount={8}>
-                    <div className="border-b border-dashed border-white/30 py-3">
-                    <div className="relative mb-3">
-                      <span className="absolute -left-7 md:-left-8 top-1/2 -translate-y-1/2 text-xs tracking-tight text-white/70">
-                        04 ::
-                      </span>
-                      <h3 className="text-sm font-bold leading-tight tracking-tight text-white md:text-base">
+                    <div className="py-3">
+                    <div className="mb-3">
+                      <h3 className="heading text-white">
                         Learning as a side effect
                       </h3>
                     </div>
-                    <p className="text-sm leading-normal tracking-tight text-white md:text-base md:leading-relaxed">
+                    <p className="body text-white">
                       The space moves fast. Skills accrue because the only way to learn is by doing.
                     </p>
                     </div>
@@ -204,12 +183,12 @@ export function HomeClient({ membersData }: HomeClientProps) {
 
             {/* FAQ Section */}
             <section className="min-h-screen flex flex-col justify-center px-4 sm:px-6 md:px-8 lg:px-12 py-20 md:py-32 lg:py-40">
-              <div className="max-w-[600px]">
+              <div className="content-container">
                 {/* Heading */}
                 <BlurIn delay={0} duration={800} amount={15}>
                   <div className="mb-12 md:mb-16">
-                    <h2 className="heading-3 text-white">
-                      Frequently<br />asked questions
+                    <h2 className="heading text-white">
+                      Frequently asked questions
                     </h2>
                   </div>
                 </BlurIn>
@@ -224,10 +203,10 @@ export function HomeClient({ membersData }: HomeClientProps) {
                           01 ::
                         </span>
                         <h3 className="text-sm font-bold leading-tight tracking-tight text-white md:text-base">
-                          How is Tempo different from other<br />blockchains?
+                          How is Tempo different from other blockchains?
                         </h3>
                       </div>
-                      <p className="text-sm leading-normal tracking-tight text-white md:text-base md:leading-relaxed">
+                      <p className="body text-white">
                         Tempo is an EVM-compatible L1 blockchain, purpose-built for payments. It doesn&apos;t displace other general-purpose blockchains; rather, it incorporates design choices that meet the needs of high-volume payment use cases. These include predictable low fees in a dedicated payments lane, stablecoin neutrality, a built-in stablecoin exchange, high throughput, low latency, private transactions, payment memos compatible with standards like ISO 20022, compliance hooks, and more.
                       </p>
                     </div>
@@ -244,7 +223,7 @@ export function HomeClient({ membersData }: HomeClientProps) {
                           Who can build on Tempo?
                         </h3>
                       </div>
-                      <p className="text-sm leading-normal tracking-tight text-white md:text-base md:leading-relaxed">
+                      <p className="body text-white">
                         Tempo is a neutral, permissionless blockchain open for anyone to build on. We&apos;re currently collaborating with global partners to test various use cases, including cross-border payouts, B2B payments, remittances, and ecommerce. Interested in working with Tempo? Request access to our private testnet <a href="#" className="underline">here</a>.
                       </p>
                     </div>
@@ -261,7 +240,7 @@ export function HomeClient({ membersData }: HomeClientProps) {
                           When will Tempo launch?
                         </h3>
                       </div>
-                      <p className="text-sm leading-normal tracking-tight text-white md:text-base md:leading-relaxed">
+                      <p className="body text-white">
                         We&apos;re providing select partners with priority access to our testnet now. Contact us <a href="#" className="underline">here</a> if you&apos;re interested.
                       </p>
                     </div>
@@ -278,7 +257,7 @@ export function HomeClient({ membersData }: HomeClientProps) {
                           Who will run validator nodes?
                         </h3>
                       </div>
-                      <p className="text-sm leading-normal tracking-tight text-white md:text-base md:leading-relaxed">
+                      <p className="body text-white">
                         A diverse group of independent entities, including some of Tempo&apos;s design partners, will run validator nodes initially before we transition to a permissionless model.
                       </p>
                     </div>
@@ -289,7 +268,7 @@ export function HomeClient({ membersData }: HomeClientProps) {
 
             {/* Bottom CTA */}
             <section className="px-4 sm:px-6 md:px-8 lg:px-12 py-20 md:py-32 lg:py-40">
-              <div className="max-w-[600px]">
+              <div className="content-container">
                 <BlurIn delay={0} duration={800} amount={12}>
                   <Link
                     href="/apply"
@@ -298,7 +277,7 @@ export function HomeClient({ membersData }: HomeClientProps) {
                       border border-dashed border-white rounded-[20px]
                       py-16 md:py-20 lg:py-24
                       text-center
-                      heading-3 text-white
+                      heading text-white
                       hover:bg-white/5
                       transition-colors duration-200
                     "

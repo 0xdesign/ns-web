@@ -531,6 +531,7 @@ User has already submitted an application. This is rate limiting working correct
 - **Monorepo Overview**: `../CLAUDE.md`
 - **Bot Documentation**: `../ns-bot/CLAUDE.md`
 - **Database Schema**: `../ns-bot/SUPABASE_SCHEMA.md`
+- **Design System**: `./DESIGN_SYSTEM.md`
 - **Web README**: `./README.md`
 - **Deployment Guide**: `./DEPLOYMENT.md`
 - **Production Deployment & Testing**: `./NEXT_STEPS.md`
