@@ -63,7 +63,7 @@ const liquidbuttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-transparent hover:scale-105 duration-300 transition text-primary",
+        default: "bg-transparent duration-300 transition text-primary",
         destructive:
           "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
         outline:
@@ -101,19 +101,53 @@ function LiquidButton({
     asChild?: boolean
   }) {
   const buttonClasses = cn(
-    "relative",
+    "relative group",
     liquidbuttonVariants({ variant, size, className })
   )
 
   const glassEffects = (
     <>
-      <div className="absolute top-0 left-0 z-0 h-full w-full rounded-full
-          shadow-[0_0_4px_rgba(0,0,0,0.02),0_2px_4px_rgba(0,0,0,0.04),inset_3px_3px_0.5px_-3px_rgba(0,0,0,0.5),inset_-3px_-3px_0.5px_-3px_rgba(0,0,0,0.45),inset_1px_1px_1px_-0.5px_rgba(0,0,0,0.3),inset_-1px_-1px_1px_-0.5px_rgba(0,0,0,0.3),inset_0_0_4px_4px_rgba(0,0,0,0.06),inset_0_0_2px_2px_rgba(0,0,0,0.03),0_0_8px_rgba(255,255,255,0.08)]
-      transition-all
-      dark:shadow-[0_0_6px_rgba(0,0,0,0.02),0_2px_4px_rgba(0,0,0,0.04),inset_3px_3px_0.5px_-3.5px_rgba(255,255,255,0.05),inset_-3px_-3px_0.5px_-3.5px_rgba(255,255,255,0.45),inset_1px_1px_1px_-0.5px_rgba(255,255,255,0.3),inset_-1px_-1px_1px_-0.5px_rgba(255,255,255,0.3),inset_0_0_4px_4px_rgba(255,255,255,0.06),inset_0_0_2px_2px_rgba(255,255,255,0.03),0_0_8px_rgba(0,0,0,0.08)]" />
+      {/* Original shadow/border layer - preserved */}
       <div
-        className="absolute top-0 left-0 isolate -z-10 h-full w-full overflow-hidden rounded-md"
-        style={{ backdropFilter: 'url("#container-glass")' }}
+        className="absolute top-0 left-0 z-0 h-full w-full rounded-full
+          shadow-[0_0_4px_rgba(0,0,0,0.02),0_2px_4px_rgba(0,0,0,0.04),inset_3px_3px_0.5px_-3px_rgba(0,0,0,0.5),inset_-3px_-3px_0.5px_-3px_rgba(0,0,0,0.45),inset_1px_1px_1px_-0.5px_rgba(0,0,0,0.3),inset_-1px_-1px_1px_-0.5px_rgba(0,0,0,0.3),inset_0_0_4px_4px_rgba(0,0,0,0.06),inset_0_0_2px_2px_rgba(0,0,0,0.03),0_0_8px_rgba(255,255,255,0.08)]
+        transition-all
+        dark:shadow-[0_0_6px_rgba(0,0,0,0.02),0_2px_4px_rgba(0,0,0,0.04),inset_3px_3px_0.5px_-3.5px_rgba(255,255,255,0.05),inset_-3px_-3px_0.5px_-3.5px_rgba(255,255,255,0.45),inset_1px_1px_1px_-0.5px_rgba(255,255,255,0.3),inset_-1px_-1px_1px_-0.5px_rgba(255,255,255,0.3),inset_0_0_4px_4px_rgba(255,255,255,0.06),inset_0_0_2px_2px_rgba(255,255,255,0.03),0_0_8px_rgba(0,0,0,0.08)]"
+      />
+
+      {/* Background tint - subtle white fill */}
+      <div
+        className="absolute top-0 left-0 h-full w-full rounded-full pointer-events-none"
+        style={{
+          background: 'rgba(255, 255, 255, 0.08)',
+          zIndex: 1
+        }}
+      />
+
+      {/* Liquid glass layer 1: Blur + Distortion (replaces old backdrop filter) */}
+      <div
+        className="absolute top-0 left-0 isolate -z-10 h-full w-full overflow-hidden rounded-full pointer-events-none"
+        style={{
+          backdropFilter: 'blur(3px)',
+          filter: 'url(#glass-distortion)'
+        }}
+      />
+
+      {/* Liquid glass layer 2: Brightness Overlay - Subtle white wash on hover */}
+      <div
+        className="absolute inset-0 rounded-full pointer-events-none transition-all duration-300 opacity-0 group-hover:opacity-[0.03]"
+        style={{
+          background: 'rgba(255, 255, 255, 1)',
+          zIndex: 2
+        }}
+      />
+
+      {/* Liquid glass layer 3: Edge Glow Border */}
+      <div
+        className="absolute inset-0 rounded-full pointer-events-none transition-all duration-300 border border-transparent group-hover:border-white/12"
+        style={{
+          zIndex: 3
+        }}
       />
     </>
   )
@@ -129,78 +163,28 @@ function LiquidButton({
           children: (
             <>
               {glassEffects}
-              <div className="pointer-events-none z-10">
+              <div className="relative" style={{ zIndex: 20 }}>
                 {childProps.children}
               </div>
             </>
           )
         } as any)}
-        <GlassFilter />
       </>
     )
   }
 
   return (
-    <>
-      <button
-        data-slot="button"
-        className={buttonClasses}
-        {...props}
-      >
-        {glassEffects}
-        <div className="pointer-events-none z-10">
-          {children}
-        </div>
-        <GlassFilter />
-      </button>
-    </>
+    <button
+      data-slot="button"
+      className={buttonClasses}
+      {...props}
+    >
+      {glassEffects}
+      <div className="relative" style={{ zIndex: 20 }}>
+        {children}
+      </div>
+    </button>
   )
-}
-
-
-function GlassFilter() {
-  return (
-    <svg className="hidden">
-      <defs>
-        <filter
-          id="container-glass"
-          x="0%"
-          y="0%"
-          width="100%"
-          height="100%"
-          colorInterpolationFilters="sRGB"
-        >
-          {/* Generate turbulent noise for distortion */}
-          <feTurbulence
-            type="fractalNoise"
-            baseFrequency="0.05 0.05"
-            numOctaves="1"
-            seed="1"
-            result="turbulence"
-          />
-
-          {/* Blur the turbulence pattern slightly */}
-          <feGaussianBlur in="turbulence" stdDeviation="2" result="blurredNoise" />
-
-          {/* Displace the source graphic with the noise */}
-          <feDisplacementMap
-            in="SourceGraphic"
-            in2="blurredNoise"
-            scale="70"
-            xChannelSelector="R"
-            yChannelSelector="B"
-            result="displaced"
-          />
-
-          {/* Apply overall blur on the final result */}
-          <feGaussianBlur in="displaced" stdDeviation="4" result="finalBlur" />
-
-          {/* Output the result */}
-          <feComposite in="finalBlur" in2="finalBlur" operator="over" />
-        </filter>
-      </defs>
-    </svg>
-  );
 }
 
 type ColorVariant =
