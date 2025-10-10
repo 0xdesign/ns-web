@@ -90,7 +90,7 @@ export function MemberSidebar({ members, totalCount }: MemberSidebarProps) {
               {members.slice(0, 50).map((member) => (
                 <div
                   key={member.user_id}
-                  className="group relative rounded-xl overflow-hidden cursor-pointer"
+                  className="group relative rounded-xl overflow-hidden"
                 >
                   {/* Layer 1: Blur + Distortion */}
                   <div

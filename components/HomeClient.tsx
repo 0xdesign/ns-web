@@ -121,60 +121,60 @@ export function HomeClient({ membersData }: HomeClientProps) {
             <section className="min-h-screen flex flex-col justify-center px-4 sm:px-6 md:px-8 lg:px-12 py-20 md:py-32 lg:py-40">
               <div className="content-container">
                 {/* Feature list */}
-                <div className="space-y-0">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-12">
                   {/* Feature 1 */}
                   <BlurIn delay={30} duration={800} amount={8}>
-                    <div className="py-3">
-                    <div className="mb-3">
-                      <h3 className="heading text-white">
-                        High-signal chat
-                      </h3>
-                    </div>
-                    <p className="body text-white">
-                      Your starting point for finding and sharing new tools, new workflows and new ways of thinking.
-                    </p>
+                    <div className="border border-white/10 rounded-xl p-6 md:p-8 bg-white/[0.02] h-[280px] md:h-[320px] flex flex-col justify-between">
+                      <div>
+                        <h3 className="heading text-white">
+                          High-signal chat
+                        </h3>
+                      </div>
+                      <p className="body text-white">
+                        Your starting point for finding and sharing new tools, new workflows and new ways of thinking.
+                      </p>
                     </div>
                   </BlurIn>
 
                   {/* Feature 2 */}
                   <BlurIn delay={60} duration={800} amount={8}>
-                    <div className="py-3">
-                    <div className="mb-3">
-                      <h3 className="heading text-white">
-                        Shared goals and ambitions
-                      </h3>
-                    </div>
-                    <p className="body text-white">
-                      Everyone wants to build, create and express at the bleeding edge.
-                    </p>
+                    <div className="border border-white/10 rounded-xl p-6 md:p-8 bg-white/[0.02] h-[280px] md:h-[320px] flex flex-col justify-between">
+                      <div>
+                        <h3 className="heading text-white">
+                          Shared goals and ambitions
+                        </h3>
+                      </div>
+                      <p className="body text-white">
+                        Everyone wants to build, create and express at the bleeding edge.
+                      </p>
                     </div>
                   </BlurIn>
 
                   {/* Feature 3 */}
                   <BlurIn delay={90} duration={800} amount={8}>
-                    <div className="py-3">
-                    <div className="mb-3">
-                      <h3 className="heading text-white">
-                        Non-performative
-                      </h3>
-                    </div>
-                    <p className="body text-white">
-                      A safe place to show work‑in‑progress without performative Twitter energy. The messy stuff is the good stuff.
-                    </p>
+                    <div className="border border-white/10 rounded-xl p-6 md:p-8 bg-white/[0.02] h-[280px] md:h-[320px] flex flex-col justify-between">
+                      <div>
+                        <h3 className="heading text-white">
+                          Non-performative
+                        </h3>
+                      </div>
+                      <p className="body text-white">
+                        A safe place to show work‑in‑progress without performative Twitter energy. The messy stuff is the good stuff.
+                      </p>
                     </div>
                   </BlurIn>
 
                   {/* Feature 4 */}
                   <BlurIn delay={120} duration={800} amount={8}>
-                    <div className="py-3">
-                    <div className="mb-3">
-                      <h3 className="heading text-white">
-                        Learning as a side effect
-                      </h3>
-                    </div>
-                    <p className="body text-white">
-                      The space moves fast. Skills accrue because the only way to learn is by doing.
-                    </p>
+                    <div className="border border-white/10 rounded-xl p-6 md:p-8 bg-white/[0.02] h-[280px] md:h-[320px] flex flex-col justify-between">
+                      <div>
+                        <h3 className="heading text-white">
+                          Learning as a side effect
+                        </h3>
+                      </div>
+                      <p className="body text-white">
+                        The space moves fast. Skills accrue because the only way to learn is by doing.
+                      </p>
                     </div>
                   </BlurIn>
                 </div>
