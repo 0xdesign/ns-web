@@ -124,57 +124,181 @@ export function HomeClient({ membersData }: HomeClientProps) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-12">
                   {/* Feature 1 */}
                   <BlurIn delay={30} duration={800} amount={8}>
-                    <div className="border border-white/10 rounded-xl p-6 md:p-8 bg-white/[0.02] h-[280px] md:h-[320px] flex flex-col justify-between">
-                      <div>
-                        <h3 className="heading text-white">
-                          High-signal chat
-                        </h3>
+                    <div className="group relative border border-white/10 rounded-xl p-6 md:p-8 bg-white/[0.02] h-[280px] md:h-[320px] overflow-hidden">
+                      {/* Layer 1: Blur + Distortion */}
+                      <div
+                        className="absolute inset-0 rounded-xl pointer-events-none"
+                        style={{
+                          backdropFilter: 'blur(2px)',
+                          filter: 'url(#glass-distortion)',
+                          zIndex: 0
+                        }}
+                      />
+
+                      {/* Layer 2: Shine/Highlight */}
+                      <div
+                        className="absolute inset-0 rounded-xl pointer-events-none transition-all duration-300"
+                        style={{
+                          boxShadow: 'inset 1px 1px 1px 0 rgba(255, 255, 255, 0.3)',
+                          zIndex: 1
+                        }}
+                      />
+
+                      {/* Layer 3: Brightness Overlay */}
+                      <div
+                        className="absolute inset-0 rounded-xl pointer-events-none transition-all duration-300 opacity-0 group-hover:opacity-[0.03]"
+                        style={{
+                          background: 'rgba(255, 255, 255, 1)',
+                          zIndex: 2
+                        }}
+                      />
+
+                      {/* Content */}
+                      <div className="relative h-full flex flex-col justify-between" style={{ zIndex: 10 }}>
+                        <div>
+                          <h3 className="heading text-white">
+                            High-signal chat
+                          </h3>
+                        </div>
+                        <p className="body text-white">
+                          Your starting point for finding and sharing new tools, new workflows and new ways of thinking.
+                        </p>
                       </div>
-                      <p className="body text-white">
-                        Your starting point for finding and sharing new tools, new workflows and new ways of thinking.
-                      </p>
                     </div>
                   </BlurIn>
 
                   {/* Feature 2 */}
                   <BlurIn delay={60} duration={800} amount={8}>
-                    <div className="border border-white/10 rounded-xl p-6 md:p-8 bg-white/[0.02] h-[280px] md:h-[320px] flex flex-col justify-between">
-                      <div>
-                        <h3 className="heading text-white">
-                          Shared goals and ambitions
-                        </h3>
+                    <div className="group relative border border-white/10 rounded-xl p-6 md:p-8 bg-white/[0.02] h-[280px] md:h-[320px] overflow-hidden">
+                      {/* Layer 1: Blur + Distortion */}
+                      <div
+                        className="absolute inset-0 rounded-xl pointer-events-none"
+                        style={{
+                          backdropFilter: 'blur(2px)',
+                          filter: 'url(#glass-distortion)',
+                          zIndex: 0
+                        }}
+                      />
+
+                      {/* Layer 2: Shine/Highlight */}
+                      <div
+                        className="absolute inset-0 rounded-xl pointer-events-none transition-all duration-300"
+                        style={{
+                          boxShadow: 'inset 1px 1px 1px 0 rgba(255, 255, 255, 0.3)',
+                          zIndex: 1
+                        }}
+                      />
+
+                      {/* Layer 3: Brightness Overlay */}
+                      <div
+                        className="absolute inset-0 rounded-xl pointer-events-none transition-all duration-300 opacity-0 group-hover:opacity-[0.03]"
+                        style={{
+                          background: 'rgba(255, 255, 255, 1)',
+                          zIndex: 2
+                        }}
+                      />
+
+                      {/* Content */}
+                      <div className="relative h-full flex flex-col justify-between" style={{ zIndex: 10 }}>
+                        <div>
+                          <h3 className="heading text-white">
+                            Shared goals and ambitions
+                          </h3>
+                        </div>
+                        <p className="body text-white">
+                          Everyone wants to build, create and express at the bleeding edge.
+                        </p>
                       </div>
-                      <p className="body text-white">
-                        Everyone wants to build, create and express at the bleeding edge.
-                      </p>
                     </div>
                   </BlurIn>
 
                   {/* Feature 3 */}
                   <BlurIn delay={90} duration={800} amount={8}>
-                    <div className="border border-white/10 rounded-xl p-6 md:p-8 bg-white/[0.02] h-[280px] md:h-[320px] flex flex-col justify-between">
-                      <div>
-                        <h3 className="heading text-white">
-                          Non-performative
-                        </h3>
+                    <div className="group relative border border-white/10 rounded-xl p-6 md:p-8 bg-white/[0.02] h-[280px] md:h-[320px] overflow-hidden">
+                      {/* Layer 1: Blur + Distortion */}
+                      <div
+                        className="absolute inset-0 rounded-xl pointer-events-none"
+                        style={{
+                          backdropFilter: 'blur(2px)',
+                          filter: 'url(#glass-distortion)',
+                          zIndex: 0
+                        }}
+                      />
+
+                      {/* Layer 2: Shine/Highlight */}
+                      <div
+                        className="absolute inset-0 rounded-xl pointer-events-none transition-all duration-300"
+                        style={{
+                          boxShadow: 'inset 1px 1px 1px 0 rgba(255, 255, 255, 0.3)',
+                          zIndex: 1
+                        }}
+                      />
+
+                      {/* Layer 3: Brightness Overlay */}
+                      <div
+                        className="absolute inset-0 rounded-xl pointer-events-none transition-all duration-300 opacity-0 group-hover:opacity-[0.03]"
+                        style={{
+                          background: 'rgba(255, 255, 255, 1)',
+                          zIndex: 2
+                        }}
+                      />
+
+                      {/* Content */}
+                      <div className="relative h-full flex flex-col justify-between" style={{ zIndex: 10 }}>
+                        <div>
+                          <h3 className="heading text-white">
+                            Non-performative
+                          </h3>
+                        </div>
+                        <p className="body text-white">
+                          A safe place to show work‑in‑progress without performative Twitter energy. The messy stuff is the good stuff.
+                        </p>
                       </div>
-                      <p className="body text-white">
-                        A safe place to show work‑in‑progress without performative Twitter energy. The messy stuff is the good stuff.
-                      </p>
                     </div>
                   </BlurIn>
 
                   {/* Feature 4 */}
                   <BlurIn delay={120} duration={800} amount={8}>
-                    <div className="border border-white/10 rounded-xl p-6 md:p-8 bg-white/[0.02] h-[280px] md:h-[320px] flex flex-col justify-between">
-                      <div>
-                        <h3 className="heading text-white">
-                          Learning as a side effect
-                        </h3>
+                    <div className="group relative border border-white/10 rounded-xl p-6 md:p-8 bg-white/[0.02] h-[280px] md:h-[320px] overflow-hidden">
+                      {/* Layer 1: Blur + Distortion */}
+                      <div
+                        className="absolute inset-0 rounded-xl pointer-events-none"
+                        style={{
+                          backdropFilter: 'blur(2px)',
+                          filter: 'url(#glass-distortion)',
+                          zIndex: 0
+                        }}
+                      />
+
+                      {/* Layer 2: Shine/Highlight */}
+                      <div
+                        className="absolute inset-0 rounded-xl pointer-events-none transition-all duration-300"
+                        style={{
+                          boxShadow: 'inset 1px 1px 1px 0 rgba(255, 255, 255, 0.3)',
+                          zIndex: 1
+                        }}
+                      />
+
+                      {/* Layer 3: Brightness Overlay */}
+                      <div
+                        className="absolute inset-0 rounded-xl pointer-events-none transition-all duration-300 opacity-0 group-hover:opacity-[0.03]"
+                        style={{
+                          background: 'rgba(255, 255, 255, 1)',
+                          zIndex: 2
+                        }}
+                      />
+
+                      {/* Content */}
+                      <div className="relative h-full flex flex-col justify-between" style={{ zIndex: 10 }}>
+                        <div>
+                          <h3 className="heading text-white">
+                            Learning as a side effect
+                          </h3>
+                        </div>
+                        <p className="body text-white">
+                          The space moves fast. Skills accrue because the only way to learn is by doing.
+                        </p>
                       </div>
-                      <p className="body text-white">
-                        The space moves fast. Skills accrue because the only way to learn is by doing.
-                      </p>
                     </div>
                   </BlurIn>
                 </div>

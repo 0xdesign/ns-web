@@ -105,26 +105,6 @@ export function ApplyClient({ membersData, error, discordAuthUrl }: ApplyClientP
                 </BlurIn>
               ))}
             </div>
-
-            {/* What We're Looking For */}
-            <div className="mt-16 md:mt-20">
-              <BlurIn delay={(error ? 150 : 120)} duration={800} amount={10}>
-                <h2 className="heading text-white mb-6">What We&apos;re Looking For</h2>
-              </BlurIn>
-              <BlurIn delay={(error ? 180 : 150)} duration={800} amount={8}>
-                <p className="body text-white mb-6">
-                  We&apos;re seeking high-potential creative technologists who demonstrate:
-                </p>
-                <ul className="space-y-3">
-                  {criteria.map((item, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <span className="text-white/90 flex-shrink-0 mt-1">✓</span>
-                      <span className="body text-white/90">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </BlurIn>
-            </div>
           </div>
         </div>
 
