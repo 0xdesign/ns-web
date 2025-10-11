@@ -50,7 +50,9 @@ export function BlurIn({
       ref={ref}
       className={className}
       style={{
-        filter: isVisible ? 'blur(0px)' : `blur(${amount}px)`,
+        // Use 'none' instead of 'blur(0px)' to avoid creating a stacking context
+        // that can break child backdrop-filter effects (e.g., liquid glass cards).
+        filter: isVisible ? 'none' : `blur(${amount}px)`,
         opacity: isVisible ? 1 : 0.3,
         transform: isVisible ? 'translateY(0)' : 'translateY(0)',
         transition: `filter ${duration}ms cubic-bezier(0.16, 1, 0.3, 1) ${isVisible ? delay : 0}ms, opacity ${duration}ms cubic-bezier(0.16, 1, 0.3, 1) ${isVisible ? delay : 0}ms`,
