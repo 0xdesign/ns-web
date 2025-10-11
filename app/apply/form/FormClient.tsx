@@ -70,11 +70,12 @@ export function FormClient({ membersData }: FormClientProps) {
     <div className="relative min-h-screen bg-neutral-950 text-white overflow-x-hidden">
       {/* Fixed background with prism */}
       <div className="fixed inset-0 z-0">
+        {/* Prism background */}
         <div className="absolute inset-0">
           <Prism
             height={3.5}
             baseWidth={5.5}
-            animationType="scroll"
+            animationType="rotate"
             glow={1.5}
             noise={0.1}
             transparent={true}
@@ -82,14 +83,12 @@ export function FormClient({ membersData }: FormClientProps) {
             mobileScale={1.8}
             colorFrequency={1.2}
             bloom={1.2}
-            scrollSensitivity={1.5}
           />
         </div>
         {/* Subtle noise texture */}
         <div className="absolute inset-0 opacity-[0.02] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxwYXRoIGQ9Ik0wIDBoMzAwdjMwMEgweiIgZmlsdGVyPSJ1cmwoI2EpIiBvcGFjaXR5PSIuMDUiLz48L3N2Zz4=')]" />
-        {/* Darkening overlays for better legibility */}
-        <div className="absolute inset-0 pointer-events-none bg-black/20" />
-        <div className="absolute inset-0 pointer-events-none bg-black/10" />
+        {/* Darkening overlay for better legibility - 80% opacity */}
+        <div className="absolute inset-0 pointer-events-none bg-black/80" />
       </div>
 
       {/* Navigation */}

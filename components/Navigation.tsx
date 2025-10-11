@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { MemberStatus, getAvatarUrl } from '@/lib/supabase'
 import { ProgressiveBlur } from '@/components/ui/progressive-blur'
 
@@ -30,9 +31,9 @@ export function Navigation({ memberCount, topMembers }: NavigationProps) {
       <nav className="fixed top-0 left-0 right-0 z-40 h-[69px]">
         <div className="flex items-center justify-between h-full px-6">
           {/* Logo */}
-          <h1 className="text-sm font-extrabold text-white/74 tracking-tight [text-shadow:2px_4px_8px_rgba(0,0,0,0.08)]">
+          <Link href="/" className="text-sm font-extrabold text-white/74 tracking-tight [text-shadow:2px_4px_8px_rgba(0,0,0,0.08)] hover:text-white/90 transition-colors cursor-pointer">
             NO/SHOP
-          </h1>
+          </Link>
 
           {/* Member pill */}
           <button

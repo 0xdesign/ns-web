@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { Navigation } from '@/components/Navigation'
 import { ShapeBlur } from '@/components/ui/shapeblur'
 import { BlurIn } from '@/components/ui/blur-in'
+import { LiquidButton } from '@/components/ui/liquid-glass-button'
+import Prism from '@/components/ui/prism'
 import type { MembersResponse } from '@/lib/supabase'
 
 interface ApplyClientProps {
@@ -20,35 +22,50 @@ export function ApplyClient({ membersData, error, discordAuthUrl }: ApplyClientP
     {
       number: 1,
       title: 'Connect with Discord',
-      description: 'Sign in with your Discord account to verify your identity'
+      description: 'Sign in with your Discord account'
     },
     {
       number: 2,
       title: 'Complete Application',
-      description: 'Tell us about yourself, what you\'re building, and why you want to join'
+      description: 'Tell us about yourself and why you want to join'
     },
     {
       number: 3,
       title: 'Review & Approval',
-      description: 'Our team will review your application (typically within 2-3 days)'
+      description: 'Your application will be reviewed in a few days.'
     },
     {
       number: 4,
-      title: 'Payment & Access',
-      description: 'If approved, complete payment ($299/month) and gain instant Discord access'
+      title: 'Access',
+      description: 'If approved, complete payment and gain instant Discord access'
     }
   ]
 
-  const criteria = [
-    'Mastery of AI tools and vibe coding workflows',
-    'Track record of shipping products and building in public',
-    'Creative vision that transcends traditional coding boundaries',
-    'Active engagement in technical communities',
-    'Commitment to collaborative learning and knowledge sharing'
-  ]
-
   return (
-    <div className="relative min-h-screen bg-black text-white overflow-hidden">
+    <div className="relative min-h-screen bg-neutral-950 text-white overflow-x-hidden">
+      {/* Fixed background with prism */}
+      <div className="fixed inset-0 z-0">
+        {/* Prism background */}
+        <div className="absolute inset-0">
+          <Prism
+            height={3.5}
+            baseWidth={5.5}
+            animationType="rotate"
+            glow={1.5}
+            noise={0.1}
+            transparent={true}
+            scale={2.5}
+            mobileScale={1.8}
+            colorFrequency={1.2}
+            bloom={1.2}
+          />
+        </div>
+        {/* Subtle noise texture */}
+        <div className="absolute inset-0 opacity-[0.02] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxwYXRoIGQ9Ik0wIDBoMzAwdjMwMEgweiIgZmlsdGVyPSJ1cmwoI2EpIiBvcGFjaXR5PSIuMDUiLz48L3N2Zz4=')]" />
+        {/* Darkening overlay for better legibility - 80% opacity */}
+        <div className="absolute inset-0 pointer-events-none bg-black/80" />
+      </div>
+
       {/* Navigation */}
       <Navigation
         memberCount={membersData.total}
@@ -56,14 +73,21 @@ export function ApplyClient({ membersData, error, discordAuthUrl }: ApplyClientP
       />
 
       {/* Main content - Split layout */}
-      <main className="relative">
+      <main className="relative z-10">
         {/* Left side - Content */}
-        <div className="lg:w-1/2 px-4 sm:px-6 md:px-8 lg:px-12 py-20 md:py-32 lg:py-40">
-          <div className="max-w-2xl">
+        <div className="lg:w-1/2 min-h-screen lg:flex lg:items-center px-4 sm:px-6 md:px-8 lg:px-12 py-16 pb-32 md:py-24 lg:py-40">
+          <div className="max-w-2xl w-full space-y-6">
+            {/* Heading */}
+            <BlurIn delay={0} duration={800} amount={10}>
+              <h1 className="heading text-white">
+                How to apply
+              </h1>
+            </BlurIn>
+
             {/* Error Message */}
             {error && (
               <BlurIn delay={0} duration={800} amount={8}>
-                <div className="rounded-xl overflow-hidden mb-12 border-l-4 border-red-400 bg-red-500/10 backdrop-blur-sm">
+                <div className="rounded-xl overflow-hidden border-l-4 border-red-400 bg-red-500/10 backdrop-blur-sm">
                   <div className="px-6 py-4">
                     <div className="flex items-start gap-3">
                       <svg className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
@@ -82,21 +106,21 @@ export function ApplyClient({ membersData, error, discordAuthUrl }: ApplyClientP
             )}
 
             {/* Process Steps */}
-            <div className="space-y-4">
+            <div className="space-y-2.5">
               {processSteps.map((step, index) => (
-                <BlurIn key={step.number} delay={(error ? 30 : 0) + (index * 30)} duration={800} amount={8}>
+                <BlurIn key={step.number} delay={(error ? 30 : 0) + (index * 30) + 30} duration={800} amount={8}>
                   <div className="rounded-xl bg-white/5 border border-white/10 hover:border-white/20 transition-colors cursor-pointer">
-                    <div className="flex gap-4 px-6 py-4">
+                    <div className="flex items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6 sm:py-4">
                       <div className="flex-shrink-0">
                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 border border-white/30 text-white text-sm font-medium">
                           {step.number}
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-base font-semibold text-white mb-1 tracking-tight">
+                        <h3 className="text-sm sm:text-base font-semibold text-white mb-0.5 sm:mb-1 tracking-tight">
                           {step.title}
                         </h3>
-                        <p className="text-sm text-white/70 leading-relaxed">
+                        <p className="text-xs sm:text-sm text-white/70 leading-relaxed">
                           {step.description}
                         </p>
                       </div>
@@ -148,15 +172,13 @@ export function ApplyClient({ membersData, error, discordAuthUrl }: ApplyClientP
           </div>
         </div>
 
-        {/* Mobile CTA - shown only on mobile */}
-        <div className="lg:hidden px-4 sm:px-6 md:px-8 pb-20">
-          <a
-            href={discordAuthUrl}
-            className="block w-full py-6 text-center text-xl font-normal whitespace-nowrap text-white hover:text-[#8B93C7] bg-white/10 border border-white/20 rounded-xl hover:bg-white/20 transition-colors"
-            style={{ fontFamily: 'var(--font-instrument-serif)', letterSpacing: '-0.04em' }}
-          >
-            Continue with Discord
-          </a>
+        {/* Mobile CTA - fixed to bottom on mobile */}
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-20 px-4 sm:px-6 md:px-8 pb-6 pt-4 bg-gradient-to-t from-black via-black to-transparent">
+          <LiquidButton asChild size="xxl" className="w-full text-white font-medium tracking-tight">
+            <a href={discordAuthUrl}>
+              Continue with Discord
+            </a>
+          </LiquidButton>
         </div>
       </main>
     </div>

@@ -19,7 +19,7 @@ The tools moved faster than the categories.
 Last year you couldn't build apps. This year you shipped three. Your job title hasn't changed but what you're capable of has.
 
 You're a designer who codes now. A writer who builds products. Someone who makes games on weekends and films on weekdays. The old boxes don't fit anymore.
-
+`
 The gap between what you can do and what you're supposed to be able to do keeps widening. You're building things that sound impossible when you try to explain them. A weekend project that would have taken a team of six. An app you made while learning the framework.
 
 The velocity is the thing. Tools that didn't exist last month are essential this month. Workflows you perfected are already obsolete. The only way to keep up is to never stop moving.
