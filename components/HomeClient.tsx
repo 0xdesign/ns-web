@@ -8,13 +8,15 @@ import { MemberSidebar } from '@/components/MemberSidebar'
 import Prism from '@/components/ui/prism'
 import { LiquidButton } from '@/components/ui/liquid-glass-button'
 import { BlurIn } from '@/components/ui/blur-in'
-import type { MembersResponse } from '@/lib/supabase'
+import type { MembersResponse, DailyDigest } from '@/lib/supabase'
+import { DailyDigestCard } from '@/components/DailyDigestCard'
 
 interface HomeClientProps {
   membersData: MembersResponse
+  latestDigest: DailyDigest | null
 }
 
-export function HomeClient({ membersData }: HomeClientProps) {
+export function HomeClient({ membersData, latestDigest }: HomeClientProps) {
   const [loadingComplete, setLoadingComplete] = useState(false)
 
   return (
@@ -59,10 +61,7 @@ export function HomeClient({ membersData }: HomeClientProps) {
         />
 
         {/* Member Sidebar (right side, drawer on mobile) */}
-        <MemberSidebar
-          members={membersData.members}
-          totalCount={membersData.total}
-        />
+        <MemberSidebar members={membersData.members} />
 
         {/* Main content area */}
         <main className="relative z-10">
@@ -113,6 +112,11 @@ export function HomeClient({ membersData }: HomeClientProps) {
                     <p>This is not a bottega. It&apos;s a commons for those discovering the ultimate ways of creating and expressing with AI.</p>
                   </BlurIn>
                 </div>
+
+                {/* Daily Digest Card - Integrated within Editorial */}
+                <div className="mt-12 md:mt-16">
+                  <DailyDigestCard digest={latestDigest} />
+                </div>
               </div>
             </section>
 
@@ -120,9 +124,9 @@ export function HomeClient({ membersData }: HomeClientProps) {
             <section className="min-h-screen flex flex-col justify-center px-4 sm:px-6 md:px-8 lg:px-12 py-20 md:py-32 lg:py-40">
               <div className="content-container">
                 {/* Feature list */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 lg:gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 lg:gap-8">
                   {/* Feature 1 */}
-                    <div className="group relative rounded-xl p-6 md:p-8 h-[280px] md:h-[280px] overflow-hidden">
+                    <div className="group relative rounded-xl p-6 md:p-8 h-[280px] md:h-[320px] overflow-hidden">
                       {/* Layer 1: Blur + Distortion */}
                       <div
                         className="absolute inset-0 rounded-xl pointer-events-none"
