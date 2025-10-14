@@ -2,14 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { MemberStatus, getAvatarUrl } from '@/lib/supabase'
-import { ProgressiveBlur } from '@/components/ui/progressive-blur'
 
 interface MemberSidebarProps {
   members: MemberStatus[]
-  totalCount: number
 }
 
-export function MemberSidebar({ members, totalCount }: MemberSidebarProps) {
+export function MemberSidebar({ members }: MemberSidebarProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   // Close drawer when clicking outside on mobile
@@ -53,14 +51,14 @@ export function MemberSidebar({ members, totalCount }: MemberSidebarProps) {
       <aside
         data-member-sidebar
         className={`
-          fixed top-6 right-6 bottom-6 h-[calc(100vh-3rem)] w-[300px]
-          z-50 overflow-hidden rounded-[28px]
+          fixed inset-y-0 right-0 w-[300px]
+          z-50 rounded-[28px]
           transition-transform duration-300 ease-out
           ${isOpen ? 'translate-x-0 opacity-100' : 'translate-x-[calc(100%+2rem)] opacity-0 md:translate-x-0 md:opacity-100'}
         `}
       >
         {/* Content */}
-        <div className="relative h-full px-2 overflow-hidden">
+        <div className="relative h-full px-2">
           <div
             className="h-full overflow-y-auto pr-2 member-list-scroll"
             style={{
@@ -68,12 +66,7 @@ export function MemberSidebar({ members, totalCount }: MemberSidebarProps) {
               msOverflowStyle: 'none',
             }}
           >
-            <div className="flex items-start justify-between gap-3 px-3.5 pt-6 pb-3">
-              <div className="text-white/90">
-                <p className="text-sm font-medium tracking-tight text-white/90">
-                  Members — {totalCount}
-                </p>
-              </div>
+            <div className="flex justify-end px-3.5 pt-6 pb-3">
               <button
                 onClick={() => setIsOpen(false)}
                 className="md:hidden flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-white/80 transition hover:bg-white/25 hover:text-white"
@@ -86,7 +79,7 @@ export function MemberSidebar({ members, totalCount }: MemberSidebarProps) {
               </button>
             </div>
 
-            <div className="mt-2 space-y-3 pb-12">
+            <div className="mt-8 space-y-3 pb-12">
               {members.slice(0, 50).map((member) => (
                 <div
                   key={member.user_id}
@@ -153,17 +146,6 @@ export function MemberSidebar({ members, totalCount }: MemberSidebarProps) {
               ))}
             </div>
           </div>
-
-          {/* Bottom blur - absolutely positioned, contained within sidebar */}
-          <ProgressiveBlur
-            position="bottom"
-            backgroundColor="rgba(4,5,10,0.9)"
-            height="160px"
-            blurAmount="28px"
-            zIndex={5}
-            fixed={false}
-            className="rounded-b-[28px]"
-          />
         </div>
       </aside>
 
