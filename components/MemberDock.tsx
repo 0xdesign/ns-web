@@ -14,6 +14,7 @@ export function MemberDock({ memberCount, topMembers, isBottomSheetOpen, onFacep
   return (
     <div
       className={`
+        md:hidden
         fixed left-1/2 -translate-x-1/2 z-[70]
         transition-all duration-300 ease-out
         ${isBottomSheetOpen ? 'bottom-[-200px] opacity-0' : 'bottom-6 opacity-100'}

@@ -234,7 +234,9 @@ export function getAvatarUrl(userId: string, avatarUrl?: string | null): string 
   }
 
   // Fallback to default Discord avatar based on user ID
-  const avatarIndex = Number(BigInt(userId) % 6n)
+  // Use Discord's official algorithm: (user_id >> 22) % 6
+  // This matches the bot's calculation in member_sync.py
+  const avatarIndex = Number((BigInt(userId) >> 22n) % 6n)
   return `https://cdn.discordapp.com/embed/avatars/${avatarIndex}.png`
 }
 

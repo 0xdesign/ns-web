@@ -183,7 +183,7 @@ export function MemberSidebar({ members, isOpen, onClose }: MemberSidebarProps) 
               msOverflowStyle: 'none',
             }}
           >
-            <div className="mt-8 space-y-3 pb-12">
+            <div className="mt-20 space-y-3 pb-12">
               {members.slice(0, 50).map((member) => (
                 <div
                   key={member.user_id}
