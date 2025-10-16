@@ -101,19 +101,6 @@ html {
   height: 0 !important;
 }
 
-@layer utilities {
-  .glass-scrollbar::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-    display: none;
-  }
-
-  .glass-scrollbar {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-}
-
 /* Better mobile tap highlights */
 * {
   -webkit-tap-highlight-color: transparent;

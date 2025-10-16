@@ -536,6 +536,15 @@ User has already submitted an application. This is rate limiting working correct
 - **Deployment Guide**: `./DEPLOYMENT.md`
 - **Production Deployment & Testing**: `./NEXT_STEPS.md`
 
+## Plan Mode Instructions
+
+When in plan mode (before implementation):
+- Sacrifice grammar for the sake of concision
+- List any unresolved questions at the end of your plan
+- Format questions clearly and concisely
+- Prioritize questions by importance (critical → nice-to-have)
+- If no questions exist, explicitly state that the plan is ready for execution
+
 ## Documentation Workflow
 
 When completing items in `NEXT_STEPS.md`:

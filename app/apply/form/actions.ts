@@ -18,7 +18,15 @@ export async function submitApplication(prevState: ApplyFormState | undefined, f
     return { submitError: 'Not authenticated. Please sign in with Discord first.' }
   }
 
-  const discordUser = JSON.parse(discordUserCookie.value)
+  // Parse Discord user data with error handling
+  let discordUser
+  try {
+    discordUser = JSON.parse(discordUserCookie.value)
+  } catch {
+    // Invalid cookie data - clean up and ask user to sign in again
+    cookieStore.delete('discord_user')
+    return { submitError: 'Invalid authentication data. Please sign in again.' }
+  }
 
   // Collect form values
   const email = (formData.get('email') || '').toString()
@@ -60,12 +68,21 @@ export async function submitApplication(prevState: ApplyFormState | undefined, f
       social_links: JSON.stringify(socialLinksRaw),
     })
 
-    // Clear the temporary cookie
+    // Clear the temporary cookie to prevent state reuse after successful submission
+    // This removes the Discord OAuth data, ensuring users can't accidentally submit
+    // duplicate applications by refreshing or navigating back to the form
     cookieStore.delete('discord_user')
 
     // Redirect to success page
     redirect('/apply/success')
   } catch (e) {
+    // Handle duplicate application (race condition caught by DB unique constraint)
+    if (e instanceof Error && e.message === 'DUPLICATE_APPLICATION') {
+      return {
+        submitError: 'You have already submitted an application.',
+        errors: undefined,
+      }
+    }
     return { submitError: 'Failed to submit application. Please try again.' }
   }
 }

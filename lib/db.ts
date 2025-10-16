@@ -161,6 +161,10 @@ export async function getApplicationByDiscordId(
 
 /**
  * Create application
+ *
+ * Note: The applications table has a unique constraint on discord_user_id
+ * to prevent duplicate submissions. This function handles the constraint
+ * violation gracefully by throwing a descriptive error.
  */
 export async function createApplication(data: {
   discord_user_id: string
@@ -178,7 +182,13 @@ export async function createApplication(data: {
     .select()
     .single()
 
-  if (error) throw error
+  if (error) {
+    // Handle unique constraint violation (PostgreSQL error code 23505)
+    if (error.code === '23505' && error.message?.includes('discord_user_id')) {
+      throw new Error('DUPLICATE_APPLICATION')
+    }
+    throw error
+  }
   return application
 }
 

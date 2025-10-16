@@ -10,12 +10,13 @@ interface DailyDigestCardProps {
 export function DailyDigestCard({ digest }: DailyDigestCardProps) {
   if (!digest) return null
 
-  // Format the digest date
-  const digestDate = new Date(digest.digest_date + 'T00:00:00')
+  // Format the digest date (force UTC to prevent timezone shifts)
+  const digestDate = new Date(digest.digest_date + 'T00:00:00Z')
   const formattedDate = digestDate.toLocaleDateString('en-US', {
     month: 'long',
     day: 'numeric',
     year: 'numeric',
+    timeZone: 'UTC',
   })
 
   return (
