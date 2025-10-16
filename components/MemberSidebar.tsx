@@ -48,7 +48,7 @@ export function MemberSidebar({ members, isOpen, onClose }: MemberSidebarProps) 
             ${isOpen ? 'translate-y-0' : 'translate-y-full'}
           `}
           style={{
-            transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)'
+            transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)'
           }}
         >
           {/* Glass Container */}
@@ -83,24 +83,14 @@ export function MemberSidebar({ members, isOpen, onClose }: MemberSidebarProps) 
 
             {/* Content */}
             <div className="relative h-full flex flex-col" style={{ zIndex: 20 }}>
-              {/* Drag Handle */}
-              <div className="flex justify-center pt-4 pb-2">
+              {/* Interactive Drag Handle - Tap to Close */}
+              <button
+                onClick={onClose}
+                className="flex justify-center pt-5 pb-4 w-full transition-opacity duration-200 hover:opacity-70 active:opacity-50"
+                aria-label="Close member list"
+              >
                 <div className="w-12 h-1 rounded-full bg-white/40" />
-              </div>
-
-              {/* Close Button */}
-              <div className="flex justify-end px-6 pb-3">
-                <button
-                  onClick={onClose}
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-white/80 transition hover:bg-white/25 hover:text-white"
-                  style={{ boxShadow: '0 8px 18px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.4)' }}
-                  aria-label="Close members"
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
+              </button>
 
               {/* Member List - Scrollable */}
               <div
