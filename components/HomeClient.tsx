@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { LoadingOverlay } from '@/components/ui/loading-overlay'
 import { Navigation } from '@/components/Navigation'
 import { MemberSidebar } from '@/components/MemberSidebar'
+import { MemberDock } from '@/components/MemberDock'
 import Prism from '@/components/ui/prism'
 import { LiquidButton } from '@/components/ui/liquid-glass-button'
 import { BlurIn } from '@/components/ui/blur-in'
@@ -18,6 +19,7 @@ interface HomeClientProps {
 
 export function HomeClient({ membersData, latestDigest }: HomeClientProps) {
   const [loadingComplete, setLoadingComplete] = useState(false)
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
 
   return (
     <>
@@ -60,8 +62,20 @@ export function HomeClient({ membersData, latestDigest }: HomeClientProps) {
           topMembers={membersData.members.slice(0, 3)}
         />
 
-        {/* Member Sidebar (right side, drawer on mobile) */}
-        <MemberSidebar members={membersData.members} />
+        {/* Member Sidebar (desktop right side, mobile bottom sheet) */}
+        <MemberSidebar
+          members={membersData.members}
+          isOpen={isBottomSheetOpen}
+          onClose={() => setIsBottomSheetOpen(false)}
+        />
+
+        {/* Member Dock (mobile only) */}
+        <MemberDock
+          memberCount={membersData.total}
+          topMembers={membersData.members.slice(0, 3)}
+          isBottomSheetOpen={isBottomSheetOpen}
+          onFacepileClick={() => setIsBottomSheetOpen(true)}
+        />
 
         {/* Main content area */}
         <main className="relative z-10">

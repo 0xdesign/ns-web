@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { MemberStatus, getAvatarUrl } from '@/lib/supabase'
+import { MemberStatus } from '@/lib/supabase'
 import { ProgressiveBlur } from '@/components/ui/progressive-blur'
 
 interface NavigationProps {
@@ -10,11 +10,6 @@ interface NavigationProps {
 }
 
 export function Navigation({ memberCount, topMembers }: NavigationProps) {
-  const handleMemberPillClick = () => {
-    const toggle = document.querySelector('[data-member-sidebar-toggle]') as HTMLButtonElement
-    toggle?.click()
-  }
-
   return (
     <>
       {/* Progressive blur at top for nav bar */}
@@ -44,49 +39,10 @@ export function Navigation({ memberCount, topMembers }: NavigationProps) {
             NO/SHOP
           </Link>
 
-          <div className="flex items-center gap-6">
-            <span className="hidden md:block text-sm font-medium tracking-tight text-white/80">
-              Members — {memberCount}
-            </span>
-
-            {/* Member pill */}
-            <button
-              data-member-pill
-              onClick={handleMemberPillClick}
-              className="
-                group
-                md:hidden
-                backdrop-blur-[3px] bg-white/10 hover:bg-white/20
-                border border-white rounded-[48px]
-                px-2 py-2 pr-4
-                flex items-center gap-3
-                transition-all duration-200
-                hover:scale-105
-              "
-            >
-              {/* Avatar stack */}
-              <div className="flex items-center pr-1.5">
-                {topMembers.slice(0, 3).map((member, i) => (
-                  <div
-                    key={member.user_id}
-                    className="w-6 h-6 rounded-full border border-white overflow-hidden -mr-1.5 relative bg-neutral-800"
-                    style={{ zIndex: 3 - i }}
-                  >
-                    <img
-                      src={getAvatarUrl(member.user_id, member.avatar_url)}
-                      alt={member.display_name || member.username}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ))}
-              </div>
-
-              {/* Count */}
-              <span className="text-sm font-medium text-white tracking-tight">
-                {memberCount}
-              </span>
-            </button>
-          </div>
+          {/* Desktop member count */}
+          <span className="hidden md:block text-sm font-medium tracking-tight text-white/80">
+            Members — {memberCount}
+          </span>
         </div>
       </nav>
     </>
