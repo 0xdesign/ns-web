@@ -423,3 +423,69 @@ Import trace for requested module:
  ✓ Compiled in 110ms (573 modules)
  ✓ Compiled in 98ms (573 modules)
  ✓ Compiled in 93ms (573 modules)
+ ✓ Compiled in 195ms (573 modules)
+ ✓ Compiled in 211ms (573 modules)
+ ✓ Compiled in 330ms (573 modules)
+ ✓ Compiled in 125ms (573 modules)
+ ⚠ ./app/apply/ApplyClient.tsx
+Attempted import error: 'LiquidButton' is not exported from '@/components/ui/liquid-glass-button' (imported as 'LiquidButton').
+
+Import trace for requested module:
+./app/apply/ApplyClient.tsx
+
+./app/apply/form/FormClient.tsx
+Attempted import error: 'LiquidButton' is not exported from '@/components/ui/liquid-glass-button' (imported as 'LiquidButton').
+
+Import trace for requested module:
+./app/apply/form/FormClient.tsx
+
+./components/HomeClient.tsx
+Attempted import error: 'LiquidButton' is not exported from '@/components/ui/liquid-glass-button' (imported as 'LiquidButton').
+
+Import trace for requested module:
+./components/HomeClient.tsx
+
+./app/apply/ApplyClient.tsx
+Attempted import error: 'LiquidButton' is not exported from '@/components/ui/liquid-glass-button' (imported as 'LiquidButton').
+
+Import trace for requested module:
+./app/apply/ApplyClient.tsx
+
+./app/apply/form/FormClient.tsx
+Attempted import error: 'LiquidButton' is not exported from '@/components/ui/liquid-glass-button' (imported as 'LiquidButton').
+
+Import trace for requested module:
+./app/apply/form/FormClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx

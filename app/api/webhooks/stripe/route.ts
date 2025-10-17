@@ -13,6 +13,7 @@ import { assignRoleWithRetry, removeRole } from '@/lib/bot-api'
 import type { Subscription as DbSubscription } from '@/lib/db'
 
 export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
 
 type StripeCustomer = Stripe.Customer | Stripe.DeletedCustomer
 

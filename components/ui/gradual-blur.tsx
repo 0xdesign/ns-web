@@ -175,7 +175,7 @@ const useResponsiveDimension = (
         nextValue = overrides.mobile
       } else if (width <= 768 && overrides.tablet) {
         nextValue = overrides.tablet
-      } else if (width <= 1024 && overrides.desktop) {
+      } else if (width >= 1024 && overrides.desktop) {
         nextValue = overrides.desktop
       }
       setValue(nextValue)
@@ -236,9 +236,10 @@ const GradualBlur = (props: GradualBlurProps) => {
     const divs: React.ReactElement[] = []
     const count = Math.max(1, Math.min(config.divCount, 24))
     const increment = 100 / count
+    const hoverIsConfigured = config.hoverIntensity !== undefined
     const currentStrength =
-      isHovered && config.hoverIntensity
-        ? config.strength * config.hoverIntensity
+      isHovered && hoverIsConfigured
+        ? config.strength * (config.hoverIntensity ?? 0)
         : config.strength
 
     const curveFunc = CURVE_FUNCTIONS[config.curve] || CURVE_FUNCTIONS.linear
@@ -303,7 +304,7 @@ const GradualBlur = (props: GradualBlurProps) => {
 
     const baseStyle: React.CSSProperties = {
       position: isPageTarget ? 'fixed' : 'absolute',
-      pointerEvents: config.hoverIntensity ? 'auto' : 'none',
+      pointerEvents: config.hoverIntensity !== undefined ? 'auto' : 'none',
       opacity: isVisible ? 1 : 0,
       transition: config.animated ? `opacity ${config.duration} ${config.easing}` : undefined,
       zIndex: isPageTarget ? config.zIndex + 100 : config.zIndex,
@@ -340,13 +341,33 @@ const GradualBlur = (props: GradualBlurProps) => {
   ])
 
   const { hoverIntensity, animated, onAnimationComplete, duration } = config
+
+  const parseCssDuration = (value: string): number => {
+    const trimmed = value.trim().toLowerCase()
+    if (trimmed.endsWith('ms')) {
+      const numeric = Number(trimmed.slice(0, -2))
+      return Number.isFinite(numeric) ? numeric : 0
+    }
+    if (trimmed.endsWith('s')) {
+      const numeric = Number(trimmed.slice(0, -1))
+      return Number.isFinite(numeric) ? numeric * 1000 : 0
+    }
+    const numeric = Number(trimmed)
+    if (Number.isFinite(numeric)) {
+      return numeric
+    }
+    return 0
+  }
+
+  const animationDurationMs = parseCssDuration(duration)
+
   useEffect(() => {
     if (isVisible && animated === 'scroll' && onAnimationComplete) {
-      const timeoutId = setTimeout(() => onAnimationComplete(), parseFloat(duration) * 1000)
+      const timeoutId = setTimeout(() => onAnimationComplete(), animationDurationMs)
       return () => clearTimeout(timeoutId)
     }
     return undefined
-  }, [isVisible, animated, onAnimationComplete, duration])
+  }, [animationDurationMs, animated, isVisible, onAnimationComplete])
 
   return (
     <div
@@ -355,8 +376,8 @@ const GradualBlur = (props: GradualBlurProps) => {
       style={containerStyle}
       aria-hidden="true"
       role="presentation"
-      onMouseEnter={hoverIntensity ? () => setIsHovered(true) : undefined}
-      onMouseLeave={hoverIntensity ? () => setIsHovered(false) : undefined}
+      onMouseEnter={hoverIntensity !== undefined ? () => setIsHovered(true) : undefined}
+      onMouseLeave={hoverIntensity !== undefined ? () => setIsHovered(false) : undefined}
     >
       <div className="gradual-blur-inner relative w-full h-full">{blurDivs}</div>
     </div>

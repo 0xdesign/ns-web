@@ -15,12 +15,13 @@ export function signCookieValue(value: string): string {
     throw new Error('NEXTAUTH_SECRET is required for cookie signing')
   }
 
+  const encodedValue = Buffer.from(value, 'utf8').toString('base64url')
   const hmac = createHmac('sha256', secret)
-  hmac.update(value)
+  hmac.update(encodedValue)
   const signature = hmac.digest('hex')
 
-  // Return value.signature format
-  return `${value}.${signature}`
+  // Return encodedValue.signature format to avoid delimiter collisions
+  return `${encodedValue}.${signature}`
 }
 
 /**
@@ -36,18 +37,25 @@ export function verifyCookieValue(signedValue: string): string | null {
     }
 
     // Split into value and signature
-    const lastDotIndex = signedValue.lastIndexOf('.')
-    if (lastDotIndex === -1) {
+    const separatorIndex = signedValue.lastIndexOf('.')
+    if (separatorIndex === -1) {
       // No signature found - invalid format
       return null
     }
 
-    const value = signedValue.slice(0, lastDotIndex)
-    const signature = signedValue.slice(lastDotIndex + 1)
+    const encodedValue = signedValue.slice(0, separatorIndex)
+    const signature = signedValue.slice(separatorIndex + 1)
+
+    let value: string
+    try {
+      value = Buffer.from(encodedValue, 'base64url').toString('utf8')
+    } catch {
+      return null
+    }
 
     // Recompute signature
     const hmac = createHmac('sha256', secret)
-    hmac.update(value)
+    hmac.update(encodedValue)
     const expectedSignature = hmac.digest('hex')
 
     // Timing-safe comparison to prevent timing attacks

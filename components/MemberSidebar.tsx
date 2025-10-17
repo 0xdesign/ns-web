@@ -33,7 +33,7 @@ export function MemberSidebar({ members, isOpen, onClose }: MemberSidebarProps) 
           aria-label="Close member sidebar"
           tabIndex={isOpen ? 0 : -1}
           className={`
-            fixed inset-0 bg-black/60 backdrop-blur-md z-45
+            fixed inset-0 bg-black/60 backdrop-blur-md z-40
             transition-opacity duration-300
             ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}
           `}
@@ -49,12 +49,15 @@ export function MemberSidebar({ members, isOpen, onClose }: MemberSidebarProps) 
         {/* Bottom Sheet */}
         <aside
           data-member-sidebar
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="member-sidebar-heading"
           className={`
             fixed bottom-0 left-0 right-0
             h-[75vh] max-h-[600px]
             rounded-t-[28px]
             z-50
-            transition-transform duration-400 ease-out
+            transition-transform duration-300 ease-out
             ${isOpen ? 'translate-y-0' : 'translate-y-full'}
           `}
           style={{
@@ -93,6 +96,9 @@ export function MemberSidebar({ members, isOpen, onClose }: MemberSidebarProps) 
 
             {/* Content */}
             <div className="relative h-full flex flex-col" style={{ zIndex: 20 }}>
+              <h2 id="member-sidebar-heading" className="sr-only">
+                Community members
+              </h2>
               {/* Interactive Drag Handle - Tap to Close */}
               <button
                 onClick={onClose}
