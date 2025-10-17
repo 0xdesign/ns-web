@@ -1,0 +1,275 @@
+"use client"
+
+import { useState } from 'react'
+import Link from 'next/link'
+import { LoadingOverlay } from '@/components/ui/loading-overlay'
+import { Navigation } from '@/components/Navigation'
+import { MemberSidebar } from '@/components/MemberSidebar'
+import { MemberDock } from '@/components/MemberDock'
+import Prism from '@/components/ui/prism'
+import { LiquidButton } from '@/components/ui/liquid-glass-button'
+import { BlurIn } from '@/components/ui/blur-in'
+import { GlassCard } from '@/components/ui/glass-card'
+import type { MembersResponse, DailyDigest } from '@/lib/supabase'
+import { DailyDigestCard } from '@/components/DailyDigestCard'
+
+interface HomeClientProps {
+  membersData: MembersResponse
+  latestDigest: DailyDigest | null
+}
+
+export function HomeClient({ membersData, latestDigest }: HomeClientProps) {
+  const [loadingComplete, setLoadingComplete] = useState(false)
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
+
+  const topMembers = membersData.members?.slice(0, 3) ?? []
+  const featureCards = [
+    {
+      title: 'High-signal chat',
+      description:
+        'Your starting point for finding and sharing new tools, new workflows and new ways of thinking.',
+      delay: 30,
+    },
+    {
+      title: 'Shared goals and ambitions',
+      description: 'Everyone wants to build, create and express at the bleeding edge.',
+      delay: 60,
+    },
+    {
+      title: 'Non-performative',
+      description:
+        'A safe place to show work-in-progress without performative Twitter energy. The messy stuff is the good stuff.',
+      delay: 90,
+    },
+    {
+      title: 'Learning as a side effect',
+      description: 'The space moves fast. Skills accrue because the only way to learn is by doing.',
+      delay: 120,
+    },
+  ] as const
+
+  const faqItems = [
+    {
+      question: 'What does the application process look like?',
+      answer:
+        'Apply with your work and what you are building. Our team reviews applications every few days. If approved you will receive a payment link; once complete, Discord access unlocks immediately.',
+      delay: 30,
+    },
+    {
+      question: 'Who is a strong fit for the community?',
+      answer:
+        'Independent creators, founders, designers, engineers and researchers who actively use AI in their work. We prioritise people shipping projects, not spectators.',
+      delay: 60,
+    },
+    {
+      question: 'What do members get access to?',
+      answer:
+        'High-signal chat, in-progress build reviews, curated drops, the daily digest, small-format salons and direct access to peers solving similar problems.',
+      delay: 90,
+    },
+    {
+      question: 'What does membership cost?',
+      answer:
+        '$299/month. Subscriptions renew monthly and you can cancel anytime in Stripe. If you run into issues, the team will help you on Discord.',
+      delay: 120,
+    },
+  ] as const
+
+  return (
+    <>
+      <LoadingOverlay onComplete={() => setLoadingComplete(true)} />
+
+      <div
+        className="relative min-h-screen bg-neutral-950 text-white overflow-x-hidden"
+        style={{
+          opacity: loadingComplete ? 1 : 0,
+          transition: "opacity 0.6s ease-out",
+        }}
+      >
+        {/* Fixed background with prism */}
+        <div className="fixed inset-0 z-0">
+          {/* Prism background */}
+          <div className="absolute inset-0">
+            <Prism
+              height={3.5}
+              baseWidth={5.5}
+              animationType="scroll"
+              glow={1.5}
+              noise={0.1}
+              transparent={true}
+              scale={2.5}
+              mobileScale={1.8}
+              colorFrequency={1.2}
+              bloom={1.2}
+              scrollSensitivity={1.5}
+            />
+          </div>
+          {/* Subtle noise texture */}
+          <div className="absolute inset-0 opacity-[0.1] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxwYXRoIGQ9Ik0wIDBoMzAwdjMwMEgweiIgZmlsdGVyPSJ1cmwoI2EpIiBvcGFjaXR5PSIuMDUiLz48L3N2Zz4=')]" />
+          {/* Darkening overlays for better legibility (cheap composite) */}
+          <div className="absolute inset-0 pointer-events-none bg-black/40" />
+        </div>
+
+        {/* Navigation */}
+        <Navigation memberCount={membersData.total} />
+
+        {/* Member Sidebar (desktop right side, mobile bottom sheet) */}
+        <MemberSidebar
+          members={membersData.members}
+          isOpen={isBottomSheetOpen}
+          onClose={() => setIsBottomSheetOpen(false)}
+        />
+
+        {/* Member Dock (mobile only) */}
+        <MemberDock
+          memberCount={membersData.total}
+          topMembers={topMembers}
+          isBottomSheetOpen={isBottomSheetOpen}
+          onFacepileClick={() => setIsBottomSheetOpen(true)}
+        />
+
+        {/* Main content area */}
+        <main className="relative z-10">
+          {/* Content container with right margin for sidebar on desktop */}
+          <div className="md:mr-[280px]">
+            {/* Hero Section */}
+            <section className="min-h-screen flex flex-col justify-center px-4 sm:px-6 md:px-8 lg:px-12 py-20 md:py-32 lg:py-40">
+              <div className="content-container">
+                <h1 className="display text-white mb-6">
+                  A home for next-gen creators
+                </h1>
+                <LiquidButton asChild size="xxl" className="text-white font-medium tracking-tight">
+                  <Link href="/apply">Apply to join</Link>
+                </LiquidButton>
+              </div>
+            </section>
+
+            {/* Editorial Section */}
+            <section className="min-h-screen flex flex-col justify-center px-4 sm:px-6 md:px-8 lg:px-12 py-20 md:py-32 lg:py-40">
+              <div className="content-container">
+                <div className="h-16 md:h-24" /> {/* Spacer */}
+                <div className="body text-white space-y-5 md:space-y-6">
+                  <BlurIn delay={0} duration={800} amount={10}>
+                    <p>Before the Renaissance, craft lived in crowded workshops—the bottegas.</p>
+                  </BlurIn>
+
+                  <BlurIn delay={30} duration={800} amount={10}>
+                    <p>Paintings were collaborative efforts. The master sketched compositions. Assistants and apprentices ground pigments and painted backgrounds.</p>
+                  </BlurIn>
+
+                  <BlurIn delay={60} duration={800} amount={10}>
+                    <p>Then everything changed. Renaissance artists broke free from the workshop model and became complete creators—studying anatomy, writing poetry, designing machines.</p>
+                  </BlurIn>
+
+                  <BlurIn delay={90} duration={800} amount={10}>
+                    <p>They claimed authorship. The center shifted from collective output to the singular creator.</p>
+                  </BlurIn>
+
+                  <BlurIn delay={120} duration={800} amount={10}>
+                    <p>The same shift is happening now. Code is the marble. The prompt is the chisel. The tools are moving the center again from teams of specialists to single creators.</p>
+                  </BlurIn>
+
+                  <BlurIn delay={150} duration={800} amount={10}>
+                    <p>One person can build a game, cut a film, build a business, create art, ship an app and publish a book.</p>
+                  </BlurIn>
+
+                  <BlurIn delay={180} duration={800} amount={10}>
+                    <p>This is not a bottega. It&apos;s a commons for those discovering the ultimate ways of creating and expressing with AI.</p>
+                  </BlurIn>
+                </div>
+
+                {/* Daily Digest Card - Integrated within Editorial */}
+                <div className="mt-12 md:mt-16">
+                  <DailyDigestCard digest={latestDigest} />
+                </div>
+              </div>
+            </section>
+
+            {/* Features Section */}
+            <section className="min-h-screen flex flex-col justify-center px-4 sm:px-6 md:px-8 lg:px-12 py-20 md:py-32 lg:py-40">
+              <div className="content-container">
+                {/* Feature list */}
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:gap-8">
+                  {featureCards.map((feature) => (
+                    <GlassCard
+                      key={feature.title}
+                      blurAmount="3px"
+                      className="rounded-xl p-6 md:p-8 h-[280px] md:h-[320px]"
+                      contentClassName="h-full"
+                    >
+                      <BlurIn delay={feature.delay} duration={800} amount={8}>
+                        <div className="flex h-full flex-col justify-between">
+                          <div>
+                            <h3 className="heading text-white">{feature.title}</h3>
+                          </div>
+                          <p className="body text-white">{feature.description}</p>
+                        </div>
+                      </BlurIn>
+                    </GlassCard>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            {/* FAQ Section */}
+            <section className="min-h-screen flex flex-col justify-center px-4 sm:px-6 md:px-8 lg:px-12 py-20 md:py-32 lg:py-40">
+              <div className="content-container">
+                {/* Heading */}
+                <BlurIn delay={0} duration={800} amount={15}>
+                  <div className="mb-12 md:mb-16">
+                    <h2 className="heading text-white">
+                      Frequently asked questions
+                    </h2>
+                  </div>
+                </BlurIn>
+
+                {/* FAQ list */}
+                <div className="space-y-0">
+                  {faqItems.map((item, index) => (
+                    <BlurIn key={item.question} delay={item.delay} duration={800} amount={8}>
+                      <div className="border-b border-dashed border-white/30 py-3">
+                        <div className="relative mb-3">
+                          <span className="absolute -left-7 md:-left-8 top-1/2 -translate-y-1/2 text-xs tracking-tight text-white/70">
+                            {String(index + 1).padStart(2, '0')} ::
+                          </span>
+                          <h3 className="text-sm font-bold leading-tight tracking-tight text-white md:text-base">
+                            {item.question}
+                          </h3>
+                        </div>
+                        <p className="body text-white">
+                          {item.answer}
+                        </p>
+                      </div>
+                    </BlurIn>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            {/* Bottom CTA */}
+            <section className="px-4 sm:px-6 md:px-8 lg:px-12 py-20 md:py-32 lg:py-40">
+              <div className="content-container">
+                <BlurIn delay={0} duration={800} amount={12}>
+                  <Link
+                    href="/apply"
+                    className="
+                      block
+                      border border-dashed border-white rounded-[20px]
+                      py-16 md:py-20 lg:py-24
+                      text-center
+                      heading text-white
+                      hover:bg-white/5
+                      transition-colors duration-200
+                    "
+                  >
+                    Apply to join
+                  </Link>
+                </BlurIn>
+              </div>
+            </section>
+          </div>
+        </main>
+      </div>
+    </>
+  )
+}

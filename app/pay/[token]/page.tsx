@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { getApplication } from '@/lib/db'
-import { validatePaymentToken, markTokenAsUsed } from '@/lib/payment-tokens'
+import { validatePaymentToken } from '@/lib/payment-tokens'
 import { ErrorMessage } from '@/components/ErrorMessage'
 
 export const dynamic = 'force-dynamic'
@@ -87,16 +87,19 @@ export default async function PayWithTokenPage({
   }
 
   // Create Checkout session for subscription
+  // Note: Token is NOT marked as used here - only after successful payment
+  // This allows users to retry if checkout is abandoned or 3DS fails
   const session = await createSubscriptionCheckout({
     customerId: stripeCustomerId,
     priceId,
     applicationId: application.id,
     successUrl: `${appUrl}/success?app=${encodeURIComponent(application.id)}`,
     cancelUrl: `${appUrl}/apply?canceled=1`,
+    // Pass token ID in metadata so webhook can invalidate it after payment
+    metadata: {
+      payment_token_id: tokenRow.id,
+    },
   })
-
-  // Mark token as used (prevents reuse)
-  await markTokenAsUsed(tokenRow.id)
 
   // Redirect to Stripe Checkout
   redirect(session.url || `${appUrl}/apply`)

@@ -37,6 +37,40 @@ export interface MembersResponse {
   total: number
 }
 
+// Daily Digest from bot
+export interface DailyDigest {
+  id: string
+  digest_date: string // YYYY-MM-DD
+  activity_summary: string | null
+  top_messages: TopMessage[]
+  top_contributors: TopContributor[]
+  stats: DigestStats
+  created_at: string
+  posted_at: string | null
+}
+
+export interface TopMessage {
+  message_id: string
+  author_id: string
+  author_name: string
+  channel_name: string
+  content: string
+  reaction_count: number
+  timestamp: string
+}
+
+export interface TopContributor {
+  author_id: string
+  author_name: string
+  message_count: number
+}
+
+export interface DigestStats {
+  total_messages: number
+  active_channels: number
+  active_members: number
+}
+
 /**
  * Get all members from Supabase (excluding GHOST members)
  */
@@ -200,6 +234,42 @@ export function getAvatarUrl(userId: string, avatarUrl?: string | null): string 
   }
 
   // Fallback to default Discord avatar based on user ID
-  const avatarIndex = Number(BigInt(userId) % 6n)
+  // Use Discord's official algorithm: (user_id >> 22) % 6
+  // This matches the bot's calculation in member_sync.py
+  const avatarIndex = Number((BigInt(userId) >> 22n) % 6n)
   return `https://cdn.discordapp.com/embed/avatars/${avatarIndex}.png`
+}
+
+/**
+ * Get the latest daily digest from Supabase
+ */
+export async function getLatestDigest(): Promise<DailyDigest | null> {
+  try {
+    logger.dbQuery('SELECT', 'daily_digests', { filter: 'latest' })
+
+    const { data, error } = await supabase
+      .from('daily_digests')
+      .select('*')
+      .order('digest_date', { ascending: false })
+      .limit(1)
+      .single()
+
+    if (error) {
+      logger.error('Failed to fetch latest digest from Supabase', error as Error, {
+        operation: 'getLatestDigest',
+      })
+      return null
+    }
+
+    logger.info('Successfully fetched latest digest', {
+      date: data?.digest_date || 'unknown',
+    })
+
+    return data
+  } catch (error) {
+    logger.error('Unexpected error fetching latest digest', error as Error, {
+      operation: 'getLatestDigest',
+    })
+    return null
+  }
 }

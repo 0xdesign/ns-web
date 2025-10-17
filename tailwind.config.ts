@@ -43,12 +43,6 @@ const config: Config = {
           950: '#09090b',
         },
       },
-      fontSize: {
-        'display-xl': ['5rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
-        'display-lg': ['4rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
-        'display-md': ['3rem', { lineHeight: '1.2', letterSpacing: '-0.01em' }],
-        'display-sm': ['2.25rem', { lineHeight: '1.2', letterSpacing: '-0.01em' }],
-      },
       fontFamily: {
         sans: ['var(--font-geist-sans)', 'system-ui', 'sans-serif'],
         mono: ['var(--font-geist-mono)', 'monospace'],

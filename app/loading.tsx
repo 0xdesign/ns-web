@@ -1,5 +1,5 @@
-import Loading from '@/components/loading'
+import { LoadingOverlay } from '@/components/ui/loading-overlay'
 
 export default function RootLoading() {
-  return <Loading />
+  return <LoadingOverlay />
 }

@@ -147,7 +147,7 @@ Web App → Supabase (SQL) ← Discord Bot (member data)
 - Runs daily at 3 AM UTC (configured via `vercel.json`)
 - Syncs all subscriptions: assigns/removes roles based on status
 - Handles edge cases: manual Discord removals, expired subscriptions, data drift
-- Optional `CRON_SECRET` for authentication
+- **Required**: `CRON_SECRET` for production security (prevents unauthorized access)
 
 ### Data Layer Organization
 
@@ -259,13 +259,15 @@ BOT_API_URL=http://localhost:8000
 BOT_API_KEY=[shared-with-bot]
 ```
 
+**Required for Production**:
+- `CRON_SECRET` - Cron job authentication (prevents unauthorized role sync access)
+
 **Optional but Recommended**:
 - `UPSTASH_REDIS_REST_URL` - Rate limiting
 - `TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` - CAPTCHA
 - `RESEND_API_KEY` - Email notifications
 - `STRIPE_WEBHOOK_SECRET` - Webhook verification
 - `NEXT_PUBLIC_DISCORD_INVITE_URL` - Fallback Discord invite link
-- `CRON_SECRET` - Cron job authentication (production)
 
 **Validation**: Most services will fail loudly if keys are missing. Check terminal output on `npm run dev`.
 
@@ -531,9 +533,19 @@ User has already submitted an application. This is rate limiting working correct
 - **Monorepo Overview**: `../CLAUDE.md`
 - **Bot Documentation**: `../ns-bot/CLAUDE.md`
 - **Database Schema**: `../ns-bot/SUPABASE_SCHEMA.md`
+- **Design System**: `./DESIGN_SYSTEM.md`
 - **Web README**: `./README.md`
 - **Deployment Guide**: `./DEPLOYMENT.md`
 - **Production Deployment & Testing**: `./NEXT_STEPS.md`
+
+## Plan Mode Instructions
+
+When in plan mode (before implementation):
+- Sacrifice grammar for the sake of concision
+- List any unresolved questions at the end of your plan
+- Format questions clearly and concisely
+- Prioritize questions by importance (critical → nice-to-have)
+- If no questions exist, explicitly state that the plan is ready for execution
 
 ## Documentation Workflow
 

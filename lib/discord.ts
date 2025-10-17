@@ -149,7 +149,9 @@ export async function addUserToGuild(params: {
   const botToken = process.env.DISCORD_BOT_TOKEN
   if (!botToken) throw new Error('Discord bot token not configured')
 
-  const body: any = { access_token: params.userAccessToken }
+  const body: { access_token: string; roles?: string[] } = {
+    access_token: params.userAccessToken,
+  }
   if (params.roleId) body.roles = [params.roleId]
 
   const response = await fetch(
@@ -205,7 +207,7 @@ function b64u(input: string) {
     .replace(/=+$/, '')
 }
 
-function b64uJson(obj: any) {
+function b64uJson(obj: Record<string, unknown>) {
   return b64u(JSON.stringify(obj))
 }
 
