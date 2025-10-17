@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { MemberStatus } from '@/lib/supabase'
 import { MemberCard } from '@/components/MemberCard'
+import { useGlassFilter } from '@/components/ui/use-glass-filter'
 
 interface MemberSidebarProps {
   members: MemberStatus[]
@@ -11,6 +12,8 @@ interface MemberSidebarProps {
 }
 
 export function MemberSidebar({ members, isOpen, onClose }: MemberSidebarProps) {
+  const filterUrl = useGlassFilter()
+
   // Prevent scroll when bottom sheet is open on mobile
   useEffect(() => {
     if (isOpen) {
@@ -71,7 +74,7 @@ export function MemberSidebar({ members, isOpen, onClose }: MemberSidebarProps) 
               className="absolute inset-0 rounded-t-[28px] pointer-events-none"
               style={{
                 backdropFilter: 'blur(4px)',
-                filter: 'url(#glass-distortion)',
+                filter: filterUrl,
                 background: 'rgba(0,0,0,0.001)',
                 zIndex: 0
               }}

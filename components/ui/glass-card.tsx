@@ -2,6 +2,7 @@
 
 import * as React from 'react'
 import { cn } from '@/lib/utils'
+import { useGlassFilter } from '@/components/ui/use-glass-filter'
 
 export interface GlassCardProps extends React.HTMLAttributes<HTMLDivElement> {
   blurAmount?: string
@@ -10,6 +11,8 @@ export interface GlassCardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
   ({ children, className, contentClassName, blurAmount = '2px', ...props }, ref) => {
+    const filterUrl = useGlassFilter()
+
     return (
       <div
         ref={ref}
@@ -20,7 +23,7 @@ export const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
           className="absolute inset-0 pointer-events-none"
           style={{
             backdropFilter: `blur(${blurAmount})`,
-            filter: 'url(#glass-distortion)',
+            filter: filterUrl,
             borderRadius: 'inherit',
             zIndex: 0,
           }}

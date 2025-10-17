@@ -5,6 +5,7 @@ import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
+import { useGlassFilter } from "@/components/ui/use-glass-filter"
 
 const buttonVariants = cva(
   "inline-flex items-center cursor-pointer justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
@@ -107,6 +108,7 @@ function LiquidButton({
   VariantProps<typeof liquidbuttonVariants> & {
     asChild?: boolean
   }) {
+  const filterUrl = useGlassFilter()
   const buttonClasses = cn(
     "relative group",
     liquidbuttonVariants({ variant, size, className })
@@ -136,7 +138,7 @@ function LiquidButton({
         className="absolute top-0 left-0 isolate -z-10 h-full w-full overflow-hidden rounded-full pointer-events-none"
         style={{
           backdropFilter: 'blur(3px)',
-          filter: 'url(#glass-distortion)'
+          filter: filterUrl
         }}
       />
 
@@ -438,4 +440,4 @@ export const MetalButton = React.forwardRef<
 
 MetalButton.displayName = "MetalButton";
 
-export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton }
+export { Button, buttonVariants, liquidbuttonVariants, LiquidButton }

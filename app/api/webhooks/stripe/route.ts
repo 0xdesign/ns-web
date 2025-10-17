@@ -17,6 +17,11 @@ export const runtime = 'nodejs'
 
 type StripeCustomer = Stripe.Customer | Stripe.DeletedCustomer
 
+type SubscriptionWithPeriodFields = Stripe.Subscription & {
+  current_period_start: number | null
+  current_period_end: number | null
+}
+
 const isStripeCustomer = (customer: StripeCustomer): customer is Stripe.Customer =>
   !('deleted' in customer)
 
@@ -52,6 +57,12 @@ const normalizeSubscriptionStatus = (
     default:
       return 'incomplete'
   }
+}
+
+const maskIdentifier = (value: string, visible = 4) => {
+  if (value.length <= visible) return value
+  const maskedPortion = '*'.repeat(Math.max(0, value.length - visible))
+  return `${maskedPortion}${value.slice(-visible)}`
 }
 
 export async function POST(request: NextRequest) {
@@ -95,7 +106,9 @@ export async function POST(request: NextRequest) {
           email: email || 'unknown@example.com',
         })
 
-        const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+        const subscription = (await stripe.subscriptions.retrieve(
+          subscriptionId
+        )) as unknown as SubscriptionWithPeriodFields
         const normalizedStatus = normalizeSubscriptionStatus(subscription.status)
         const currentPeriodStartIso = subscription.current_period_start
           ? new Date(subscription.current_period_start * 1000).toISOString()
@@ -118,13 +131,14 @@ export async function POST(request: NextRequest) {
 
         const paymentTokenId = session.metadata?.payment_token_id
         if (paymentTokenId) {
+          const maskedToken = maskIdentifier(paymentTokenId)
           try {
             const { markTokenAsUsed } = await import('@/lib/payment-tokens')
             await markTokenAsUsed(paymentTokenId)
-            console.log(`✅ Invalidated payment token ${paymentTokenId} after successful payment`)
+            console.log(`✅ Invalidated payment token ${maskedToken} after successful payment`)
           } catch (e) {
             console.error(
-              `⚠️  Failed to invalidate payment token:`,
+              `⚠️  Failed to invalidate payment token ${maskedToken}:`,
               e instanceof Error ? e.message : e
             )
           }
@@ -178,7 +192,7 @@ export async function POST(request: NextRequest) {
       }
 
       case 'customer.subscription.updated': {
-        const subscription = event.data.object as Stripe.Subscription
+        const subscription = event.data.object as SubscriptionWithPeriodFields
         const stripeCustomerId = extractCustomerId(subscription.customer)
         if (!stripeCustomerId) break
 

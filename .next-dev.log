@@ -489,3 +489,146 @@ Module parse failed: Duplicate export 'MetalButton' (398:69)
 Import trace for requested module:
 ./components/ui/liquid-glass-button.tsx
 ./components/HomeClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development-fallback/0.pack.gz_' -> '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development-fallback/0.pack.gz'
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (406:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+ ✓ Compiled in 758ms (1393 modules)
+ ✓ Compiled in 156ms (574 modules)
+ ✓ Compiled in 200ms (574 modules)
+ ✓ Compiled in 124ms (574 modules)
+ ✓ Compiled in 103ms (574 modules)
+ ✓ Compiled in 575ms (1393 modules)
+ ✓ Compiled in 665ms (1393 modules)
+ ✓ Compiled in 113ms (574 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development-fallback/0.pack.gz_' -> '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development-fallback/0.pack.gz'
+ ✓ Compiled in 673ms (1393 modules)

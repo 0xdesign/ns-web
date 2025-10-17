@@ -1,7 +1,7 @@
 'use server'
 
 import { redirect } from 'next/navigation'
-import { cookies } from 'next/headers'
+import { cookies, type UnsafeUnwrappedCookies } from 'next/headers'
 import { createApplication, getApplicationByDiscordId } from '@/lib/db'
 import { validateApplicationForm } from '@/lib/validations'
 
@@ -12,7 +12,7 @@ export type ApplyFormState = {
 
 export async function submitApplication(prevState: ApplyFormState | undefined, formData: FormData): Promise<ApplyFormState | void> {
   // Ensure authenticated via Discord
-  const cookieStore = await cookies()
+  const cookieStore = cookies() as unknown as UnsafeUnwrappedCookies
   const discordUserCookie = cookieStore.get('discord_user')
   if (!discordUserCookie) {
     return { submitError: 'Not authenticated. Please sign in with Discord first.' }
@@ -86,4 +86,3 @@ export async function submitApplication(prevState: ApplyFormState | undefined, f
     return { submitError: 'Failed to submit application. Please try again.' }
   }
 }
-

@@ -9,10 +9,11 @@ import { GlassCard } from '@/components/ui/glass-card'
 import type { MembersResponse } from '@/lib/supabase'
 
 interface SuccessClientProps {
-  membersData: MembersResponse
+  membersData: MembersResponse | null | undefined
 }
 
 export function SuccessClient({ membersData }: SuccessClientProps) {
+  const memberCount = membersData?.total ?? 0
   const nextSteps = [
     {
       number: 1,
@@ -58,7 +59,7 @@ export function SuccessClient({ membersData }: SuccessClientProps) {
       </div>
 
       {/* Navigation */}
-      <Navigation memberCount={membersData.total} />
+      <Navigation memberCount={memberCount} />
 
       {/* Main content */}
       <main className="relative z-10">
