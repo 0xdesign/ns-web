@@ -11,33 +11,45 @@ export function LoadingOverlay({ onComplete }: LoadingOverlayProps) {
   const [isClipping, setIsClipping] = useState(false)
 
   useEffect(() => {
+    let frame = 0
+    const timeouts: number[] = []
+
     // Animate percentage from 0 to 100 over 2 seconds
     const duration = 2000
-    const startTime = Date.now()
+    const startTime = performance.now()
 
     const animatePercentage = () => {
-      const elapsed = Date.now() - startTime
+      const elapsed = performance.now() - startTime
       const progress = Math.min(elapsed / duration, 1)
       const currentPercentage = Math.round(progress * 100)
 
       setPercentage(currentPercentage)
 
       if (progress < 1) {
-        requestAnimationFrame(animatePercentage)
+        frame = requestAnimationFrame(animatePercentage)
       } else {
         // Start clipping animation after percentage reaches 100%
-        setTimeout(() => {
+        const clipTimeout = window.setTimeout(() => {
           setIsClipping(true)
 
           // Call onComplete after clip animation
-          setTimeout(() => {
+          const completeTimeout = window.setTimeout(() => {
             onComplete?.()
           }, 400)
+          timeouts.push(completeTimeout)
         }, 100)
+        timeouts.push(clipTimeout)
       }
     }
 
-    requestAnimationFrame(animatePercentage)
+    frame = requestAnimationFrame(animatePercentage)
+
+    return () => {
+      if (frame) {
+        cancelAnimationFrame(frame)
+      }
+      timeouts.forEach(clearTimeout)
+    }
   }, [onComplete])
 
   return (

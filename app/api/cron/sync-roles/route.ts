@@ -6,13 +6,24 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
   try {
-    // Optional: protect with a simple bearer token
+    // Require CRON_SECRET for production security
     const expected = process.env.CRON_SECRET
-    if (expected) {
-      const provided = request.headers.get('authorization') || ''
-      if (!provided.endsWith(expected)) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-      }
+    if (!expected) {
+      console.error('CRON_SECRET is not set - cron endpoint is unprotected!')
+      return NextResponse.json(
+        { error: 'Server misconfiguration: CRON_SECRET required' },
+        { status: 500 }
+      )
+    }
+
+    const authHeader = request.headers.get('authorization') || ''
+    // Support both "Bearer <secret>" and raw "<secret>" formats
+    const provided = authHeader.startsWith('Bearer ')
+      ? authHeader.slice(7)
+      : authHeader
+
+    if (provided !== expected) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const roleId = process.env.MEMBER_ROLE_ID

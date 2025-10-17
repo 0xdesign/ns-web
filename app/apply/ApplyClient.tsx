@@ -1,9 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { Navigation } from '@/components/Navigation'
-import { ShapeBlur } from '@/components/ui/shapeblur'
+import { ShapeBlur } from '@/components/ui/ShapeBlur'
 import { BlurIn } from '@/components/ui/blur-in'
 import { LiquidButton } from '@/components/ui/liquid-glass-button'
 import Prism from '@/components/ui/prism'
@@ -67,10 +66,7 @@ export function ApplyClient({ membersData, error, discordAuthUrl }: ApplyClientP
       </div>
 
       {/* Navigation */}
-      <Navigation
-        memberCount={membersData.total}
-        topMembers={membersData.members.slice(0, 3)}
-      />
+      <Navigation memberCount={membersData.total} />
 
       {/* Main content - Split layout */}
       <main className="relative z-10">

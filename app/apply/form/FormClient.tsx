@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { Navigation } from '@/components/Navigation'
 import { LiquidButton } from '@/components/ui/liquid-glass-button'
 import { BlurIn } from '@/components/ui/blur-in'
+import { GlassCard } from '@/components/ui/glass-card'
 import Prism from '@/components/ui/prism'
 import type { MembersResponse } from '@/lib/supabase'
 import type { ApplyFormState } from './actions'
@@ -92,10 +93,7 @@ export function FormClient({ membersData }: FormClientProps) {
       </div>
 
       {/* Navigation */}
-      <Navigation
-        memberCount={membersData.total}
-        topMembers={membersData.members.slice(0, 3)}
-      />
+      <Navigation memberCount={membersData.total} />
 
       {/* Main content */}
       <main className="relative z-10">
@@ -116,54 +114,19 @@ export function FormClient({ membersData }: FormClientProps) {
             {/* Global Error */}
             {state?.submitError && (
               <BlurIn delay={60} duration={800} amount={8}>
-                <div className="group relative rounded-xl overflow-hidden mb-8">
-                  {/* Liquid glass layers */}
-                  <div
-                    className="absolute inset-0 rounded-xl pointer-events-none"
-                    style={{
-                      backdropFilter: 'blur(2px)',
-                      filter: 'url(#glass-distortion)',
-                      zIndex: 0
-                    }}
-                  />
-                  <div
-                    className="absolute inset-0 rounded-xl pointer-events-none"
-                    style={{
-                      boxShadow: 'inset 1px 1px 1px 0 rgba(255, 255, 255, 0.3)',
-                      zIndex: 1
-                    }}
-                  />
-
-                  {/* Content */}
-                  <div className="relative px-6 py-4 border-l-4 border-red-400" style={{ zIndex: 20 }}>
-                    <p className="text-sm text-red-400 font-medium">{state.submitError}</p>
-                  </div>
-                </div>
+                <GlassCard
+                  className="mb-8 rounded-xl"
+                  contentClassName="px-6 py-4 border-l-4 border-red-400"
+                >
+                  <p className="text-sm font-medium text-red-400">{state.submitError}</p>
+                </GlassCard>
               </BlurIn>
             )}
 
             {/* Form */}
             <BlurIn delay={state?.submitError ? 90 : 60} duration={800} amount={8}>
-              <div className="group relative rounded-xl overflow-hidden">
-                {/* Liquid glass layers for form container */}
-                <div
-                  className="absolute inset-0 rounded-xl pointer-events-none"
-                  style={{
-                    backdropFilter: 'blur(2px)',
-                    filter: 'url(#glass-distortion)',
-                    zIndex: 0
-                  }}
-                />
-                <div
-                  className="absolute inset-0 rounded-xl pointer-events-none"
-                  style={{
-                    boxShadow: 'inset 1px 1px 1px 0 rgba(255, 255, 255, 0.3)',
-                    zIndex: 1
-                  }}
-                />
-
-                {/* Form Content */}
-                <form action={formAction} className="relative space-y-8 px-6 py-8 md:px-8 md:py-10" style={{ zIndex: 20 }}>
+              <GlassCard className="rounded-xl" contentClassName="px-6 py-8 md:px-8 md:py-10">
+                <form action={formAction} className="space-y-8">
                   {/* Email */}
                   <div>
                     <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
@@ -299,7 +262,7 @@ export function FormClient({ membersData }: FormClientProps) {
                     <SubmitButton />
                   </div>
                 </form>
-              </div>
+              </GlassCard>
             </BlurIn>
           </div>
         </div>

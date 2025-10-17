@@ -147,7 +147,7 @@ Web App → Supabase (SQL) ← Discord Bot (member data)
 - Runs daily at 3 AM UTC (configured via `vercel.json`)
 - Syncs all subscriptions: assigns/removes roles based on status
 - Handles edge cases: manual Discord removals, expired subscriptions, data drift
-- Optional `CRON_SECRET` for authentication
+- **Required**: `CRON_SECRET` for production security (prevents unauthorized access)
 
 ### Data Layer Organization
 
@@ -259,13 +259,15 @@ BOT_API_URL=http://localhost:8000
 BOT_API_KEY=[shared-with-bot]
 ```
 
+**Required for Production**:
+- `CRON_SECRET` - Cron job authentication (prevents unauthorized role sync access)
+
 **Optional but Recommended**:
 - `UPSTASH_REDIS_REST_URL` - Rate limiting
 - `TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` - CAPTCHA
 - `RESEND_API_KEY` - Email notifications
 - `STRIPE_WEBHOOK_SECRET` - Webhook verification
 - `NEXT_PUBLIC_DISCORD_INVITE_URL` - Fallback Discord invite link
-- `CRON_SECRET` - Cron job authentication (production)
 
 **Validation**: Most services will fail loudly if keys are missing. Check terminal output on `npm run dev`.
 

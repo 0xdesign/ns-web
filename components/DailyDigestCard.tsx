@@ -1,6 +1,7 @@
 "use client"
 
 import { BlurIn } from '@/components/ui/blur-in'
+import { GlassCard } from '@/components/ui/glass-card'
 import type { DailyDigest } from '@/lib/supabase'
 
 interface DailyDigestCardProps {
@@ -21,58 +22,19 @@ export function DailyDigestCard({ digest }: DailyDigestCardProps) {
 
   return (
     <BlurIn delay={210} duration={800} amount={10}>
-      <div className="group relative rounded-xl p-6 md:p-8 overflow-hidden">
-        {/* Layer 1: Blur + Distortion */}
-        <div
-          className="absolute inset-0 rounded-xl pointer-events-none"
-          style={{
-            backdropFilter: 'blur(3px)',
-            filter: 'url(#glass-distortion)',
-            background: 'rgba(0,0,0,0.001)',
-            zIndex: 0
-          }}
-        />
-
-        {/* Layer 2: Shine/Highlight */}
-        <div
-          className="absolute inset-0 rounded-xl pointer-events-none transition-all duration-300"
-          style={{
-            boxShadow: 'inset 1px 1px 1px 0 rgba(255, 255, 255, 0.3)',
-            zIndex: 1
-          }}
-        />
-
-        {/* Layer 3: Brightness Overlay */}
-        <div
-          className="absolute inset-0 rounded-xl pointer-events-none transition-all duration-300 opacity-0 group-hover:opacity-[0.03]"
-          style={{
-            background: 'rgba(255, 255, 255, 1)',
-            zIndex: 2
-          }}
-        />
-
-        {/* Layer 4: Edge Glow Border */}
-        <div
-          className="absolute inset-0 rounded-xl pointer-events-none transition-all duration-300 border border-transparent group-hover:border-white/12"
-          style={{
-            zIndex: 3
-          }}
-        />
-
-        {/* Content */}
-        <div className="relative space-y-6" style={{ zIndex: 20 }}>
-          {/* Header */}
-          <div className="space-y-2">
-            <h3 className="heading text-white">
-              Daily Digest
-            </h3>
+      <GlassCard blurAmount="3px" className="rounded-xl p-6 md:p-8" contentClassName="space-y-6">
+        {/* Header */}
+        <div className="space-y-2">
+          <h3 className="heading text-white">
+            Daily Digest
+          </h3>
             <p className="text-sm text-white/60">{formattedDate}</p>
           </div>
 
           {/* Activity Summary */}
           {digest.activity_summary && (
             <div className="space-y-2">
-              <h4 className="text-sm font-bold text-white/80">Today's Activity</h4>
+              <h4 className="text-sm font-bold text-white/80">Today&rsquo;s Activity</h4>
               <p className="body text-white/90">{digest.activity_summary}</p>
             </div>
           )}
@@ -91,7 +53,7 @@ export function DailyDigestCard({ digest }: DailyDigestCardProps) {
                       <span className="ml-auto">{message.reaction_count} reactions</span>
                     </div>
                     <p className="text-sm text-white/70 line-clamp-2">
-                      "{message.content}"
+                      &ldquo;{message.content}&rdquo;
                     </p>
                   </div>
                 ))}
@@ -129,8 +91,7 @@ export function DailyDigestCard({ digest }: DailyDigestCardProps) {
               <span>{digest.stats.active_members} members</span>
             </div>
           )}
-        </div>
-      </div>
+      </GlassCard>
     </BlurIn>
   )
 }

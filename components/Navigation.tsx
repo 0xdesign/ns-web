@@ -1,15 +1,13 @@
 'use client'
 
 import Link from 'next/link'
-import { MemberStatus } from '@/lib/supabase'
 import { ProgressiveBlur } from '@/components/ui/progressive-blur'
 
 interface NavigationProps {
   memberCount: number
-  topMembers: MemberStatus[]
 }
 
-export function Navigation({ memberCount, topMembers }: NavigationProps) {
+export function Navigation({ memberCount }: NavigationProps) {
   return (
     <>
       {/* Progressive blur at top for nav bar */}

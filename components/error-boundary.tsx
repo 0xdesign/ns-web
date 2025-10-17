@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useEffect } from 'react'
 
 export default function ErrorBoundary({
@@ -61,7 +62,7 @@ export default function ErrorBoundary({
             </svg>
             Try again
           </button>
-          <a
+          <Link
             href="/"
             className="w-full inline-flex items-center justify-center gap-2 rounded-lg border-2 border-neutral-200 dark:border-neutral-700 px-6 py-3 text-base font-semibold text-neutral-900 dark:text-white hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors"
           >
@@ -79,7 +80,7 @@ export default function ErrorBoundary({
               />
             </svg>
             Go home
-          </a>
+          </Link>
         </div>
 
         {process.env.NODE_ENV === 'development' && (

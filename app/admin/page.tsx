@@ -1,3 +1,5 @@
+import Image from 'next/image'
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { isAdmin } from '@/lib/admin-auth'
 import {
@@ -6,7 +8,9 @@ import {
   getAllSubscriptions,
 } from '@/lib/db'
 import { getMembers } from '@/lib/supabase'
-import Link from 'next/link'
+
+// Force dynamic rendering (uses cookies for auth)
+export const dynamic = 'force-dynamic'
 
 export default async function AdminPage() {
   // Check admin access
@@ -87,10 +91,14 @@ export default async function AdminPage() {
                     {/* Discord Info */}
                     <div className="flex items-center gap-3 mb-4">
                       {app.discord_avatar && (
-                        <img
+                        <Image
                           src={`https://cdn.discordapp.com/avatars/${app.discord_user_id}/${app.discord_avatar}.png`}
                           alt={app.discord_username}
+                          width={48}
+                          height={48}
                           className="w-12 h-12 rounded-full"
+                          sizes="48px"
+                          unoptimized
                         />
                       )}
                       <div>
@@ -220,10 +228,14 @@ export default async function AdminPage() {
                 <div key={app.id} className="bg-white dark:bg-gray-800 shadow rounded-lg p-4">
                   <div className="flex items-center gap-3">
                     {app.discord_avatar && (
-                      <img
+                      <Image
                         src={`https://cdn.discordapp.com/avatars/${app.discord_user_id}/${app.discord_avatar}.png`}
                         alt={app.discord_username}
+                        width={40}
+                        height={40}
                         className="w-10 h-10 rounded-full"
+                        sizes="40px"
+                        unoptimized
                       />
                     )}
                     <div>
@@ -252,10 +264,14 @@ export default async function AdminPage() {
                 <div key={app.id} className="bg-white dark:bg-gray-800 shadow rounded-lg p-4">
                   <div className="flex items-center gap-3">
                     {app.discord_avatar && (
-                      <img
+                      <Image
                         src={`https://cdn.discordapp.com/avatars/${app.discord_user_id}/${app.discord_avatar}.png`}
                         alt={app.discord_username}
+                        width={40}
+                        height={40}
                         className="w-10 h-10 rounded-full"
+                        sizes="40px"
+                        unoptimized
                       />
                     )}
                     <div>
@@ -284,10 +300,14 @@ export default async function AdminPage() {
                 <div key={app.id} className="bg-white dark:bg-gray-800 shadow rounded-lg p-4">
                   <div className="flex items-center gap-3">
                     {app.discord_avatar && (
-                      <img
+                      <Image
                         src={`https://cdn.discordapp.com/avatars/${app.discord_user_id}/${app.discord_avatar}.png`}
                         alt={app.discord_username}
+                        width={40}
+                        height={40}
                         className="w-10 h-10 rounded-full"
+                        sizes="40px"
+                        unoptimized
                       />
                     )}
                     <div>
@@ -340,10 +360,17 @@ export default async function AdminPage() {
               {currentMembers.slice(0, 30).map((m) => (
                 <div key={m.user_id} className="bg-white dark:bg-gray-800 shadow rounded-lg p-4">
                   <div className="flex items-center gap-3">
-                    <img
-                      src={m.avatar_url || `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(m.user_id) % 6n)}.png`}
+                    <Image
+                      src={
+                        m.avatar_url ||
+                        `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(m.user_id) % 6n)}.png`
+                      }
                       alt={m.display_name || m.username}
+                      width={40}
+                      height={40}
                       className="w-10 h-10 rounded-full"
+                      sizes="40px"
+                      unoptimized
                     />
                     <div className="min-w-0">
                       <p className="font-medium text-gray-900 dark:text-white truncate">{m.display_name || m.username}</p>

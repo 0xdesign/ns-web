@@ -483,6 +483,29 @@ export async function isAdmin(discordUserId: string): Promise<boolean> {
 }
 
 /**
+ * Get latest subscription for a customer
+ * Used by Discord join callback to verify current membership
+ */
+export async function getLatestSubscriptionForCustomer(
+  customerId: string
+): Promise<Subscription | null> {
+  const { data, error } = await supabase
+    .from('subscriptions')
+    .select('*')
+    .eq('customer_id', customerId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single()
+
+  if (error) {
+    if (error.code === 'PGRST116') return null // No rows found
+    throw error
+  }
+
+  return data
+}
+
+/**
  * Get all subscriptions (for daily sync job)
  */
 export async function getAllSubscriptions(): Promise<
@@ -494,5 +517,6 @@ export async function getAllSubscriptions(): Promise<
     .in('status', ['active', 'past_due', 'canceled'])
 
   if (error) throw error
-  return data as any
+  const rows = (data ?? []) as Array<Subscription & { customer: Customer | null }>
+  return rows.filter((row): row is Subscription & { customer: Customer } => row.customer !== null)
 }

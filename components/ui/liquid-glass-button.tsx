@@ -43,12 +43,20 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button"
+  ({ className, variant, size, asChild = false, type, ...props }, ref) => {
+    const computedClassName = cn(buttonVariants({ variant, size, className }))
+
+    if (asChild) {
+      return (
+        <Slot className={computedClassName} ref={ref} {...props} />
+      )
+    }
+
     return (
-      <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+      <button
+        className={computedClassName}
         ref={ref}
+        type={type ?? 'button'}
         {...props}
       />
     )
@@ -95,6 +103,7 @@ function LiquidButton({
   size,
   asChild = false,
   children,
+  type,
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof liquidbuttonVariants> & {
@@ -152,33 +161,32 @@ function LiquidButton({
     </>
   )
 
-  if (asChild && React.isValidElement(children)) {
-    // Clone the child element and merge props
-    const childProps = children.props as any
-    return (
-      <>
-        {React.cloneElement(children, {
-          ...props,
-          className: cn(buttonClasses, childProps.className),
-          children: (
-            <>
-              {glassEffects}
-              <div className="relative" style={{ zIndex: 20 }}>
-                {childProps.children}
-              </div>
-            </>
-          )
-        } as any)}
-      </>
-    )
+  if (
+    asChild &&
+    React.isValidElement<{ className?: string; children?: React.ReactNode }>(children)
+  ) {
+    const childProps = children.props
+    return React.cloneElement(children, {
+      ...props,
+      className: cn(buttonClasses, childProps.className),
+      children: (
+        <>
+          {glassEffects}
+          <div className="relative" style={{ zIndex: 20 }}>
+            {childProps.children}
+          </div>
+        </>
+      ),
+    })
   }
 
-  return (
-    <button
-      data-slot="button"
-      className={buttonClasses}
-      {...props}
-    >
+    return (
+      <button
+        data-slot="button"
+        className={buttonClasses}
+        type={type ?? 'button'}
+        {...props}
+      >
       {glassEffects}
       <div className="relative" style={{ zIndex: 20 }}>
         {children}
@@ -322,72 +330,112 @@ const ShineEffect = ({ isPressed }: { isPressed: boolean }) => {
 export const MetalButton = React.forwardRef<
   HTMLButtonElement,
   MetalButtonProps
->(({ children, className, variant = "default", ...props }, ref) => {
-  const [isPressed, setIsPressed] = React.useState(false);
-  const [isHovered, setIsHovered] = React.useState(false);
-  const [isTouchDevice, setIsTouchDevice] = React.useState(false);
+>(
+  (
+    {
+      children,
+      className,
+      variant = "default",
+      type,
+      onMouseDown,
+      onMouseUp,
+      onMouseLeave,
+      onMouseEnter,
+      onTouchStart,
+      onTouchEnd,
+      onTouchCancel,
+      ...props
+    },
+    ref,
+  ) => {
+    const [isPressed, setIsPressed] = React.useState(false);
+    const [isHovered, setIsHovered] = React.useState(false);
+    const [isTouchDevice, setIsTouchDevice] = React.useState(false);
 
-  React.useEffect(() => {
-    setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0);
-  }, []);
+    React.useEffect(() => {
+      setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0);
+    }, []);
 
-  const buttonText = children || "Button";
-  const variants = metalButtonVariants(
-    variant,
-    isPressed,
-    isHovered,
-    isTouchDevice,
-  );
+    const buttonText = children || "Button";
+    const variants = metalButtonVariants(
+      variant,
+      isPressed,
+      isHovered,
+      isTouchDevice,
+    );
 
-  const handleInternalMouseDown = () => {
-    setIsPressed(true);
-  };
-  const handleInternalMouseUp = () => {
-    setIsPressed(false);
-  };
-  const handleInternalMouseLeave = () => {
-    setIsPressed(false);
-    setIsHovered(false);
-  };
-  const handleInternalMouseEnter = () => {
-    if (!isTouchDevice) {
-      setIsHovered(true);
-    }
-  };
-  const handleInternalTouchStart = () => {
-    setIsPressed(true);
-  };
-  const handleInternalTouchEnd = () => {
-    setIsPressed(false);
-  };
-  const handleInternalTouchCancel = () => {
-    setIsPressed(false);
-  };
+    const handleInternalMouseDown = () => {
+      setIsPressed(true);
+    };
+    const handleInternalMouseUp = () => {
+      setIsPressed(false);
+    };
+    const handleInternalMouseLeave = () => {
+      setIsPressed(false);
+      setIsHovered(false);
+    };
+    const handleInternalMouseEnter = () => {
+      if (!isTouchDevice) {
+        setIsHovered(true);
+      }
+    };
+    const handleInternalTouchStart = () => {
+      setIsPressed(true);
+    };
+    const handleInternalTouchEnd = () => {
+      setIsPressed(false);
+    };
+    const handleInternalTouchCancel = () => {
+      setIsPressed(false);
+    };
 
-  return (
-    <div className={variants.wrapper} style={variants.wrapperStyle}>
-      <div className={variants.inner} style={variants.innerStyle}></div>
-      <button
-        ref={ref}
-        className={cn(variants.button, className)}
-        style={variants.buttonStyle}
-        {...props}
-        onMouseDown={handleInternalMouseDown}
-        onMouseUp={handleInternalMouseUp}
-        onMouseLeave={handleInternalMouseLeave}
-        onMouseEnter={handleInternalMouseEnter}
-        onTouchStart={handleInternalTouchStart}
-        onTouchEnd={handleInternalTouchEnd}
-        onTouchCancel={handleInternalTouchCancel}
-      >
-        <ShineEffect isPressed={isPressed} />
-        {buttonText}
-        {isHovered && !isPressed && !isTouchDevice && (
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t rounded-lg from-transparent to-white/5" />
-        )}
-      </button>
-    </div>
-  );
-});
+    return (
+      <div className={variants.wrapper} style={variants.wrapperStyle}>
+        <div className={variants.inner} style={variants.innerStyle}></div>
+        <button
+          ref={ref}
+          className={cn(variants.button, className)}
+          style={variants.buttonStyle}
+          type={(type as React.ButtonHTMLAttributes<HTMLButtonElement>["type"]) ?? "button"}
+          {...props}
+          onMouseDown={(event) => {
+            onMouseDown?.(event);
+            handleInternalMouseDown();
+          }}
+          onMouseUp={(event) => {
+            onMouseUp?.(event);
+            handleInternalMouseUp();
+          }}
+          onMouseLeave={(event) => {
+            onMouseLeave?.(event);
+            handleInternalMouseLeave();
+          }}
+          onMouseEnter={(event) => {
+            onMouseEnter?.(event);
+            handleInternalMouseEnter();
+          }}
+          onTouchStart={(event) => {
+            onTouchStart?.(event);
+            handleInternalTouchStart();
+          }}
+          onTouchEnd={(event) => {
+            onTouchEnd?.(event);
+            handleInternalTouchEnd();
+          }}
+          onTouchCancel={(event) => {
+            onTouchCancel?.(event);
+            handleInternalTouchCancel();
+          }}
+        >
+          <ShineEffect isPressed={isPressed} />
+          {buttonText}
+          {isHovered && !isPressed && !isTouchDevice && (
+            <div className="pointer-events-none absolute inset-0 rounded-lg bg-gradient-to-t from-transparent to-white/5" />
+          )}
+        </button>
+      </div>
+    );
+  },
+);
 
 MetalButton.displayName = "MetalButton";

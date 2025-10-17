@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import Stripe from 'stripe'
 import { stripe, verifyWebhookSignature } from '@/lib/stripe'
 import {
   isWebhookProcessed,
@@ -9,8 +10,48 @@ import {
   getCustomerByStripeId,
 } from '@/lib/db'
 import { assignRoleWithRetry, removeRole } from '@/lib/bot-api'
+import type { Subscription as DbSubscription } from '@/lib/db'
 
 export const dynamic = 'force-dynamic'
+
+type StripeCustomer = Stripe.Customer | Stripe.DeletedCustomer
+
+const isStripeCustomer = (customer: StripeCustomer): customer is Stripe.Customer =>
+  !('deleted' in customer)
+
+const extractCustomerId = (
+  customer: string | Stripe.Customer | Stripe.DeletedCustomer | null
+): string | null => {
+  if (!customer) return null
+  if (typeof customer === 'string') return customer
+  return customer.id
+}
+
+const getDiscordUserIdFromCustomer = (customer: StripeCustomer): string | undefined => {
+  if (!isStripeCustomer(customer)) return undefined
+  return customer.metadata?.discord_user_id
+}
+
+const normalizeSubscriptionStatus = (
+  status: Stripe.Subscription.Status
+): DbSubscription['status'] => {
+  switch (status) {
+    case 'active':
+    case 'past_due':
+    case 'canceled':
+    case 'unpaid':
+    case 'incomplete':
+      return status
+    case 'trialing':
+      return 'active'
+    case 'incomplete_expired':
+      return 'incomplete'
+    case 'paused':
+      return 'canceled'
+    default:
+      return 'incomplete'
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -32,39 +73,62 @@ export async function POST(request: NextRequest) {
 
     switch (event.type) {
       case 'checkout.session.completed': {
-        const session = event.data.object as any // Stripe.Checkout.Session
-        const customerId: string | null = session.customer || null
-        const subscriptionId: string | null = session.subscription || null
+        const session = event.data.object as Stripe.Checkout.Session
+        const customerId = extractCustomerId(session.customer)
+        const subscriptionId =
+          typeof session.subscription === 'string'
+            ? session.subscription
+            : session.subscription?.id ?? null
 
         if (!customerId || !subscriptionId) break
 
-        // Retrieve customer to get metadata (discord_user_id)
         const customer = await stripe.customers.retrieve(customerId)
-        const email = (customer as any).email as string | null
-        const discordUserId = (customer as any).metadata?.discord_user_id as string | undefined
+        const discordUserId = getDiscordUserIdFromCustomer(customer)
+        const email = isStripeCustomer(customer) && customer.email ? customer.email : null
 
         if (!discordUserId) break
 
-        // Upsert customer and get database customer record
         const dbCustomer = await upsertCustomer({
           discord_user_id: discordUserId,
           stripe_customer_id: customerId,
           email: email || 'unknown@example.com',
         })
 
-        // Retrieve subscription for details + metadata
-        const sub = await stripe.subscriptions.retrieve(subscriptionId)
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+        const normalizedStatus = normalizeSubscriptionStatus(subscription.status)
+        const currentPeriodStartIso = subscription.current_period_start
+          ? new Date(subscription.current_period_start * 1000).toISOString()
+          : new Date().toISOString()
+        const currentPeriodEndIso = subscription.current_period_end
+          ? new Date(subscription.current_period_end * 1000).toISOString()
+          : new Date().toISOString()
+
         await upsertSubscription({
-          customer_id: dbCustomer.id, // Use database customer ID, not Stripe customer ID
-          stripe_subscription_id: sub.id,
-          status: (sub.status as any) || 'active',
-          current_period_start: new Date(sub.current_period_start * 1000).toISOString(),
-          current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
-          cancel_at_period_end: !!sub.cancel_at_period_end,
-          canceled_at: sub.canceled_at ? new Date(sub.canceled_at * 1000).toISOString() : null,
+          customer_id: dbCustomer.id,
+          stripe_subscription_id: subscription.id,
+          status: normalizedStatus,
+          current_period_start: currentPeriodStartIso,
+          current_period_end: currentPeriodEndIso,
+          cancel_at_period_end: Boolean(subscription.cancel_at_period_end),
+          canceled_at: subscription.canceled_at
+            ? new Date(subscription.canceled_at * 1000).toISOString()
+            : null,
         })
 
-        // Role assignment guard: only for approved application
+        const paymentTokenId = session.metadata?.payment_token_id
+        if (paymentTokenId) {
+          try {
+            const { markTokenAsUsed } = await import('@/lib/payment-tokens')
+            await markTokenAsUsed(paymentTokenId)
+            console.log(`✅ Invalidated payment token ${paymentTokenId} after successful payment`)
+          } catch (e) {
+            console.error(
+              `⚠️  Failed to invalidate payment token:`,
+              e instanceof Error ? e.message : e
+            )
+          }
+        }
+
         const app = await getApplicationByDiscordId(discordUserId)
         if (app && app.status === 'approved') {
           const roleId = process.env.MEMBER_ROLE_ID
@@ -73,7 +137,10 @@ export async function POST(request: NextRequest) {
               await assignRoleWithRetry(discordUserId, roleId, app.id)
               console.log(`✅ Assigned role to ${discordUserId} on checkout completion`)
             } catch (e) {
-              console.error(`⚠️  Failed to assign role to ${discordUserId}:`, e instanceof Error ? e.message : e)
+              console.error(
+                `⚠️  Failed to assign role to ${discordUserId}:`,
+                e instanceof Error ? e.message : e
+              )
               console.error('   → User may need to join the Discord server first')
             }
           }
@@ -82,12 +149,12 @@ export async function POST(request: NextRequest) {
       }
 
       case 'invoice.payment_succeeded': {
-        // Reinforce role for active/past_due members
-        const invoice = event.data.object as any
-        const customerId = invoice.customer as string
+        const invoice = event.data.object as Stripe.Invoice
+        const customerId = extractCustomerId(invoice.customer)
         if (!customerId) break
+
         const customer = await stripe.customers.retrieve(customerId)
-        const discordUserId = (customer as any).metadata?.discord_user_id as string | undefined
+        const discordUserId = getDiscordUserIdFromCustomer(customer)
         if (!discordUserId) break
 
         const app = await getApplicationByDiscordId(discordUserId)
@@ -98,7 +165,10 @@ export async function POST(request: NextRequest) {
               await assignRoleWithRetry(discordUserId, roleId, app.id)
               console.log(`✅ Assigned role to ${discordUserId} on payment success`)
             } catch (e) {
-              console.error(`⚠️  Failed to assign role to ${discordUserId}:`, e instanceof Error ? e.message : e)
+              console.error(
+                `⚠️  Failed to assign role to ${discordUserId}:`,
+                e instanceof Error ? e.message : e
+              )
               console.error('   → User may need to join the Discord server first')
             }
           }
@@ -107,13 +177,18 @@ export async function POST(request: NextRequest) {
       }
 
       case 'customer.subscription.updated': {
-        const subscription = event.data.object as any
-        const stripeCustomerId = subscription.customer as string
-        const status = subscription.status as string
-        const cancelAtPeriodEnd = !!subscription.cancel_at_period_end
-        const currentPeriodEnd = new Date(subscription.current_period_end * 1000)
+        const subscription = event.data.object as Stripe.Subscription
+        const stripeCustomerId = extractCustomerId(subscription.customer)
+        if (!stripeCustomerId) break
 
-        // Get database customer by Stripe customer ID
+        const normalizedStatus = normalizeSubscriptionStatus(subscription.status)
+        const currentPeriodEndDate = subscription.current_period_end
+          ? new Date(subscription.current_period_end * 1000)
+          : new Date()
+        const currentPeriodStartIso = subscription.current_period_start
+          ? new Date(subscription.current_period_start * 1000).toISOString()
+          : new Date().toISOString()
+
         const dbCustomer = await getCustomerByStripeId(stripeCustomerId)
         if (!dbCustomer) {
           console.error('Customer not found for subscription update:', stripeCustomerId)
@@ -121,14 +196,12 @@ export async function POST(request: NextRequest) {
         }
 
         await upsertSubscription({
-          customer_id: dbCustomer.id, // Use database customer ID
+          customer_id: dbCustomer.id,
           stripe_subscription_id: subscription.id,
-          status: (status as any),
-          current_period_start: subscription.current_period_start
-            ? new Date(subscription.current_period_start * 1000).toISOString()
-            : new Date().toISOString(), // Fallback to now if missing
-          current_period_end: currentPeriodEnd.toISOString(),
-          cancel_at_period_end: cancelAtPeriodEnd,
+          status: normalizedStatus,
+          current_period_start: currentPeriodStartIso,
+          current_period_end: currentPeriodEndDate.toISOString(),
+          cancel_at_period_end: Boolean(subscription.cancel_at_period_end),
           canceled_at: subscription.canceled_at
             ? new Date(subscription.canceled_at * 1000).toISOString()
             : null,
@@ -143,12 +216,11 @@ export async function POST(request: NextRequest) {
         const roleId = process.env.MEMBER_ROLE_ID
         if (!roleId) break
 
-        // Keep role while active or past_due, or until period end if canceled
         const now = new Date()
         const shouldHaveRole =
-          status === 'active' ||
-          status === 'past_due' ||
-          (status === 'canceled' && currentPeriodEnd > now)
+          normalizedStatus === 'active' ||
+          normalizedStatus === 'past_due' ||
+          (normalizedStatus === 'canceled' && currentPeriodEndDate > now)
 
         try {
           if (shouldHaveRole) {
@@ -159,18 +231,22 @@ export async function POST(request: NextRequest) {
             console.log(`✅ Removed role from ${discordUserId} on subscription update`)
           }
         } catch (e) {
-          console.error(`⚠️  Failed to sync role for ${discordUserId}:`, e instanceof Error ? e.message : e)
+          console.error(
+            `⚠️  Failed to sync role for ${discordUserId}:`,
+            e instanceof Error ? e.message : e
+          )
           console.error('   → User may need to join the Discord server first')
         }
         break
       }
 
       case 'customer.subscription.deleted': {
-        // Remove role when subscription fully ends
-        const subscription = event.data.object as any
-        const customerId = subscription.customer as string
+        const subscription = event.data.object as Stripe.Subscription
+        const customerId = extractCustomerId(subscription.customer)
+        if (!customerId) break
+
         const customer = await stripe.customers.retrieve(customerId)
-        const discordUserId = (customer as any).metadata?.discord_user_id as string | undefined
+        const discordUserId = getDiscordUserIdFromCustomer(customer)
         if (!discordUserId) break
 
         const roleId = process.env.MEMBER_ROLE_ID
@@ -195,4 +271,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Webhook handler error' }, { status: 400 })
   }
 }
-

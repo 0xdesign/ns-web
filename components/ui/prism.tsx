@@ -3,6 +3,10 @@
 import { useEffect, useRef } from "react";
 import { Renderer, Triangle, Program, Mesh } from "ogl";
 
+type PrismContainerElement = HTMLDivElement & {
+  __prismIO?: IntersectionObserver
+};
+
 interface PrismProps {
   height?: number;
   baseWidth?: number;
@@ -46,7 +50,7 @@ const Prism = ({
   timeScale = 0.5,
   scrollSensitivity = 1,
 }: PrismProps) => {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<PrismContainerElement | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -513,7 +517,7 @@ const Prism = ({
       });
       io.observe(container);
       startRAF();
-      (container as any).__prismIO = io;
+      container.__prismIO = io;
     } else {
       startRAF();
     }
@@ -537,9 +541,9 @@ const Prism = ({
         }
       }
       if (suspendWhenOffscreen) {
-        const io = (container as any).__prismIO
-        if (io) io.disconnect();
-        delete (container as any).__prismIO;
+        const ioRef = container.__prismIO;
+        if (ioRef) ioRef.disconnect();
+        delete container.__prismIO;
       }
       if (gl.canvas.parentElement === container)
         container.removeChild(gl.canvas);

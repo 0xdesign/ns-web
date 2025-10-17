@@ -5,6 +5,7 @@ import { Navigation } from '@/components/Navigation'
 import { LiquidButton } from '@/components/ui/liquid-glass-button'
 import { BlurIn } from '@/components/ui/blur-in'
 import Prism from '@/components/ui/prism'
+import { GlassCard } from '@/components/ui/glass-card'
 import type { MembersResponse } from '@/lib/supabase'
 
 interface SuccessClientProps {
@@ -57,10 +58,7 @@ export function SuccessClient({ membersData }: SuccessClientProps) {
       </div>
 
       {/* Navigation */}
-      <Navigation
-        memberCount={membersData.total}
-        topMembers={membersData.members.slice(0, 3)}
-      />
+      <Navigation memberCount={membersData.total} />
 
       {/* Main content */}
       <main className="relative z-10">
@@ -105,61 +103,22 @@ export function SuccessClient({ membersData }: SuccessClientProps) {
 
               <div className="space-y-4">
                 {nextSteps.map((step, index) => (
-                  <BlurIn key={step.number} delay={120 + (index * 30)} duration={800} amount={8}>
-                    <div className="group relative rounded-xl overflow-hidden">
-                      {/* Layer 1: Blur + Distortion */}
-                      <div
-                        className="absolute inset-0 rounded-xl pointer-events-none"
-                        style={{
-                          backdropFilter: 'blur(2px)',
-                          filter: 'url(#glass-distortion)',
-                          zIndex: 0
-                        }}
-                      />
-
-                      {/* Layer 2: Shine/Highlight */}
-                      <div
-                        className="absolute inset-0 rounded-xl pointer-events-none transition-all duration-300"
-                        style={{
-                          boxShadow: 'inset 1px 1px 1px 0 rgba(255, 255, 255, 0.3)',
-                          zIndex: 1
-                        }}
-                      />
-
-                      {/* Layer 3: Brightness Overlay */}
-                      <div
-                        className="absolute inset-0 rounded-xl pointer-events-none transition-all duration-300 opacity-0 group-hover:opacity-[0.03]"
-                        style={{
-                          background: 'rgba(255, 255, 255, 1)',
-                          zIndex: 2
-                        }}
-                      />
-
-                      {/* Layer 4: Edge Glow Border */}
-                      <div
-                        className="absolute inset-0 rounded-xl pointer-events-none transition-all duration-300 border border-transparent group-hover:border-white/12"
-                        style={{
-                          zIndex: 3
-                        }}
-                      />
-
-                      {/* Content */}
-                      <div className="relative flex gap-4 px-6 py-4" style={{ zIndex: 20 }}>
-                        <div className="flex-shrink-0">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 border border-white/30 text-white text-sm font-medium">
-                            {step.number}
-                          </div>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-base font-semibold text-white mb-1 tracking-tight">
-                            {step.title}
-                          </h3>
-                          <p className="text-sm text-white/70 leading-relaxed">
-                            {step.description}
-                          </p>
+                  <BlurIn key={step.number} delay={120 + index * 30} duration={800} amount={8}>
+                    <GlassCard className="rounded-xl" contentClassName="flex gap-4 px-6 py-4">
+                      <div className="flex-shrink-0">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 border border-white/30 text-white text-sm font-medium">
+                          {step.number}
                         </div>
                       </div>
-                    </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-base font-semibold text-white mb-1 tracking-tight">
+                          {step.title}
+                        </h3>
+                        <p className="text-sm text-white/70 leading-relaxed">
+                          {step.description}
+                        </p>
+                      </div>
+                    </GlassCard>
                   </BlurIn>
                 ))}
               </div>
@@ -167,49 +126,32 @@ export function SuccessClient({ membersData }: SuccessClientProps) {
 
             {/* Info Card */}
             <BlurIn delay={210} duration={800} amount={8}>
-              <div className="group relative rounded-xl overflow-hidden mb-12 md:mb-16">
-                {/* Liquid glass layers */}
-                <div
-                  className="absolute inset-0 rounded-xl pointer-events-none"
-                  style={{
-                    backdropFilter: 'blur(2px)',
-                    filter: 'url(#glass-distortion)',
-                    zIndex: 0
-                  }}
-                />
-                <div
-                  className="absolute inset-0 rounded-xl pointer-events-none"
-                  style={{
-                    boxShadow: 'inset 1px 1px 1px 0 rgba(255, 255, 255, 0.3)',
-                    zIndex: 1
-                  }}
-                />
-
-                {/* Content */}
-                <div className="relative px-6 py-4 border-l-4 border-blue-400" style={{ zIndex: 20 }}>
-                  <div className="flex items-start gap-3">
-                    <svg
-                      className="h-6 w-6 text-blue-400 flex-shrink-0"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
-                      />
-                    </svg>
-                    <div className="flex-1">
-                      <h3 className="text-sm font-semibold text-white mb-2">Check Your Email</h3>
-                      <p className="text-sm text-white/70 leading-relaxed">
-                        Make sure to check your spam folder if you don&apos;t see our email. Add our email address to your contacts to ensure future communications reach your inbox.
-                      </p>
-                    </div>
+              <GlassCard
+                className="mb-12 rounded-xl md:mb-16"
+                contentClassName="px-6 py-4 border-l-4 border-blue-400"
+              >
+                <div className="flex items-start gap-3">
+                  <svg
+                    className="h-6 w-6 text-blue-400 flex-shrink-0"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="2"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+                    />
+                  </svg>
+                  <div className="flex-1">
+                    <h3 className="text-sm font-semibold text-white mb-2">Check Your Email</h3>
+                    <p className="text-sm text-white/70 leading-relaxed">
+                      Make sure to check your spam folder if you don&apos;t see our email. Add our email address to your contacts to ensure future communications reach your inbox.
+                    </p>
                   </div>
                 </div>
-              </div>
+              </GlassCard>
             </BlurIn>
 
             {/* CTA Buttons */}

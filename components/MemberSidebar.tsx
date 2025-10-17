@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { MemberStatus } from '@/lib/supabase'
 import { MemberCard } from '@/components/MemberCard'
 
