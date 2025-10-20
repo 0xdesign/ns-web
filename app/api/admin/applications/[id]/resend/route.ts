@@ -35,7 +35,14 @@ export async function POST(
     if (application.status === 'approved') {
       await revokeActivePaymentTokens(application.id)
       const newToken = await generatePaymentToken(application.id)
-      const paymentUrl = `${process.env.NEXT_PUBLIC_APP_URL}/pay/${newToken}`
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL
+      if (!baseUrl) {
+        return NextResponse.json(
+          { error: 'Configuration error', detail: 'NEXT_PUBLIC_APP_URL is not set' },
+          { status: 500 }
+        )
+      }
+      const paymentUrl = `${baseUrl.replace(/\/$/, '')}/pay/${newToken}`
 
       await sendApprovalEmail({
         to: application.email,
@@ -91,7 +98,10 @@ export async function POST(
     console.error('Resend status email error:', error)
 
     if (error instanceof Error && error.message.includes('Unauthorized')) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json(
+        { error: 'Forbidden', detail: 'Admin access required' },
+        { status: 403 }
+      )
     }
 
     return NextResponse.json(

@@ -61,9 +61,12 @@ export async function POST(
           to: application.email,
           username: application.discord_username,
         })
-        console.log('Rejection email sent successfully to:', application.email)
+        console.log('Rejection email sent', { applicationId: application.id })
       } catch (emailError) {
-        console.error('Failed to send rejection email:', emailError)
+        console.error('Failed to send rejection email', {
+          applicationId: application.id,
+          error: emailError instanceof Error ? emailError.message : String(emailError),
+        })
         // Don't fail the whole rejection if email fails
       }
     }
