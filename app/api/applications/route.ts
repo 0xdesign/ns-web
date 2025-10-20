@@ -64,7 +64,9 @@ export async function POST(request: NextRequest) {
       email: formData.email,
       why_join: formData.why_join,
       what_building: formData.what_building,
+      experience_level: formData.experience_level,
       social_links: JSON.stringify(formData.social_links),
+      project_links: JSON.stringify(formData.project_links),
     })
 
     // Clear Discord user cookie

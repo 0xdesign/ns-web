@@ -632,3 +632,169 @@ Import trace for requested module:
  ✓ Compiled in 113ms (574 modules)
 <w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development-fallback/0.pack.gz_' -> '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development-fallback/0.pack.gz'
  ✓ Compiled in 673ms (1393 modules)
+ ✓ Compiled in 226ms (574 modules)
+ ✓ Compiled in 254ms (574 modules)
+ ✓ Compiled in 137ms (575 modules)
+ ○ Compiling /api/auth/discord/callback ...
+ ✓ Compiled /api/auth/discord/callback in 514ms (842 modules)
+ GET /api/auth/discord/callback?code=JwvDCLwoo40itqcHKLfBdO9R0BXFHO 307 in 969ms
+ ⨯ Error: ENOENT: no such file or directory, open '/Users/yazinakkawi/experiments/noshop/ns-web/.next/server/vendor-chunks/@swc.js'
+    at <unknown> (.next/server/app/apply/form/page.js:617:47)
+    at Object.<anonymous> (.next/server/app/apply/form/page.js:620:3) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/yazinakkawi/experiments/noshop/ns-web/.next/server/vendor-chunks/@swc.js',
+  page: '/apply/form'
+}
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 803ms (1496 modules)
+ ⨯ Error: Cannot find module './611.js'
+Require stack:
+- /Users/yazinakkawi/experiments/noshop/ns-web/.next/server/webpack-runtime.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/.next/server/pages/_document.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/server/require.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/server/load-components.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/build/utils.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/build/swc/options.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/build/swc/index.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/server/lib/start-server.js
+    at <unknown> (.next/server/pages/_document.js:1:325)
+    at Object.<anonymous> (.next/server/pages/_document.js:1:371) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+Error: ENOENT: no such file or directory, open '/Users/yazinakkawi/experiments/noshop/ns-web/.next/server/vendor-chunks/@swc.js'
+    at <unknown> (.next/server/app/apply/form/page.js:617:47)
+    at Object.<anonymous> (.next/server/app/apply/form/page.js:620:3) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/yazinakkawi/experiments/noshop/ns-web/.next/server/vendor-chunks/@swc.js',
+  page: '/apply/form'
+}
+ ⨯ Error: Cannot find module './611.js'
+Require stack:
+- /Users/yazinakkawi/experiments/noshop/ns-web/.next/server/webpack-runtime.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/.next/server/pages/_document.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/server/require.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/server/load-components.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/build/utils.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/build/swc/options.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/build/swc/index.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/server/lib/start-server.js
+    at <unknown> (.next/server/pages/_document.js:1:325)
+    at Object.<anonymous> (.next/server/pages/_document.js:1:371) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+[Error: ENOENT: no such file or directory, open '/Users/yazinakkawi/experiments/noshop/ns-web/.next/fallback-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/yazinakkawi/experiments/noshop/ns-web/.next/fallback-build-manifest.json'
+}
+ GET /apply/form 500 in 1347ms
+ GET /apply/form 500 in 242ms
+ ✓ Compiled in 1312ms (1400 modules)
+ ✓ Compiled in 2.1s (1400 modules)
+ ✓ Compiled in 4.9s (1400 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 3s (1400 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 2.1s (1400 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 3.3s (1400 modules)
+ ✓ Compiled in 2.1s (1400 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1343ms (1400 modules)
+ ✓ Compiled in 1764ms (1400 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 2.9s (1400 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development/0.pack.gz_' -> '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development/0.pack.gz'
+ ✓ Compiled in 2.2s (1400 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development/0.pack.gz_' -> '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development/0.pack.gz'
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1634ms (1400 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development/0.pack.gz_' -> '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development/0.pack.gz'
+ ✓ Compiled in 1978ms (1400 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development/0.pack.gz_' -> '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development/0.pack.gz'
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1879ms (1394 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 908ms (575 modules)
+ ✓ Compiled in 427ms (576 modules)
+ ✓ Compiled in 189ms (576 modules)
+ ✓ Compiled in 273ms (576 modules)
+ ✓ Compiled in 259ms (576 modules)
+ ✓ Compiled in 270ms (575 modules)
+ ✓ Compiled in 3.3s (810 modules)
+ ✓ Compiled in 5.5s (575 modules)
+   Reload env: .env
+ ✓ Compiled in 913ms (1371 modules)
+   Reload env: .env
+ ✓ Compiled in 215ms (1371 modules)
+ ✓ Compiled in 274ms (1371 modules)
+ ✓ Compiled in 165ms (575 modules)
+ ✓ Compiled in 357ms (575 modules)
+ ✓ Compiled in 896ms (1384 modules)
+ ✓ Compiled in 446ms (1384 modules)
+ ✓ Compiled in 295ms (1384 modules)
+ ✓ Compiled in 291ms (1384 modules)
+ ✓ Compiled in 500ms (1385 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 228ms (575 modules)
+ ✓ Compiled in 521ms (1386 modules)
+ ✓ Compiled in 668ms (1386 modules)
+ ✓ Compiled in 665ms (1386 modules)
+ ✓ Compiled in 107ms (575 modules)
+ ✓ Compiled in 908ms (1386 modules)
+ ✓ Compiled in 409ms (1388 modules)
+ ✓ Compiled in 453ms (1388 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 678ms (1388 modules)
+ ✓ Compiled in 372ms (1388 modules)
+ ✓ Compiled in 163ms (576 modules)
+ ✓ Compiled in 113ms (576 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 136ms (576 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development/3.pack.gz_' -> '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development/3.pack.gz'
+ ✓ Compiled in 2.2s (1388 modules)
+ ✓ Compiled in 797ms (1388 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1352ms (1388 modules)
+ ✓ Compiled in 687ms (1388 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1179ms (1388 modules)
+ ✓ Compiled in 452ms (1388 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1074ms (1388 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1955ms (1388 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1239ms (1388 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1186ms (1388 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1172ms (1388 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1535ms (1388 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1119ms (1388 modules)
+ ✓ Compiled in 515ms (1388 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1607ms (1388 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 2.3s (1388 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1316ms (1388 modules)
+ ✓ Compiled in 308ms (576 modules)

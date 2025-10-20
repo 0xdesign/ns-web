@@ -5,6 +5,7 @@
  */
 
 import { z } from 'zod'
+import { EXPERIENCE_LEVEL_VALUES } from './experience-levels'
 
 /**
  * Application form validation schema
@@ -25,10 +26,21 @@ export const applicationSchema = z.object({
     .min(50, 'Please provide at least 50 characters describing what you\'re building')
     .max(1000, 'Please keep your response under 1000 characters'),
 
+  experience_level: z.enum(EXPERIENCE_LEVEL_VALUES, {
+    errorMap: () => ({
+      message: 'Please select the option that best matches your AI experience level',
+    }),
+  }),
+
   social_links: z
     .array(z.string().url('Invalid URL'))
     .min(1, 'Please provide at least one social link (GitHub, Twitter, portfolio, etc.)')
     .max(5, 'Maximum 5 social links allowed'),
+
+  project_links: z
+    .array(z.string().url('Invalid URL'))
+    .max(5, 'Maximum 5 project links allowed')
+    .default([]),
 })
 
 export type ApplicationFormData = z.infer<typeof applicationSchema>

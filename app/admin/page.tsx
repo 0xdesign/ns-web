@@ -7,6 +7,10 @@ import {
   getApplicationsByStatus,
   getAllSubscriptions,
 } from '@/lib/db'
+import {
+  EXPERIENCE_LEVEL_LABELS,
+  type ExperienceLevel,
+} from '@/lib/experience-levels'
 import { getMembers } from '@/lib/supabase'
 
 // Force dynamic rendering (uses cookies for auth)
@@ -133,6 +137,16 @@ export default async function AdminPage() {
 
                       <div>
                         <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Experience with AI
+                        </h4>
+                        <p className="text-sm text-gray-900 dark:text-white">
+                          {EXPERIENCE_LEVEL_LABELS[(app.experience_level as ExperienceLevel)] ??
+                            app.experience_level}
+                        </p>
+                      </div>
+
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                           Social Links
                         </h4>
                         <div className="flex flex-wrap gap-2">
@@ -168,6 +182,64 @@ export default async function AdminPage() {
                               ))
                             } catch {
                               return null
+                            }
+                          })()}
+                        </div>
+                      </div>
+
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Past Project Links
+                        </h4>
+                        <div className="flex flex-wrap gap-2">
+                          {(() => {
+                            try {
+                              const rawLinks = JSON.parse(app.project_links ?? '[]')
+                              if (!Array.isArray(rawLinks) || rawLinks.length === 0) {
+                                return (
+                                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                                    None provided
+                                  </span>
+                                )
+                              }
+
+                              const urls = rawLinks
+                                .map((value: unknown) => {
+                                  if (typeof value !== 'string') return null
+                                  try {
+                                    const url = new URL(value)
+                                    return ['http:', 'https:'].includes(url.protocol) ? url : null
+                                  } catch {
+                                    return null
+                                  }
+                                })
+                                .filter((url): url is URL => url !== null)
+
+                              if (!urls.length) {
+                                return (
+                                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                                    None provided
+                                  </span>
+                                )
+                              }
+
+                              return urls.map((url, i) => (
+                                <a
+                                  key={i}
+                                  href={url.toString()}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 underline"
+                                >
+                                  {url.hostname || url.href}
+                                </a>
+                              ))
+                            } catch {
+                              return (
+                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                  None provided
+                                </span>
+                              )
                             }
                           })()}
                         </div>

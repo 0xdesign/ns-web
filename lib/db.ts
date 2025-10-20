@@ -28,7 +28,9 @@ export interface Application {
   email: string
   why_join: string
   what_building: string
+  experience_level: string
   social_links: string // JSON array
+  project_links: string // JSON array
   status: 'pending' | 'approved' | 'rejected' | 'waitlisted'
   reviewed_by: string | null
   reviewed_at: string | null
@@ -174,7 +176,9 @@ export async function createApplication(data: {
   email: string
   why_join: string
   what_building: string
+  experience_level: string
   social_links: string
+  project_links: string
 }): Promise<Application> {
   const { data: application, error } = await supabase
     .from('applications')

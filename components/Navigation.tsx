@@ -5,9 +5,10 @@ import { ProgressiveBlur } from '@/components/ui/progressive-blur'
 
 interface NavigationProps {
   memberCount: number
+  showMemberCount?: boolean
 }
 
-export function Navigation({ memberCount }: NavigationProps) {
+export function Navigation({ memberCount, showMemberCount = false }: NavigationProps) {
   return (
     <>
       {/* Progressive blur at top for nav bar */}
@@ -38,9 +39,11 @@ export function Navigation({ memberCount }: NavigationProps) {
           </Link>
 
           {/* Desktop member count */}
-          <span className="hidden md:block text-sm font-medium tracking-tight text-white/80">
-            Members — {memberCount}
-          </span>
+          {showMemberCount && (
+            <span className="hidden md:block text-sm font-medium tracking-tight text-white/80">
+              Members — {memberCount}
+            </span>
+          )}
         </div>
       </nav>
     </>

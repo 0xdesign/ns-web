@@ -32,14 +32,21 @@ export async function submitApplication(prevState: ApplyFormState | undefined, f
   const email = (formData.get('email') || '').toString()
   const why_join = (formData.get('why_join') || '').toString()
   const what_building = (formData.get('what_building') || '').toString()
+  const experience_level = (formData.get('experience_level') || '').toString()
   const socialLinksRaw = formData.getAll('social_links').map(v => v.toString()).filter(v => v.trim() !== '')
+  const projectLinksRaw = formData
+    .getAll('project_links')
+    .map((value) => value.toString())
+    .filter((value) => value.trim() !== '')
 
   // Validate
   const validation = validateApplicationForm({
     email,
     why_join,
     what_building,
+    experience_level,
     social_links: socialLinksRaw,
+    project_links: projectLinksRaw,
   })
 
   if (!validation.success) {
@@ -65,7 +72,9 @@ export async function submitApplication(prevState: ApplyFormState | undefined, f
       email,
       why_join,
       what_building,
+      experience_level,
       social_links: JSON.stringify(socialLinksRaw),
+      project_links: JSON.stringify(projectLinksRaw),
     })
 
     // Clear the temporary cookie to prevent state reuse after successful submission
