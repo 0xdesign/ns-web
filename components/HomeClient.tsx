@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { LoadingOverlay } from '@/components/ui/loading-overlay'
 import { Navigation } from '@/components/Navigation'
@@ -12,6 +12,7 @@ import { BlurIn } from '@/components/ui/blur-in'
 import { GlassCard } from '@/components/ui/glass-card'
 import type { MembersResponse, DailyDigest } from '@/lib/supabase'
 import { DailyDigestCard } from '@/components/DailyDigestCard'
+import { hasVisited, markVisited } from '@/lib/visit-cache'
 
 interface HomeClientProps {
   membersData: MembersResponse
@@ -19,8 +20,15 @@ interface HomeClientProps {
 }
 
 export function HomeClient({ membersData, latestDigest }: HomeClientProps) {
-  const [loadingComplete, setLoadingComplete] = useState(false)
+  // Initialize state with localStorage check (prevents flash on return visits)
+  const [loadingComplete, setLoadingComplete] = useState(() => hasVisited())
+  const [showLoader, setShowLoader] = useState(() => !hasVisited())
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
+
+  const handleLoadingComplete = () => {
+    setLoadingComplete(true)
+    markVisited()
+  }
 
   const topMembers = membersData.members?.slice(0, 3) ?? []
   const featureCards = [
@@ -75,9 +83,29 @@ export function HomeClient({ membersData, latestDigest }: HomeClientProps) {
     },
   ] as const
 
+  // Memoize Prism to prevent WebGL context recreation
+  const prismComponent = useMemo(
+    () => (
+      <Prism
+        height={3.5}
+        baseWidth={5.5}
+        animationType="scroll"
+        glow={1.5}
+        noise={0.1}
+        transparent={true}
+        scale={2.5}
+        mobileScale={1.8}
+        colorFrequency={1.2}
+        bloom={1.2}
+        scrollSensitivity={1.5}
+      />
+    ),
+    []
+  )
+
   return (
     <>
-      <LoadingOverlay onComplete={() => setLoadingComplete(true)} />
+      {showLoader && <LoadingOverlay onComplete={handleLoadingComplete} />}
 
       <div
         className="relative min-h-screen bg-neutral-950 text-white overflow-x-hidden"
@@ -90,19 +118,7 @@ export function HomeClient({ membersData, latestDigest }: HomeClientProps) {
         <div className="fixed inset-0 z-0">
           {/* Prism background */}
           <div className="absolute inset-0">
-            <Prism
-              height={3.5}
-              baseWidth={5.5}
-              animationType="scroll"
-              glow={1.5}
-              noise={0.1}
-              transparent={true}
-              scale={2.5}
-              mobileScale={1.8}
-              colorFrequency={1.2}
-              bloom={1.2}
-              scrollSensitivity={1.5}
-            />
+            {prismComponent}
           </div>
           {/* Subtle noise texture */}
           <div className="absolute inset-0 opacity-[0.1] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxwYXRoIGQ9Ik0wIDBoMzAwdjMwMEgweiIgZmlsdGVyPSJ1cmwoI2EpIiBvcGFjaXR5PSIuMDUiLz48L3N2Zz4=')]" />
@@ -111,7 +127,7 @@ export function HomeClient({ membersData, latestDigest }: HomeClientProps) {
         </div>
 
         {/* Navigation */}
-        <Navigation memberCount={membersData.total} />
+        <Navigation memberCount={membersData.total} showMemberCount />
 
         {/* Member Sidebar (desktop right side, mobile bottom sheet) */}
         <MemberSidebar

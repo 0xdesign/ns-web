@@ -2,6 +2,7 @@
 
 import { BlurIn } from '@/components/ui/blur-in'
 import { GlassCard } from '@/components/ui/glass-card'
+import { parseMarkdownLinks } from '@/lib/markdown'
 import type { DailyDigest } from '@/lib/supabase'
 
 interface DailyDigestCardProps {
@@ -35,7 +36,9 @@ export function DailyDigestCard({ digest }: DailyDigestCardProps) {
           {digest.activity_summary && (
             <div className="space-y-2">
               <h4 className="text-sm font-bold text-white/80">Today&rsquo;s Activity</h4>
-              <p className="body text-white/90">{digest.activity_summary}</p>
+              <p className="body text-white/90 whitespace-pre-wrap">
+                {parseMarkdownLinks(digest.activity_summary)}
+              </p>
             </div>
           )}
 

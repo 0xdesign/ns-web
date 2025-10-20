@@ -8,9 +8,60 @@ import { LiquidButton } from '@/components/ui/liquid-glass-button'
 import { BlurIn } from '@/components/ui/blur-in'
 import { GlassCard } from '@/components/ui/glass-card'
 import Prism from '@/components/ui/prism'
+import { EXPERIENCE_LEVELS, type ExperienceLevel } from '@/lib/experience-levels'
 import type { MembersResponse } from '@/lib/supabase'
 import type { ApplyFormState } from './actions'
 import { submitApplication } from './actions'
+
+type SocialLinkType = 'twitter' | 'github' | 'instagram' | 'portfolio'
+
+type SocialLinkEntry = {
+  id: string
+  type: SocialLinkType
+  value: string
+}
+
+const SOCIAL_LINK_CONFIG: Record<
+  SocialLinkType,
+  { label: string; placeholder: string; defaultValue: string }
+> = {
+  twitter: {
+    label: 'Twitter / X',
+    placeholder: 'https://x.com/username',
+    defaultValue: 'https://x.com/',
+  },
+  github: {
+    label: 'GitHub',
+    placeholder: 'https://github.com/username',
+    defaultValue: 'https://github.com/',
+  },
+  instagram: {
+    label: 'Instagram',
+    placeholder: 'https://instagram.com/username',
+    defaultValue: 'https://instagram.com/',
+  },
+  portfolio: {
+    label: 'Project or Portfolio',
+    placeholder: 'https://your-project.com',
+    defaultValue: '',
+  },
+}
+
+const createSocialLink = (type: SocialLinkType): SocialLinkEntry => ({
+  id: `${type}-${Math.random().toString(36).slice(2, 9)}`,
+  type,
+  value: SOCIAL_LINK_CONFIG[type].defaultValue,
+})
+
+type ProjectLinkEntry = {
+  id: string
+  value: string
+}
+
+const createProjectLink = (): ProjectLinkEntry => ({
+  id: `project-${Math.random().toString(36).slice(2, 9)}`,
+  value: '',
+})
 
 interface FormClientProps {
   membersData: MembersResponse
@@ -21,8 +72,15 @@ export function FormClient({ membersData }: FormClientProps) {
     email: '',
     why_join: '',
     what_building: '',
-    social_links: [''],
   })
+  const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel>(
+    EXPERIENCE_LEVELS[0].value
+  )
+  const [socialLinks, setSocialLinks] = useState<SocialLinkEntry[]>(() => [
+    createSocialLink('twitter'),
+  ])
+  const [projectLinks, setProjectLinks] = useState<ProjectLinkEntry[]>([])
+  const [showLinkOptions, setShowLinkOptions] = useState(false)
   const [state, formAction] = useActionState<ApplyFormState, FormData>(
     async (prevState: ApplyFormState, formData: FormData) => {
       const result = await submitApplication(prevState, formData)
@@ -31,26 +89,58 @@ export function FormClient({ membersData }: FormClientProps) {
     {}
   )
 
-  const handleSocialLinkChange = (index: number, value: string) => {
-    const newLinks = [...formData.social_links]
-    newLinks[index] = value
-    setFormData({ ...formData, social_links: newLinks })
+  const getErrors = (field: string): string[] => {
+    if (!state?.errors) return []
+    return Object.entries(state.errors)
+      .filter(([key]) => key === field || key.startsWith(`${field}.`))
+      .flatMap(([, messages]) => messages)
   }
 
-  const addSocialLink = () => {
-    if (formData.social_links.length < 5) {
-      setFormData({
-        ...formData,
-        social_links: [...formData.social_links, ''],
-      })
-    }
+  const handleSocialLinkChange = (id: string, value: string) => {
+    setSocialLinks((links) =>
+      links.map((link) => (link.id === id ? { ...link, value } : link))
+    )
   }
 
-  const removeSocialLink = (index: number) => {
-    if (formData.social_links.length > 1) {
-      const newLinks = formData.social_links.filter((_, i) => i !== index)
-      setFormData({ ...formData, social_links: newLinks })
-    }
+  const addSocialLink = (type: SocialLinkType) => {
+    setSocialLinks((links) => {
+      if (links.length >= 5) {
+        return links
+      }
+      if (type !== 'portfolio' && links.some((link) => link.type === type)) {
+        return links
+      }
+      return [...links, createSocialLink(type)]
+    })
+    setShowLinkOptions(false)
+  }
+
+  const removeSocialLink = (id: string) => {
+    setSocialLinks((links) => {
+      if (links.length <= 1) {
+        return links
+      }
+      return links.filter((link) => link.id !== id)
+    })
+  }
+
+  const handleProjectLinkChange = (id: string, value: string) => {
+    setProjectLinks((links) =>
+      links.map((link) => (link.id === id ? { ...link, value } : link))
+    )
+  }
+
+  const addProjectLink = () => {
+    setProjectLinks((links) => {
+      if (links.length >= 5) {
+        return links
+      }
+      return [...links, createProjectLink()]
+    })
+  }
+
+  const removeProjectLink = (id: string) => {
+    setProjectLinks((links) => links.filter((link) => link.id !== id))
   }
 
   function SubmitButton() {
@@ -66,6 +156,51 @@ export function FormClient({ membersData }: FormClientProps) {
       </LiquidButton>
     )
   }
+
+  function CharacterProgress({
+    current,
+    min,
+    max,
+  }: {
+    current: number
+    min: number
+    max: number
+  }) {
+    const progress = Math.max(0, Math.min(1, current / max))
+    const minPercent = Math.max(0, Math.min(1, min / max)) * 100
+    const meetsMinimum = current >= min
+    const barColor = meetsMinimum ? 'bg-emerald-400' : 'bg-white/60'
+    const markerColor = meetsMinimum ? 'bg-emerald-500' : 'bg-white/80'
+
+    return (
+      <div className="mt-3 space-y-2">
+        <div className="relative">
+          <div className="relative h-1 rounded-full bg-white/10 overflow-hidden">
+            <div
+              className={`h-full transition-all duration-300 ${barColor}`}
+              style={{ width: `${progress * 100}%` }}
+            />
+            <div
+              className="absolute inset-y-0"
+              style={{ left: `calc(${minPercent}% - 1px)` }}
+            >
+              <div className={`h-full w-0.5 ${markerColor}`} />
+            </div>
+          </div>
+          <div
+            className="pointer-events-none absolute top-full mt-1 flex -translate-x-1/2 text-[10px] uppercase tracking-wide text-white/60"
+            style={{ left: `${minPercent}%` }}
+          >
+            Min {min}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  const socialLinkErrors = getErrors('social_links')
+  const projectLinkErrors = getErrors('project_links')
+  const experienceErrors = getErrors('experience_level')
 
   return (
     <div className="relative min-h-screen bg-neutral-950 text-white overflow-x-hidden">
@@ -125,7 +260,7 @@ export function FormClient({ membersData }: FormClientProps) {
 
             {/* Form */}
             <BlurIn delay={state?.submitError ? 90 : 60} duration={800} amount={8}>
-              <GlassCard className="rounded-xl" contentClassName="px-6 py-8 md:px-8 md:py-10">
+              <div className="rounded-xl border border-white/10 bg-neutral-900/80 px-6 py-8 md:px-8 md:py-10">
                 <form action={formAction} className="space-y-8">
                   {/* Email */}
                   <div>
@@ -150,7 +285,7 @@ export function FormClient({ membersData }: FormClientProps) {
                   {/* Why Join */}
                   <div>
                     <label htmlFor="why_join" className="block text-sm font-medium text-white mb-2">
-                      Why do you want to join this community? *
+                      Why do you want to join? *
                     </label>
                     <p className="text-sm text-white/55 mb-2">
                       Minimum 50 characters. Tell us what draws you to this community.
@@ -165,14 +300,10 @@ export function FormClient({ membersData }: FormClientProps) {
                       placeholder="Share your motivation..."
                       required
                     />
-                    <div className="flex justify-between items-center mt-2">
-                      <p className="text-sm text-white/55">
-                        {formData.why_join.length}/1000 characters
-                      </p>
-                      {state?.errors?.why_join && (
-                        <p className="text-sm text-red-400">{state.errors.why_join[0]}</p>
-                      )}
-                    </div>
+                    <CharacterProgress current={formData.why_join.length} min={50} max={1000} />
+                    {state?.errors?.why_join && (
+                      <p className="mt-2 text-sm text-red-400">{state.errors.why_join[0]}</p>
+                    )}
                   </div>
 
                   {/* What Building */}
@@ -193,14 +324,57 @@ export function FormClient({ membersData }: FormClientProps) {
                       placeholder="Describe your projects..."
                       required
                     />
-                    <div className="flex justify-between items-center mt-2">
-                      <p className="text-sm text-white/55">
-                        {formData.what_building.length}/1000 characters
-                      </p>
-                      {state?.errors?.what_building && (
-                        <p className="text-sm text-red-400">{state.errors.what_building[0]}</p>
-                      )}
+                    <CharacterProgress current={formData.what_building.length} min={50} max={1000} />
+                    {state?.errors?.what_building && (
+                      <p className="mt-2 text-sm text-red-400">{state.errors.what_building[0]}</p>
+                    )}
+                  </div>
+
+                  {/* Experience Level */}
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-2">
+                      What&apos;s your experience level creating with AI? *
+                    </label>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {EXPERIENCE_LEVELS.map((option) => {
+                        const isSelected = experienceLevel === option.value
+                        return (
+                          <label
+                            key={option.value}
+                            className={`relative flex cursor-pointer items-start gap-3 rounded-lg border px-4 py-3 transition-colors ${
+                              isSelected
+                                ? 'border-white/60 bg-white/10'
+                                : 'border-white/15 bg-white/5 hover:border-white/35'
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="experience_level"
+                              value={option.value}
+                              checked={isSelected}
+                              onChange={() => setExperienceLevel(option.value)}
+                              className="sr-only"
+                              required
+                            />
+                            <span
+                              className={`mt-1 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border ${
+                                isSelected ? 'border-white bg-white' : 'border-white/40'
+                              }`}
+                              aria-hidden="true"
+                            >
+                              {isSelected && <span className="h-2 w-2 rounded-full bg-neutral-900" />}
+                            </span>
+                            <span className="flex flex-col text-left">
+                              <span className="text-sm font-semibold text-white">{option.title}</span>
+                              <span className="text-sm text-white/60">{option.description}</span>
+                            </span>
+                          </label>
+                        )
+                      })}
                     </div>
+                    {experienceErrors.length > 0 && (
+                      <p className="mt-2 text-sm text-red-400">{experienceErrors[0]}</p>
+                    )}
                   </div>
 
                   {/* Social Links */}
@@ -208,46 +382,129 @@ export function FormClient({ membersData }: FormClientProps) {
                     <label className="block text-sm font-medium text-white mb-2">
                       Social Links *
                     </label>
-                    <p className="text-sm text-white/55 mb-3">
-                      Add links to your GitHub, Twitter, portfolio, or other profiles (minimum 1, maximum 5)
-                    </p>
-                    <div className="space-y-3">
-                      {formData.social_links.map((link, index) => (
-                        <div key={index} className="flex gap-2">
-                          <input
-                            type="url"
-                            name="social_links"
-                            value={link}
-                            onChange={(e) => handleSocialLinkChange(index, e.target.value)}
-                            placeholder="https://github.com/username"
-                            className="block w-full rounded-lg px-4 py-3 text-white placeholder-white/40 bg-white/5 border border-white/30 focus:border-white/50 focus:ring-2 focus:ring-white/20 focus:outline-none backdrop-blur-sm transition-colors"
-                          />
-                          {formData.social_links.length > 1 && (
+                    <div className="space-y-5">
+                      {socialLinks.map((link) => {
+                        const config = SOCIAL_LINK_CONFIG[link.type]
+                        const inputId = `${link.id}-input`
+                        return (
+                          <div key={link.id}>
+                            <label htmlFor={inputId} className="block text-sm font-medium text-white">
+                              {config.label}
+                            </label>
+                            <div className="mt-2 flex gap-2">
+                              <input
+                                id={inputId}
+                                type="url"
+                                name="social_links"
+                                value={link.value}
+                                onChange={(e) => handleSocialLinkChange(link.id, e.target.value)}
+                                placeholder={config.placeholder}
+                                className="block w-full rounded-lg px-4 py-3 text-white placeholder-white/40 bg-neutral-900 border border-white/25 focus:border-white/50 focus:ring-2 focus:ring-white/20 focus:outline-none transition-colors"
+                                required
+                              />
+                              {socialLinks.length > 1 && (
+                                <button
+                                  type="button"
+                                  onClick={() => removeSocialLink(link.id)}
+                                  className="flex-shrink-0 px-4 py-3 text-sm text-red-400 hover:text-red-300 transition-colors"
+                                >
+                                  Remove
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                    {socialLinks.length < 5 && (
+                      <div className="mt-3">
+                        {showLinkOptions ? (
+                          <div className="flex flex-wrap items-center gap-2">
+                            {(['github', 'instagram', 'portfolio'] as SocialLinkType[]).map((type) => {
+                              const isDisabled =
+                                type !== 'portfolio' && socialLinks.some((entry) => entry.type === type)
+                              return (
+                                <button
+                                  key={type}
+                                  type="button"
+                                  onClick={() => addSocialLink(type)}
+                                  disabled={isDisabled}
+                                  className="inline-flex items-center gap-2 rounded-lg border border-white/20 px-3 py-2 text-sm text-white/80 hover:text-white hover:border-white/40 transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+                                >
+                                  {isDisabled ? 'Already added' : `Add ${SOCIAL_LINK_CONFIG[type].label}`}
+                                </button>
+                              )
+                            })}
                             <button
                               type="button"
-                              onClick={() => removeSocialLink(index)}
-                              className="flex-shrink-0 px-4 py-3 text-sm text-red-400 hover:text-red-300 transition-colors"
+                              onClick={() => setShowLinkOptions(false)}
+                              className="inline-flex items-center gap-1 px-3 py-2 text-sm text-white/60 hover:text-white transition-colors"
                             >
-                              Remove
+                              Cancel
                             </button>
-                          )}
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setShowLinkOptions(true)}
+                            className="text-sm text-white/70 hover:text-white transition-colors inline-flex items-center gap-1"
+                          >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                            Add link
+                          </button>
+                        )}
+                      </div>
+                    )}
+                    {socialLinkErrors.length > 0 && (
+                      <p className="mt-2 text-sm text-red-400">{socialLinkErrors[0]}</p>
+                    )}
+                  </div>
+
+                  {/* Project Links */}
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-2">
+                      Past project links (optional)
+                    </label>
+                    <p className="text-sm text-white/55 mb-3">
+                      Share up to 5 URLs that showcase what you&apos;ve built before.
+                    </p>
+                    <div className="space-y-3">
+                      {projectLinks.map((link) => (
+                        <div key={link.id} className="flex gap-2">
+                          <input
+                            type="url"
+                            name="project_links"
+                            value={link.value}
+                            onChange={(e) => handleProjectLinkChange(link.id, e.target.value)}
+                            placeholder="https://your-project.com"
+                            className="block w-full rounded-lg px-4 py-3 text-white placeholder-white/40 bg-neutral-900 border border-white/25 focus:border-white/50 focus:ring-2 focus:ring-white/20 focus:outline-none transition-colors"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeProjectLink(link.id)}
+                            className="flex-shrink-0 px-4 py-3 text-sm text-red-400 hover:text-red-300 transition-colors"
+                          >
+                            Remove
+                          </button>
                         </div>
                       ))}
                     </div>
-                    {formData.social_links.length < 5 && (
+                    {projectLinks.length < 5 && (
                       <button
                         type="button"
-                        onClick={addSocialLink}
+                        onClick={addProjectLink}
                         className="mt-3 text-sm text-white/70 hover:text-white transition-colors inline-flex items-center gap-1"
                       >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                         </svg>
-                        Add another link
+                        Add project link
                       </button>
                     )}
-                    {state?.errors?.social_links && (
-                      <p className="mt-2 text-sm text-red-400">{state.errors.social_links[0]}</p>
+                    {projectLinkErrors.length > 0 && (
+                      <p className="mt-2 text-sm text-red-400">{projectLinkErrors[0]}</p>
                     )}
                   </div>
 
@@ -262,7 +519,7 @@ export function FormClient({ membersData }: FormClientProps) {
                     <SubmitButton />
                   </div>
                 </form>
-              </GlassCard>
+              </div>
             </BlurIn>
           </div>
         </div>
