@@ -18,6 +18,17 @@ export async function POST(
     // Require admin access
     await requireAdmin()
 
+    let sendEmail = true
+    try {
+      const form = await request.formData()
+      const formValue = form.get('sendEmail')
+      if (typeof formValue === 'string') {
+        sendEmail = !['false', '0', 'off'].includes(formValue.toLowerCase())
+      }
+    } catch {
+      // Ignore body parse errors (likely no body sent)
+    }
+
     const { id } = await params
 
     // Get application
@@ -61,23 +72,27 @@ export async function POST(
     const paymentUrl = `${process.env.NEXT_PUBLIC_APP_URL}/pay/${token}`
 
     // Send approval email
-    try {
-      await sendApprovalEmail({
-        to: application.email,
-        username: application.discord_username,
-        paymentUrl,
-      })
-      console.log('Approval email sent successfully to:', application.email)
-    } catch (emailError) {
-      console.error('Failed to send approval email:', emailError)
-      // Don't fail the whole approval if email fails
-      // Admin can manually send the payment link if needed
+    if (sendEmail) {
+      try {
+        await sendApprovalEmail({
+          to: application.email,
+          username: application.discord_username,
+          paymentUrl,
+        })
+        console.log('Approval email sent successfully to:', application.email)
+      } catch (emailError) {
+        console.error('Failed to send approval email:', emailError)
+        // Don't fail the whole approval if email fails
+        // Admin can manually send the payment link if needed
+      }
     }
 
     return NextResponse.json(
       {
         success: true,
-        message: 'Application approved and email sent',
+        message: sendEmail
+          ? 'Application approved and email sent'
+          : 'Application approved (email skipped)',
         paymentUrl,
         email: application.email,
       },

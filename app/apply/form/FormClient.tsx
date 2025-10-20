@@ -6,10 +6,10 @@ import Link from 'next/link'
 import { Navigation } from '@/components/Navigation'
 import { LiquidButton } from '@/components/ui/liquid-glass-button'
 import { BlurIn } from '@/components/ui/blur-in'
-import { GlassCard } from '@/components/ui/glass-card'
 import Prism from '@/components/ui/prism'
 import { EXPERIENCE_LEVELS, type ExperienceLevel } from '@/lib/experience-levels'
 import type { MembersResponse } from '@/lib/supabase'
+import type { DiscordSessionUser } from '@/lib/current-user'
 import type { ApplyFormState } from './actions'
 import { submitApplication } from './actions'
 
@@ -65,9 +65,11 @@ const createProjectLink = (): ProjectLinkEntry => ({
 
 interface FormClientProps {
   membersData: MembersResponse
+  discordUser: DiscordSessionUser | null
+  discordAuthUrl: string
 }
 
-export function FormClient({ membersData }: FormClientProps) {
+export function FormClient({ membersData, discordUser, discordAuthUrl }: FormClientProps) {
   const [formData, setFormData] = useState({
     email: '',
     why_join: '',
@@ -188,7 +190,7 @@ export function FormClient({ membersData }: FormClientProps) {
             </div>
           </div>
           <div
-            className="pointer-events-none absolute top-full mt-1 flex -translate-x-1/2 text-[10px] uppercase tracking-wide text-white/60"
+            className="pointer-events-none absolute top-full mt-1 flex text-[10px] uppercase tracking-wide text-white/60"
             style={{ left: `${minPercent}%` }}
           >
             Min {min}
@@ -201,6 +203,10 @@ export function FormClient({ membersData }: FormClientProps) {
   const socialLinkErrors = getErrors('social_links')
   const projectLinkErrors = getErrors('project_links')
   const experienceErrors = getErrors('experience_level')
+  const submitError = state?.submitError ?? null
+  const isAuthError =
+    submitError === 'Not authenticated. Please sign in with Discord first.' ||
+    submitError === 'Invalid authentication data. Please sign in again.'
 
   return (
     <div className="relative min-h-screen bg-neutral-950 text-white overflow-x-hidden">
@@ -228,7 +234,11 @@ export function FormClient({ membersData }: FormClientProps) {
       </div>
 
       {/* Navigation */}
-      <Navigation memberCount={membersData.total} />
+      <Navigation
+        memberCount={membersData.total}
+        discordUser={discordUser}
+        discordAuthUrl={discordAuthUrl}
+      />
 
       {/* Main content */}
       <main className="relative z-10">
@@ -245,21 +255,8 @@ export function FormClient({ membersData }: FormClientProps) {
                 </p>
               </BlurIn>
             </div>
-
-            {/* Global Error */}
-            {state?.submitError && (
-              <BlurIn delay={60} duration={800} amount={8}>
-                <GlassCard
-                  className="mb-8 rounded-xl"
-                  contentClassName="px-6 py-4 border-l-4 border-red-400"
-                >
-                  <p className="text-sm font-medium text-red-400">{state.submitError}</p>
-                </GlassCard>
-              </BlurIn>
-            )}
-
             {/* Form */}
-            <BlurIn delay={state?.submitError ? 90 : 60} duration={800} amount={8}>
+            <BlurIn delay={60} duration={800} amount={8}>
               <div className="rounded-xl border border-white/10 bg-neutral-900/80 px-6 py-8 md:px-8 md:py-10">
                 <form action={formAction} className="space-y-8">
                   {/* Email */}
@@ -507,6 +504,24 @@ export function FormClient({ membersData }: FormClientProps) {
                       <p className="mt-2 text-sm text-red-400">{projectLinkErrors[0]}</p>
                     )}
                   </div>
+
+                  {submitError && (
+                    <div className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                      <p className="font-medium">
+                        {isAuthError
+                          ? 'Please connect your Discord account before submitting your application.'
+                          : submitError}
+                      </p>
+                      {isAuthError && discordAuthUrl && (
+                        <a
+                          href={discordAuthUrl}
+                          className="mt-2 inline-flex items-center text-sm font-semibold text-red-100 underline underline-offset-4 transition-colors hover:text-white"
+                        >
+                          Connect Discord
+                        </a>
+                      )}
+                    </div>
+                  )}
 
                   {/* Submit Buttons */}
                   <div className="flex flex-col-reverse sm:flex-row justify-end gap-4 pt-4">

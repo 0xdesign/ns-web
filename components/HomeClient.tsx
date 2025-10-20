@@ -13,13 +13,16 @@ import { GlassCard } from '@/components/ui/glass-card'
 import type { MembersResponse, DailyDigest } from '@/lib/supabase'
 import { DailyDigestCard } from '@/components/DailyDigestCard'
 import { hasVisited, markVisited } from '@/lib/visit-cache'
+import type { DiscordSessionUser } from '@/lib/current-user'
 
 interface HomeClientProps {
   membersData: MembersResponse
   latestDigest: DailyDigest | null
+  discordUser: DiscordSessionUser | null
+  discordAuthUrl: string
 }
 
-export function HomeClient({ membersData, latestDigest }: HomeClientProps) {
+export function HomeClient({ membersData, latestDigest, discordUser, discordAuthUrl }: HomeClientProps) {
   // Initialize state with localStorage check (prevents flash on return visits)
   const [loadingComplete, setLoadingComplete] = useState(() => hasVisited())
   const [showLoader, setShowLoader] = useState(() => !hasVisited())
@@ -127,7 +130,12 @@ export function HomeClient({ membersData, latestDigest }: HomeClientProps) {
         </div>
 
         {/* Navigation */}
-        <Navigation memberCount={membersData.total} showMemberCount />
+        <Navigation
+          memberCount={membersData.total}
+          showMemberCount
+          discordUser={discordUser}
+          discordAuthUrl={discordAuthUrl}
+        />
 
         {/* Member Sidebar (desktop right side, mobile bottom sheet) */}
         <MemberSidebar

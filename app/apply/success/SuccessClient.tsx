@@ -7,12 +7,15 @@ import { BlurIn } from '@/components/ui/blur-in'
 import Prism from '@/components/ui/prism'
 import { GlassCard } from '@/components/ui/glass-card'
 import type { MembersResponse } from '@/lib/supabase'
+import type { DiscordSessionUser } from '@/lib/current-user'
 
 interface SuccessClientProps {
   membersData: MembersResponse | null | undefined
+  discordUser: DiscordSessionUser | null
+  discordAuthUrl: string
 }
 
-export function SuccessClient({ membersData }: SuccessClientProps) {
+export function SuccessClient({ membersData, discordUser, discordAuthUrl }: SuccessClientProps) {
   const memberCount = membersData?.total ?? 0
   const nextSteps = [
     {
@@ -59,7 +62,11 @@ export function SuccessClient({ membersData }: SuccessClientProps) {
       </div>
 
       {/* Navigation */}
-      <Navigation memberCount={memberCount} />
+      <Navigation
+        memberCount={memberCount}
+        discordUser={discordUser}
+        discordAuthUrl={discordAuthUrl}
+      />
 
       {/* Main content */}
       <main className="relative z-10">

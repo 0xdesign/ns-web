@@ -1,7 +1,10 @@
+import { cookies } from 'next/headers'
 import { getMembers, getLatestDigest } from '@/lib/supabase'
 import type { MembersResponse } from '@/lib/supabase'
 import { logger } from '@/lib/logger'
 import { HomeClient } from '@/components/HomeClient'
+import { getDiscordAuthUrl } from '@/lib/discord'
+import { parseDiscordUserCookie } from '@/lib/current-user'
 
 export default async function Home() {
   let membersData: MembersResponse = { members: [], total: 0 }
@@ -17,5 +20,17 @@ export default async function Home() {
     // membersData already initialized with empty state
   }
 
-  return <HomeClient membersData={membersData} latestDigest={latestDigest} />
+  const cookieStore = await cookies()
+  const discordCookie = cookieStore.get('discord_user')
+  const discordUser = parseDiscordUserCookie(discordCookie?.value)
+  const discordAuthUrl = getDiscordAuthUrl('/')
+
+  return (
+    <HomeClient
+      membersData={membersData}
+      latestDigest={latestDigest}
+      discordUser={discordUser}
+      discordAuthUrl={discordAuthUrl}
+    />
+  )
 }

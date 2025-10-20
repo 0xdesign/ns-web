@@ -7,14 +7,16 @@ import { BlurIn } from '@/components/ui/blur-in'
 import { LiquidButton } from '@/components/ui/liquid-glass-button'
 import Prism from '@/components/ui/prism'
 import type { MembersResponse } from '@/lib/supabase'
+import type { DiscordSessionUser } from '@/lib/current-user'
 
 interface ApplyClientProps {
   membersData: MembersResponse
   error?: string
   discordAuthUrl: string
+  discordUser: DiscordSessionUser | null
 }
 
-export function ApplyClient({ membersData, error, discordAuthUrl }: ApplyClientProps) {
+export function ApplyClient({ membersData, error, discordAuthUrl, discordUser }: ApplyClientProps) {
   const [isHovered, setIsHovered] = useState(false)
 
   const processSteps = [
@@ -66,7 +68,11 @@ export function ApplyClient({ membersData, error, discordAuthUrl }: ApplyClientP
       </div>
 
       {/* Navigation */}
-      <Navigation memberCount={membersData.total} />
+      <Navigation
+        memberCount={membersData.total}
+        discordUser={discordUser}
+        discordAuthUrl={discordAuthUrl}
+      />
 
       {/* Main content - Split layout */}
       <main className="relative z-10">

@@ -220,6 +220,23 @@ export async function updateApplicationStatus(
   return data
 }
 
+export async function resetApplicationToPending(id: string): Promise<Application> {
+  const { data, error } = await supabase
+    .from('applications')
+    .update({
+      status: 'pending',
+      reviewed_by: null,
+      reviewed_at: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
+}
+
 /**
  * Get applications by status
  */
@@ -230,6 +247,16 @@ export async function getApplicationsByStatus(
     .from('applications')
     .select('*')
     .eq('status', status)
+    .order('created_at', { ascending: false })
+
+  if (error) throw error
+  return data || []
+}
+
+export async function getAllApplications(): Promise<Application[]> {
+  const { data, error } = await supabase
+    .from('applications')
+    .select('*')
     .order('created_at', { ascending: false })
 
   if (error) throw error
