@@ -17,7 +17,7 @@ export default async function ApplyPage({
   ])
 
   const error = params.error
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const discordCookie = cookieStore.get('discord_user')
   const discordUser = parseDiscordUserCookie(discordCookie?.value)
   const discordAuthUrl = getDiscordAuthUrl('/apply')

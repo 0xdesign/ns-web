@@ -6,7 +6,7 @@ import { FormClient } from './FormClient'
 
 export default async function ApplicationFormPage() {
   const membersData = await getMembers()
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const discordCookie = cookieStore.get('discord_user')
   const discordUser = parseDiscordUserCookie(discordCookie?.value)
   const discordAuthUrl = getDiscordAuthUrl('/apply/form')

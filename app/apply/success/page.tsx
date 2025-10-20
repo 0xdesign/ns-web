@@ -6,7 +6,7 @@ import { SuccessClient } from './SuccessClient'
 
 export default async function ApplicationSuccessPage() {
   const membersData = await getMembers()
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const discordCookie = cookieStore.get('discord_user')
   const discordUser = parseDiscordUserCookie(discordCookie?.value)
   const discordAuthUrl = getDiscordAuthUrl('/apply/success')

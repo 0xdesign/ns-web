@@ -20,7 +20,7 @@ export default async function Home() {
     // membersData already initialized with empty state
   }
 
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const discordCookie = cookieStore.get('discord_user')
   const discordUser = parseDiscordUserCookie(discordCookie?.value)
   const discordAuthUrl = getDiscordAuthUrl('/')

@@ -190,7 +190,7 @@ export function FormClient({ membersData, discordUser, discordAuthUrl }: FormCli
             </div>
           </div>
           <div
-            className="pointer-events-none absolute top-full mt-1 flex -translate-x-1/2 text-[10px] uppercase tracking-wide text-white/60"
+            className="pointer-events-none absolute top-full mt-1 flex text-[10px] uppercase tracking-wide text-white/60"
             style={{ left: `${minPercent}%` }}
           >
             Min {min}
