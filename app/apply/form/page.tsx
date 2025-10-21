@@ -2,6 +2,7 @@ import { cookies } from 'next/headers'
 import { getMembers } from '@/lib/supabase'
 import { getDiscordAuthUrl } from '@/lib/discord'
 import { parseDiscordUserCookie } from '@/lib/current-user'
+import { getApplicationByDiscordId } from '@/lib/db'
 import { FormClient } from './FormClient'
 
 export default async function ApplicationFormPage() {
@@ -9,6 +10,9 @@ export default async function ApplicationFormPage() {
   const cookieStore = await cookies()
   const discordCookie = cookieStore.get('discord_user')
   const discordUser = parseDiscordUserCookie(discordCookie?.value)
+  const existingApplication = discordUser
+    ? await getApplicationByDiscordId(discordUser.id)
+    : null
   const discordAuthUrl = getDiscordAuthUrl('/apply/form')
 
   return (
@@ -16,6 +20,7 @@ export default async function ApplicationFormPage() {
       membersData={membersData}
       discordUser={discordUser}
       discordAuthUrl={discordAuthUrl}
+      existingApplication={existingApplication}
     />
   )
 }

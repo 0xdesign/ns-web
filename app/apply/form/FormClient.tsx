@@ -9,6 +9,7 @@ import { BlurIn } from '@/components/ui/blur-in'
 import Prism from '@/components/ui/prism'
 import { EXPERIENCE_LEVELS, EXPERIENCE_LEVEL_VALUES, type ExperienceLevel } from '@/lib/experience-levels'
 import type { MembersResponse } from '@/lib/supabase'
+import type { Application } from '@/lib/db'
 import type { DiscordSessionUser } from '@/lib/current-user'
 import { APPLY_FORM_DRAFT_STORAGE_KEY } from '@/lib/storage-keys'
 import type { ApplyFormState } from './actions'
@@ -73,9 +74,10 @@ interface FormClientProps {
   membersData: MembersResponse
   discordUser: DiscordSessionUser | null
   discordAuthUrl: string
+  existingApplication: Application | null
 }
 
-export function FormClient({ membersData, discordUser, discordAuthUrl }: FormClientProps) {
+export function FormClient({ membersData, discordUser, discordAuthUrl, existingApplication }: FormClientProps) {
   const [formData, setFormData] = useState({
     email: '',
     why_join: '',
@@ -153,6 +155,14 @@ export function FormClient({ membersData, discordUser, discordAuthUrl }: FormCli
   }
 
   useEffect(() => {
+    if (existingApplication) {
+      setDraftHydrated(true)
+      if (typeof window !== 'undefined') {
+        window.sessionStorage.removeItem(APPLY_FORM_DRAFT_STORAGE_KEY)
+      }
+      return
+    }
+
     if (typeof window === 'undefined') {
       return
     }
@@ -221,9 +231,13 @@ export function FormClient({ membersData, discordUser, discordAuthUrl }: FormCli
     } finally {
       setDraftHydrated(true)
     }
-  }, [])
+  }, [existingApplication])
 
   const persistDraft = useCallback(() => {
+    if (existingApplication) {
+      return
+    }
+
     if (typeof window === 'undefined') {
       return
     }
@@ -242,15 +256,19 @@ export function FormClient({ membersData, discordUser, discordAuthUrl }: FormCli
     } catch {
       // ignore storage failures (quota exceeded, etc.)
     }
-  }, [experienceLevel, formData.email, formData.what_building, formData.why_join, projectLinks, socialLinks])
+  }, [existingApplication, experienceLevel, formData.email, formData.what_building, formData.why_join, projectLinks, socialLinks])
 
   useEffect(() => {
+    if (existingApplication) {
+      return
+    }
+
     if (!draftHydrated) {
       return
     }
 
     persistDraft()
-  }, [draftHydrated, persistDraft])
+  }, [draftHydrated, persistDraft, existingApplication])
 
   function SubmitButton() {
     const { pending } = useFormStatus()
@@ -314,6 +332,10 @@ export function FormClient({ membersData, discordUser, discordAuthUrl }: FormCli
   const isAuthError =
     submitError === 'Not authenticated. Please sign in with Discord first.' ||
     submitError === 'Invalid authentication data. Please sign in again.'
+  const hasExistingApplication = Boolean(existingApplication)
+  const submissionDate = existingApplication
+    ? new Date(existingApplication.created_at).toLocaleString()
+    : null
 
   return (
     <div className="relative min-h-screen bg-neutral-950 text-white overflow-x-hidden">
@@ -345,7 +367,7 @@ export function FormClient({ membersData, discordUser, discordAuthUrl }: FormCli
         memberCount={membersData.total}
         discordUser={discordUser}
         discordAuthUrl={discordAuthUrl}
-        onConnectDiscord={persistDraft}
+        onConnectDiscord={hasExistingApplication ? undefined : persistDraft}
       />
 
       {/* Main content */}
@@ -355,16 +377,74 @@ export function FormClient({ membersData, discordUser, discordAuthUrl }: FormCli
             {/* Hero Section */}
             <div className="mb-12 md:mb-16">
               <BlurIn delay={0} duration={800} amount={12}>
-                <h1 className="heading text-white mb-4">Complete Your Application</h1>
+                <h1 className="heading text-white mb-4">
+                  {hasExistingApplication ? 'Application Already Submitted' : 'Complete Your Application'}
+                </h1>
               </BlurIn>
               <BlurIn delay={30} duration={800} amount={10}>
                 <p className="body text-white">
-                  Tell us about yourself and what you&apos;re building
+                  {hasExistingApplication
+                    ? 'Thanks for applying. We captured your submission details below while we finish our review.'
+                    : 'Tell us about yourself and what you&apos;re building'}
                 </p>
               </BlurIn>
             </div>
-            {/* Form */}
-            <BlurIn delay={60} duration={800} amount={8}>
+            {/* Form or submission summary */}
+            {hasExistingApplication ? (
+              <BlurIn delay={60} duration={800} amount={8}>
+                <div className="rounded-xl border border-white/10 bg-neutral-900/80 px-6 py-8 md:px-8 md:py-10 space-y-6">
+                  <div className="space-y-2">
+                    <p className="text-lg font-semibold text-white">You&apos;re all set.</p>
+                    <p className="text-sm text-white/70">
+                      {submissionDate
+                        ? `We received your application on ${submissionDate}.`
+                        : 'We have your application on file.'}
+                    </p>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3">
+                      <p className="text-xs uppercase tracking-wide text-white/50">Status</p>
+                      <p className="mt-1 text-sm font-semibold text-white">
+                        {existingApplication?.status ?? 'pending'}
+                      </p>
+                    </div>
+                    <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3">
+                      <p className="text-xs uppercase tracking-wide text-white/50">Discord</p>
+                      <p className="mt-1 text-sm font-semibold text-white">
+                        {discordUser
+                          ? `${discordUser.username}${
+                              discordUser.discriminator && discordUser.discriminator !== '0'
+                                ? `#${discordUser.discriminator}`
+                                : ''
+                            }`
+                          : existingApplication?.discord_username ?? 'Connected'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-3 sm:flex-row">
+                    <Link
+                      href="/"
+                      className="inline-flex items-center justify-center rounded-md border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white hover:border-white/35 hover:bg-white/15 transition-colors"
+                    >
+                      Return home
+                    </Link>
+                    <Link
+                      href="/apply/success"
+                      className="inline-flex items-center justify-center rounded-md border border-white/20 bg-white/5 px-4 py-2 text-sm font-medium text-white hover:border-white/35 hover:bg-white/10 transition-colors"
+                    >
+                      View next steps
+                    </Link>
+                  </div>
+
+                  <p className="text-xs text-white/50">
+                    Have updates to share? Reply to the confirmation email or reach out to the team on Discord.
+                  </p>
+                </div>
+              </BlurIn>
+            ) : (
+              <BlurIn delay={60} duration={800} amount={8}>
               <div className="rounded-xl border border-white/10 bg-neutral-900/80 px-6 py-8 md:px-8 md:py-10">
                 <form action={formAction} className="space-y-8">
                   {/* Email */}
@@ -645,6 +725,7 @@ export function FormClient({ membersData, discordUser, discordAuthUrl }: FormCli
                 </form>
               </div>
             </BlurIn>
+            )}
           </div>
         </div>
       </main>
