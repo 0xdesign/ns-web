@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { ProgressiveBlur } from '@/components/ui/progressive-blur'
 import type { DiscordSessionUser } from '@/lib/current-user'
 
@@ -73,12 +74,12 @@ export function Navigation({
                 className="flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/80 transition-colors hover:border-white/35 hover:text-white sm:text-sm"
               >
                 {avatarUrl ? (
-                  <img
+                  <Image
                     src={avatarUrl}
                     alt={displayName ?? 'Discord user'}
+                    width={24}
+                    height={24}
                     className="h-6 w-6 rounded-full object-cover"
-                    loading="lazy"
-                    decoding="async"
                   />
                 ) : (
                   <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/10 text-xs font-semibold uppercase">
