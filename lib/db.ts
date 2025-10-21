@@ -28,7 +28,9 @@ export interface Application {
   email: string
   why_join: string
   what_building: string
+  experience_level: string
   social_links: string // JSON array
+  project_links: string // JSON array
   status: 'pending' | 'approved' | 'rejected' | 'waitlisted'
   reviewed_by: string | null
   reviewed_at: string | null
@@ -170,11 +172,41 @@ export async function createApplication(data: {
   email: string
   why_join: string
   what_building: string
+  experience_level: string
   social_links: string
+  project_links: string
 }): Promise<Application> {
   const { data: application, error } = await supabase
     .from('applications')
     .insert([data])
+    .select()
+    .single()
+
+  if (error) throw error
+  return application
+}
+
+export async function updateApplicationDetails(data: {
+  id: string
+  email: string
+  why_join: string
+  what_building: string
+  experience_level: string
+  social_links: string
+  project_links: string
+}): Promise<Application> {
+  const { data: application, error } = await supabase
+    .from('applications')
+    .update({
+      email: data.email,
+      why_join: data.why_join,
+      what_building: data.what_building,
+      experience_level: data.experience_level,
+      social_links: data.social_links,
+      project_links: data.project_links,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', data.id)
     .select()
     .single()
 

@@ -29,6 +29,9 @@ export const applicationSchema = z.object({
     .array(z.string().url('Invalid URL'))
     .min(1, 'Please provide at least one social link (GitHub, Twitter, portfolio, etc.)')
     .max(5, 'Maximum 5 social links allowed'),
+
+  experience_level: z.string().optional(),
+  project_links: z.array(z.string().url('Invalid URL')).max(5, 'Maximum 5 project links allowed').optional(),
 })
 
 export type ApplicationFormData = z.infer<typeof applicationSchema>
