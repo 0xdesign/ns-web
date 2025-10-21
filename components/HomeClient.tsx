@@ -30,6 +30,7 @@ export function HomeClient({ membersData, latestDigest, discordUser, discordAuth
 
   const handleLoadingComplete = () => {
     setLoadingComplete(true)
+    setShowLoader(false)
     markVisited()
   }
 
