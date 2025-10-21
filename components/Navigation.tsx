@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ProgressiveBlur } from '@/components/ui/progressive-blur'
 import type { DiscordSessionUser } from '@/lib/current-user'
 
