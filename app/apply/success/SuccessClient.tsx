@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import Link from 'next/link'
 import { Navigation } from '@/components/Navigation'
 import { LiquidButton } from '@/components/ui/liquid-glass-button'
@@ -8,6 +9,7 @@ import Prism from '@/components/ui/prism'
 import { GlassCard } from '@/components/ui/glass-card'
 import type { MembersResponse } from '@/lib/supabase'
 import type { DiscordSessionUser } from '@/lib/current-user'
+import { APPLY_FORM_DRAFT_STORAGE_KEY } from '@/lib/storage-keys'
 
 interface SuccessClientProps {
   membersData: MembersResponse | null | undefined
@@ -17,6 +19,12 @@ interface SuccessClientProps {
 
 export function SuccessClient({ membersData, discordUser, discordAuthUrl }: SuccessClientProps) {
   const memberCount = membersData?.total ?? 0
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+    window.sessionStorage.removeItem(APPLY_FORM_DRAFT_STORAGE_KEY)
+  }, [])
   const nextSteps = [
     {
       number: 1,

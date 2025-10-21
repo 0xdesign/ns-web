@@ -1,15 +1,16 @@
 'use client'
 
-import { useState, useActionState } from 'react'
+import { useState, useActionState, useEffect, useCallback } from 'react'
 import { useFormStatus } from 'react-dom'
 import Link from 'next/link'
 import { Navigation } from '@/components/Navigation'
 import { LiquidButton } from '@/components/ui/liquid-glass-button'
 import { BlurIn } from '@/components/ui/blur-in'
 import Prism from '@/components/ui/prism'
-import { EXPERIENCE_LEVELS, type ExperienceLevel } from '@/lib/experience-levels'
+import { EXPERIENCE_LEVELS, EXPERIENCE_LEVEL_VALUES, type ExperienceLevel } from '@/lib/experience-levels'
 import type { MembersResponse } from '@/lib/supabase'
 import type { DiscordSessionUser } from '@/lib/current-user'
+import { APPLY_FORM_DRAFT_STORAGE_KEY } from '@/lib/storage-keys'
 import type { ApplyFormState } from './actions'
 import { submitApplication } from './actions'
 
@@ -47,11 +48,16 @@ const SOCIAL_LINK_CONFIG: Record<
   },
 }
 
-const createSocialLink = (type: SocialLinkType): SocialLinkEntry => ({
+const createSocialLink = (type: SocialLinkType, initialValue?: string): SocialLinkEntry => ({
   id: `${type}-${Math.random().toString(36).slice(2, 9)}`,
   type,
-  value: SOCIAL_LINK_CONFIG[type].defaultValue,
+  value: initialValue ?? SOCIAL_LINK_CONFIG[type].defaultValue,
 })
+
+type SocialLinkDraft = {
+  type: SocialLinkType
+  value: string
+}
 
 type ProjectLinkEntry = {
   id: string
@@ -83,6 +89,7 @@ export function FormClient({ membersData, discordUser, discordAuthUrl }: FormCli
   ])
   const [projectLinks, setProjectLinks] = useState<ProjectLinkEntry[]>([])
   const [showLinkOptions, setShowLinkOptions] = useState(false)
+  const [draftHydrated, setDraftHydrated] = useState(false)
   const [state, formAction] = useActionState<ApplyFormState, FormData>(
     async (prevState: ApplyFormState, formData: FormData) => {
       const result = await submitApplication(prevState, formData)
@@ -144,6 +151,106 @@ export function FormClient({ membersData, discordUser, discordAuthUrl }: FormCli
   const removeProjectLink = (id: string) => {
     setProjectLinks((links) => links.filter((link) => link.id !== id))
   }
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    try {
+      const rawDraft = window.sessionStorage.getItem(APPLY_FORM_DRAFT_STORAGE_KEY)
+      if (rawDraft) {
+        const draft = JSON.parse(rawDraft) as {
+          email?: unknown
+          why_join?: unknown
+          what_building?: unknown
+          experience_level?: unknown
+          social_links?: unknown
+          project_links?: unknown
+        }
+
+        setFormData((prev) => ({
+          ...prev,
+          email: typeof draft.email === 'string' ? draft.email : prev.email,
+          why_join: typeof draft.why_join === 'string' ? draft.why_join : prev.why_join,
+          what_building:
+            typeof draft.what_building === 'string' ? draft.what_building : prev.what_building,
+        }))
+
+        if (
+          typeof draft.experience_level === 'string' &&
+          (EXPERIENCE_LEVEL_VALUES as readonly string[]).includes(draft.experience_level)
+        ) {
+          setExperienceLevel(draft.experience_level as ExperienceLevel)
+        }
+
+        if (Array.isArray(draft.social_links)) {
+          const restoredLinks = (draft.social_links as SocialLinkDraft[])
+            .map((link) => {
+              if (!link || typeof link.type !== 'string' || typeof link.value !== 'string') {
+                return null
+              }
+              if (!(link.type in SOCIAL_LINK_CONFIG)) {
+                return null
+              }
+              return createSocialLink(link.type as SocialLinkType, link.value)
+            })
+            .filter((entry): entry is SocialLinkEntry => entry !== null)
+
+          if (restoredLinks.length > 0) {
+            setSocialLinks(restoredLinks)
+          }
+        }
+
+        if (Array.isArray(draft.project_links)) {
+          const restoredProjects = (draft.project_links as unknown[])
+            .map((value) =>
+              typeof value === 'string'
+                ? { id: `project-${Math.random().toString(36).slice(2, 9)}`, value }
+                : null
+            )
+            .filter((entry): entry is ProjectLinkEntry => entry !== null)
+
+          if (restoredProjects.length > 0) {
+            setProjectLinks(restoredProjects)
+          }
+        }
+      }
+    } catch {
+      // ignore malformed draft data
+    } finally {
+      setDraftHydrated(true)
+    }
+  }, [])
+
+  const persistDraft = useCallback(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    const draft = {
+      email: formData.email,
+      why_join: formData.why_join,
+      what_building: formData.what_building,
+      experience_level: experienceLevel,
+      social_links: socialLinks.map((link) => ({ type: link.type, value: link.value })),
+      project_links: projectLinks.map((link) => link.value),
+    }
+
+    try {
+      window.sessionStorage.setItem(APPLY_FORM_DRAFT_STORAGE_KEY, JSON.stringify(draft))
+    } catch {
+      // ignore storage failures (quota exceeded, etc.)
+    }
+  }, [experienceLevel, formData.email, formData.what_building, formData.why_join, projectLinks, socialLinks])
+
+  useEffect(() => {
+    if (!draftHydrated) {
+      return
+    }
+
+    persistDraft()
+  }, [draftHydrated, persistDraft])
 
   function SubmitButton() {
     const { pending } = useFormStatus()
@@ -238,6 +345,7 @@ export function FormClient({ membersData, discordUser, discordAuthUrl }: FormCli
         memberCount={membersData.total}
         discordUser={discordUser}
         discordAuthUrl={discordAuthUrl}
+        onConnectDiscord={persistDraft}
       />
 
       {/* Main content */}
@@ -515,6 +623,7 @@ export function FormClient({ membersData, discordUser, discordAuthUrl }: FormCli
                       {isAuthError && discordAuthUrl && (
                         <a
                           href={discordAuthUrl}
+                          onClick={persistDraft}
                           className="mt-2 inline-flex items-center text-sm font-semibold text-red-100 underline underline-offset-4 transition-colors hover:text-white"
                         >
                           Connect Discord

@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { createApplication, getApplicationByDiscordId } from '@/lib/db'
 import { validateApplicationForm } from '@/lib/validations'
+import { parseDiscordUserCookie } from '@/lib/current-user'
 
 export type ApplyFormState = {
   errors?: Record<string, string[]>
@@ -19,10 +20,8 @@ export async function submitApplication(prevState: ApplyFormState | undefined, f
   }
 
   // Parse Discord user data with error handling
-  let discordUser
-  try {
-    discordUser = JSON.parse(discordUserCookie.value)
-  } catch {
+  const discordUser = parseDiscordUserCookie(discordUserCookie.value)
+  if (!discordUser) {
     // Invalid cookie data - clean up and ask user to sign in again
     cookieStore.delete('discord_user')
     return { submitError: 'Invalid authentication data. Please sign in again.' }

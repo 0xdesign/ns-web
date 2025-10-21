@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { ProgressiveBlur } from '@/components/ui/progressive-blur'
 import type { DiscordSessionUser } from '@/lib/current-user'
@@ -9,6 +10,7 @@ interface NavigationProps {
   discordUser?: DiscordSessionUser | null
   discordAuthUrl?: string
   showMemberCount?: boolean
+  onConnectDiscord?: () => void
 }
 
 export function Navigation({
@@ -16,6 +18,7 @@ export function Navigation({
   discordUser,
   discordAuthUrl,
   showMemberCount = false,
+  onConnectDiscord,
 }: NavigationProps) {
   const profileLink = discordUser ? `https://discord.com/users/${discordUser.id}` : undefined
   const avatarUrl =
@@ -73,12 +76,12 @@ export function Navigation({
                 className="flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/80 transition-colors hover:border-white/35 hover:text-white sm:text-sm"
               >
                 {avatarUrl ? (
-                  <img
+                  <Image
                     src={avatarUrl}
                     alt={displayName ?? 'Discord user'}
+                    width={24}
+                    height={24}
                     className="h-6 w-6 rounded-full object-cover"
-                    loading="lazy"
-                    decoding="async"
                   />
                 ) : (
                   <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/10 text-xs font-semibold uppercase">
@@ -91,6 +94,7 @@ export function Navigation({
               discordAuthUrl && (
                 <a
                   href={discordAuthUrl}
+                  onClick={onConnectDiscord}
                   className="inline-flex items-center rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white/80 transition-colors hover:border-white/35 hover:text-white sm:px-4 sm:text-sm"
                 >
                   Connect Discord
