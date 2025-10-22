@@ -136,6 +136,7 @@ export function HomeClient({ membersData, latestDigest, discordUser, discordAuth
           showMemberCount
           discordUser={discordUser}
           discordAuthUrl={discordAuthUrl}
+          showAuthActions={false}
         />
 
         {/* Member Sidebar (desktop right side, mobile bottom sheet) */}

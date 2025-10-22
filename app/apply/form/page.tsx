@@ -14,6 +14,10 @@ export default async function ApplicationFormPage() {
     ? await getApplicationByDiscordId(discordUser.id)
     : null
   const discordAuthUrl = getDiscordAuthUrl('/apply/form')
+  const navigationAuthUrls = {
+    disconnect: `/api/auth/discord/logout?redirect=${encodeURIComponent('/apply/form')}`,
+    switchAccount: `/api/auth/discord/switch?state=${encodeURIComponent('/apply/form')}`,
+  }
 
   return (
     <FormClient
@@ -21,6 +25,7 @@ export default async function ApplicationFormPage() {
       discordUser={discordUser}
       discordAuthUrl={discordAuthUrl}
       existingApplication={existingApplication}
+      navigationAuthUrls={navigationAuthUrls}
     />
   )
 }

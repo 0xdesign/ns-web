@@ -10,12 +10,17 @@ export default async function ApplicationSuccessPage() {
   const discordCookie = cookieStore.get('discord_user')
   const discordUser = parseDiscordUserCookie(discordCookie?.value)
   const discordAuthUrl = getDiscordAuthUrl('/apply/success')
+  const navigationAuthUrls = {
+    disconnect: `/api/auth/discord/logout?redirect=${encodeURIComponent('/apply/success')}`,
+    switchAccount: `/api/auth/discord/switch?state=${encodeURIComponent('/apply/success')}`,
+  }
 
   return (
     <SuccessClient
       membersData={membersData}
       discordUser={discordUser}
       discordAuthUrl={discordAuthUrl}
+      navigationAuthUrls={navigationAuthUrls}
     />
   )
 }
