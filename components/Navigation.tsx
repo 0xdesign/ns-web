@@ -98,7 +98,9 @@ export function Navigation({
                   )}
                   <span>{displayName}</span>
                 </a>
-                {showAuthActions && (authUrls?.switchAccount || authUrls?.disconnect) && (
+                {showAuthActions &&
+                  discordAuthUrl &&
+                  (authUrls?.switchAccount || authUrls?.disconnect) && (
                   <div className="flex items-center gap-1 sm:gap-2 text-[11px] font-medium text-white/70 sm:text-xs">
                     {authUrls?.switchAccount && (
                       <a
