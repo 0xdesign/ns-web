@@ -13,6 +13,7 @@ test-results
 
 # next.js
 /.next/
+/.next-dev.pid
 /out/
 
 # production

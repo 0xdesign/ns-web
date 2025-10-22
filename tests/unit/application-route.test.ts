@@ -7,6 +7,7 @@ const mockGetApplicationByDiscordId = vi.fn();
 const mockCreateApplication = vi.fn();
 const mockUpdateApplicationDetails = vi.fn();
 const mockValidateApplicationForm = vi.fn();
+const mockValidateApplicationUpdate = vi.fn();
 const mockEnforceApplicationRateLimit = vi.fn();
 
 vi.mock('next/headers', () => ({
@@ -24,6 +25,7 @@ vi.mock('@/lib/db', () => ({
 
 vi.mock('@/lib/validations', () => ({
   validateApplicationForm: mockValidateApplicationForm,
+  validateApplicationUpdate: mockValidateApplicationUpdate,
 }));
 
 vi.mock('@/lib/rate-limit', () => ({
@@ -60,6 +62,10 @@ describe('Applications API route', () => {
       allowed: true,
       remaining: 2,
       reset: Date.now() + 1000,
+    });
+    mockValidateApplicationUpdate.mockReturnValue({
+      success: true,
+      data: {},
     });
   });
 
@@ -156,5 +162,51 @@ describe('Applications API route', () => {
     expect(response.status).toBe(429);
     expect(body.error).toContain('Too many applications');
     expect(mockCreateApplication).not.toHaveBeenCalled();
+  });
+
+  it('updates an application with partial data', async () => {
+    const existing = {
+      id: 'existing-app',
+      status: 'pending',
+      email: 'test@example.com',
+      why_join: 'A'.repeat(60),
+      what_building: 'B'.repeat(60),
+      experience_level: 'intermediate',
+      social_links: '["https://github.com/example"]',
+      project_links: '[]',
+    };
+
+    mockGetApplicationByDiscordId.mockResolvedValue(existing);
+    mockValidateApplicationUpdate.mockReturnValue({
+      success: true,
+      data: {
+        why_join: 'C'.repeat(60),
+      },
+    });
+    mockUpdateApplicationDetails.mockResolvedValue({
+      ...existing,
+      why_join: 'C'.repeat(60),
+      updated_at: new Date().toISOString(),
+    });
+
+    const { PATCH } = await import('@/app/api/applications/route');
+    const response = await PATCH(
+      createRequest(
+        {
+          why_join: 'C'.repeat(60),
+        },
+        'PATCH'
+      )
+    );
+
+    expect(response.status).toBe(200);
+    expect(mockValidateApplicationUpdate).toHaveBeenCalled();
+    expect(mockUpdateApplicationDetails).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'existing-app',
+        why_join: 'C'.repeat(60),
+        email: existing.email,
+      })
+    );
   });
 });

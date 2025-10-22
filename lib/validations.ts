@@ -7,9 +7,9 @@
 import { z } from 'zod'
 
 /**
- * Application form validation schema
+ * Application form validation schema (create)
  */
-export const applicationSchema = z.object({
+export const applicationCreateSchema = z.object({
   email: z
     .string()
     .email('Invalid email address')
@@ -34,17 +34,26 @@ export const applicationSchema = z.object({
   project_links: z.array(z.string().url('Invalid URL')).max(5, 'Maximum 5 project links allowed').optional(),
 })
 
-export type ApplicationFormData = z.infer<typeof applicationSchema>
+/**
+ * Application form validation schema (partial updates)
+ */
+export const applicationUpdateSchema = applicationCreateSchema.partial()
+
+export type ApplicationFormData = z.infer<typeof applicationCreateSchema>
+export type ApplicationUpdateData = z.infer<typeof applicationUpdateSchema>
 
 /**
  * Validate application form data
  */
-export function validateApplicationForm(data: unknown): {
+function validateWithSchema<T extends z.ZodTypeAny>(
+  schema: T,
+  data: unknown
+): {
   success: boolean
-  data?: ApplicationFormData
+  data?: z.infer<T>
   errors?: Record<string, string[]>
 } {
-  const result = applicationSchema.safeParse(data)
+  const result = schema.safeParse(data)
 
   if (!result.success) {
     const errors: Record<string, string[]> = {}
@@ -55,9 +64,16 @@ export function validateApplicationForm(data: unknown): {
       }
       errors[path].push(err.message)
     })
-
     return { success: false, errors }
   }
 
   return { success: true, data: result.data }
+}
+
+export function validateApplicationForm(data: unknown) {
+  return validateWithSchema(applicationCreateSchema, data)
+}
+
+export function validateApplicationUpdate(data: unknown) {
+  return validateWithSchema(applicationUpdateSchema, data)
 }

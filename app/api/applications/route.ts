@@ -7,7 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createApplication, getApplicationByDiscordId, updateApplicationDetails } from '@/lib/db'
-import { validateApplicationForm } from '@/lib/validations'
+import { validateApplicationForm, validateApplicationUpdate } from '@/lib/validations'
 import { enforceApplicationRateLimit } from '@/lib/rate-limit'
 
 async function getAuthenticatedDiscordUser() {
@@ -185,7 +185,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json()
-    const validation = validateApplicationForm(body)
+    const validation = validateApplicationUpdate(body)
 
     if (!validation.success) {
       return NextResponse.json(
@@ -201,12 +201,22 @@ export async function PATCH(request: NextRequest) {
 
     const updatedApplication = await updateApplicationDetails({
       id: existingApplication.id,
-      email: formData.email,
-      why_join: formData.why_join,
-      what_building: formData.what_building,
+      email: formData.email ?? existingApplication.email,
+      why_join: formData.why_join ?? existingApplication.why_join,
+      what_building: formData.what_building ?? existingApplication.what_building,
       experience_level: formData.experience_level ?? existingApplication.experience_level,
-      social_links: JSON.stringify(formData.social_links),
-      project_links: JSON.stringify(formData.project_links ?? []),
+      social_links: JSON.stringify(
+        formData.social_links ??
+          (existingApplication.social_links
+            ? JSON.parse(existingApplication.social_links)
+            : [])
+      ),
+      project_links: JSON.stringify(
+        formData.project_links ??
+          (existingApplication.project_links
+            ? JSON.parse(existingApplication.project_links)
+            : [])
+      ),
     })
 
     return NextResponse.json({
