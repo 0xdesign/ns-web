@@ -8,9 +8,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createApplication, getApplicationByDiscordId, updateApplicationDetails } from '@/lib/db'
 import { validateApplicationForm } from '@/lib/validations'
+import { enforceApplicationRateLimit } from '@/lib/rate-limit'
 
-function getAuthenticatedDiscordUser() {
-  const cookieStore = cookies()
+async function getAuthenticatedDiscordUser() {
+  const cookieStore = await cookies()
   const discordUserCookie = cookieStore.get('discord_user')
 
   if (!discordUserCookie) {
@@ -69,6 +70,29 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const forwardedFor = request.headers.get('x-forwarded-for')
+    const ip =
+      forwardedFor?.split(',')[0]?.trim() ||
+      request.headers.get('x-real-ip') ||
+      request.headers.get('cf-connecting-ip') ||
+      request.headers.get('x-client-ip') ||
+      'unknown'
+
+    const rateLimit = await enforceApplicationRateLimit(ip)
+
+    if (!rateLimit.allowed) {
+      const retryAfter = Math.max(Math.ceil((rateLimit.reset - Date.now()) / 1000), 0)
+      return NextResponse.json(
+        {
+          error: 'Too many applications from this network. Please try again later.',
+        },
+        {
+          status: 429,
+          headers: retryAfter ? { 'Retry-After': String(retryAfter) } : undefined,
+        }
+      )
+    }
+
     // Check if user already has an application
     const existingApplication = await getApplicationByDiscordId(discordUser.id)
 
@@ -115,7 +139,8 @@ export async function POST(request: NextRequest) {
     })
 
     // Clear Discord user cookie
-    cookies().delete('discord_user')
+    const cookieStore = await cookies()
+    cookieStore.delete('discord_user')
 
     return NextResponse.json(
       {

@@ -69,20 +69,6 @@ BOT_API_KEY=your_bot_api_key
 
 **Note**: Must match bot's `BOT_API_KEY` environment variable in Railway
 
-### Upstash Redis (Required - Rate Limiting)
-
-```
-UPSTASH_REDIS_REST_URL=https://your-redis.upstash.io
-UPSTASH_REDIS_REST_TOKEN=your_token
-```
-
-### Cloudflare Turnstile (Required - CAPTCHA)
-
-```
-TURNSTILE_SITE_KEY=0x4AAAAAAAA...
-TURNSTILE_SECRET_KEY=0x4AAAAAAAA...
-```
-
 ### NextAuth (Required)
 
 ```

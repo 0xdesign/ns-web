@@ -8,7 +8,7 @@ This repository contains the **web frontend** for the membership platform. The D
 
 - **Landing Page** - Public homepage with membership information
 - **Member Directory** - Public directory of active members with status
-- **Application System** - Discord OAuth + application form with CAPTCHA
+- **Application System** - Discord OAuth + application form
 - **Payment Integration** - Stripe Subscriptions ($299/month recurring)
 - **User Dashboard** - Self-service subscription management via Stripe Customer Portal
 - **Admin Dashboard** - Review applications, manage members
@@ -22,8 +22,6 @@ This repository contains the **web frontend** for the membership platform. The D
 - **Database**: Supabase (Postgres 17)
 - **Payments**: Stripe Subscriptions
 - **Auth**: Discord OAuth
-- **Rate Limiting**: Upstash Redis
-- **CAPTCHA**: Cloudflare Turnstile
 
 ## Architecture
 
@@ -73,10 +71,6 @@ Required environment variables:
 - `STRIPE_PRICE_ID` - Stripe price ID for $299/month subscription
 - `BOT_API_URL` - URL to bot API (e.g., http://localhost:8000 for local, or Railway URL for production)
 - `BOT_API_KEY` - API key for bot API calls
-- `UPSTASH_REDIS_REST_URL` - Upstash Redis REST URL
-- `UPSTASH_REDIS_REST_TOKEN` - Upstash Redis REST token
-- `TURNSTILE_SITE_KEY` - Cloudflare Turnstile site key
-- `TURNSTILE_SECRET_KEY` - Cloudflare Turnstile secret key
 - `NEXTAUTH_SECRET` - NextAuth secret (generate with: `openssl rand -base64 32`)
 - `RESEND_API_KEY` - Resend API key for email notifications
 
@@ -230,8 +224,7 @@ All environment variables from `.env.example` must be set in Vercel dashboard un
 
 - ✅ API key authentication for bot API calls
 - ✅ Webhook signature verification (Stripe)
-- ✅ CAPTCHA on application form (Turnstile)
-- ✅ Rate limiting (3 applications/day per IP via Upstash Redis)
+- ✅ Rate limiting (3 applications/day per IP via built-in limiter)
 - ✅ Payment token security (bcrypt hashed, one-time use, 7-day expiry)
 - ✅ Webhook idempotency (prevents duplicate Stripe event processing)
 - ✅ Admin authentication (Discord ID whitelist)

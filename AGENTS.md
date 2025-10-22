@@ -31,7 +31,7 @@
 - Before opening a PR: run `npm run lint` and `npm run build`; ensure `.env.local` is configured locally.
 
 ## Security & Configuration Tips
-- Copy `.env.example` to `.env.local`; never commit secrets. Key vars: Supabase URL/keys, Discord OAuth, Stripe keys/webhook secret, Bot API URL/key, NextAuth secret, Turnstile keys.
+- Copy `.env.example` to `.env.local`; never commit secrets. Key vars: Supabase URL/keys, Discord OAuth, Stripe keys/webhook secret, Bot API URL/key, NextAuth secret.
 - Keep third-party clients and secrets isolated in `lib/` and import where needed.
 
 ## Agent-Specific Notes
