@@ -19,4 +19,8 @@ A formal test harness is not yet configured. When adding coverage, reach for Vit
 Write commits as short, imperative statements (e.g., "Add member avatars"). Before pushing, run `npm run lint` and `npm run build`, and confirm `.env.local` mirrors `.env.example`. Pull requests should include a clear summary, linked issues, screenshots for UI changes, and notes on environment or config updates. Highlight migration or API changes prominently in the PR description.
 
 ## Security & Configuration Tips
-Never commit secrets. Copy `.env.example` to `.env.local` and supply Supabase, Discord OAuth, Stripe, Bot API, NextAuth, and Turnstile credentials locally. Keep third-party clients isolated in `lib/` and reuse them instead of duplicating credentials or request logic.
+Never commit secrets. Copy `.env.example` to `.env.local` and supply Supabase, Discord OAuth, Stripe, Bot API, and NextAuth credentials. Keep third-party clients isolated in `lib/` and reuse them instead of duplicating credentials or request logic.
+
+## Agent-Specific Notes
+- Keep changes minimal and focused; avoid unrelated refactors.
+- Do not add dependencies or alter build config without prior discussion.

@@ -4,7 +4,7 @@
  * Generate and validate secure one-time payment tokens
  */
 
-import { supabase } from './db'
+import { supabase } from './supabase'
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
 

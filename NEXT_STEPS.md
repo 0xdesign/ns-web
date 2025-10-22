@@ -4,6 +4,8 @@
 
 **Date:** October 16, 2025
 
+> **Testing caveats (Oct 2025):** Latest automated suites rely on mocked services. Real Stripe Checkout/webhook delivery, Discord bot role sync, and Resend email flows still need live integration runs before go-live.
+
 ---
 
 ## ✅ What's Working (Happy Path)
@@ -91,9 +93,14 @@ These scenarios are **untested** and may have bugs:
   - Should be blocked by unique constraint on `discord_user_id`
   - Verify friendly error message shown
 
+- [ ] **Email Deliverability**
+  - Add DKIM/SPF/DMARC records (Resend dashboard shows required DNS entries)
+  - Consider using dedicated subdomain (e.g., `mail.rasp.club`) for transactional mail
+  - Send follow-up approval email to confirm it lands in inbox (not spam)
+
 - [ ] **Rate Limiting**
   - Submit 4 applications from same IP
-  - 4th should be blocked by Upstash Redis rate limit
+  - 4th should be blocked by the application rate limiter
   - Verify 429 status returned
 
 ---
@@ -806,14 +813,6 @@ NEXTAUTH_SECRET=            # Generate with: openssl rand -base64 32
 # Resend (Email)
 RESEND_API_KEY=re_...
 FROM_EMAIL=noreply@yourdomain.com
-
-# Rate Limiting (Upstash Redis)
-UPSTASH_REDIS_REST_URL=
-UPSTASH_REDIS_REST_TOKEN=
-
-# CAPTCHA (Cloudflare Turnstile)
-TURNSTILE_SITE_KEY=
-TURNSTILE_SECRET_KEY=
 ```
 
 ### Configure Vercel Cron (for role sync)
@@ -896,80 +895,7 @@ SUPABASE_SERVICE_ROLE_KEY=eyJ...  # Service role, not anon key
 
 ---
 
-## 7. Upstash Redis (Rate Limiting)
-
-**Portal:** https://upstash.com
-
-### Production Redis Database
-
-- [ ] Go to **Databases**
-- [ ] Create new database or use existing
-- [ ] Name: `production-ratelimit` (or similar)
-- [ ] Region: Choose closest to your primary users
-- [ ] Type: **Global** (for multi-region) or **Regional** (cheaper)
-- [ ] Click **Create**
-
-### Get Connection Details
-
-- [ ] Click on database
-- [ ] Copy **REST URL** → `UPSTASH_REDIS_REST_URL`
-- [ ] Copy **REST Token** → `UPSTASH_REDIS_REST_TOKEN`
-
-**Environment Variables to Update (Vercel):**
-```bash
-UPSTASH_REDIS_REST_URL=https://...
-UPSTASH_REDIS_REST_TOKEN=...
-```
-
-### Test Rate Limiting
-
-- [ ] Deploy app with Upstash credentials
-- [ ] Submit 3 applications from same IP
-- [ ] Verify 4th attempt is blocked with 429 status
-
----
-
-## 8. Cloudflare Turnstile (CAPTCHA)
-
-**Portal:** https://dash.cloudflare.com
-
-### Create Production Site
-
-- [ ] Go to **Turnstile** (in sidebar)
-- [ ] Click **Add Site**
-- [ ] Name: `Production - Creative Technologists`
-- [ ] Domain: `yourdomain.com`
-- [ ] Widget Mode: **Managed** (recommended)
-- [ ] Click **Create**
-
-### Get Keys
-
-- [ ] Copy **Site Key** → `TURNSTILE_SITE_KEY`
-- [ ] Copy **Secret Key** → `TURNSTILE_SECRET_KEY`
-
-**Environment Variables to Update (Vercel):**
-```bash
-TURNSTILE_SITE_KEY=0x4AAA...
-TURNSTILE_SECRET_KEY=0x4AAA...
-```
-
-### Update Widget in Application Form
-
-If you hardcoded a test site key, update it to use environment variable:
-
-```tsx
-// In app/apply/form/page.tsx
-<Turnstile
-  siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
-  onSuccess={setToken}
-/>
-```
-
-**Note:** May need to add `NEXT_PUBLIC_TURNSTILE_SITE_KEY` to environment variables.
-
----
-
-## 9. GitHub Repository (Source Control)
+## 7. GitHub Repository (Source Control)
 
 **Portal:** https://github.com
 
