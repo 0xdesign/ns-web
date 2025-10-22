@@ -3,15 +3,23 @@
 import { useEffect, useRef } from "react";
 import { Renderer, Triangle, Program, Mesh } from "ogl";
 
+type PrismContainerElement = HTMLDivElement & {
+  __prismIO?: IntersectionObserver
+};
+
 interface PrismProps {
   height?: number;
   baseWidth?: number;
-  animationType?: "rotate" | "hover" | "3drotate";
+  animationType?: "rotate" | "hover" | "3drotate" | "scroll";
   glow?: number;
   offset?: { x: number; y: number };
   noise?: number;
   transparent?: boolean;
   scale?: number;
+  // Optional: override scale on mobile viewports
+  mobileScale?: number;
+  // Optional: breakpoint (in px) below which mobileScale applies. Defaults to 768.
+  mobileBreakpoint?: number;
   hueShift?: number;
   colorFrequency?: number;
   hoverStrength?: number;
@@ -19,6 +27,7 @@ interface PrismProps {
   bloom?: number;
   suspendWhenOffscreen?: boolean;
   timeScale?: number;
+  scrollSensitivity?: number;
 }
 
 const Prism = ({
@@ -27,9 +36,11 @@ const Prism = ({
   animationType = "rotate",
   glow = 1,
   offset = { x: 0, y: 0 },
-  noise = 0.5,
+  noise = 0.8,
   transparent = true,
   scale = 3.6,
+  mobileScale,
+  mobileBreakpoint = 768,
   hueShift = 0,
   colorFrequency = 1,
   hoverStrength = 2,
@@ -37,8 +48,9 @@ const Prism = ({
   bloom = 1,
   suspendWhenOffscreen = false,
   timeScale = 0.5,
+  scrollSensitivity = 1,
 }: PrismProps) => {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<PrismContainerElement | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -52,7 +64,16 @@ const Prism = ({
     const offX = offset?.x ?? 0;
     const offY = offset?.y ?? 0;
     const SAT = transparent ? 1.5 : 1;
-    const SCALE = Math.max(0.001, scale);
+    // Determine effective scale (mobile override if provided)
+    const getEffectiveScale = () => {
+      const base = Math.max(0.001, scale);
+      if (typeof window !== 'undefined' && typeof mobileScale === 'number') {
+        const bp = Math.max(0, mobileBreakpoint || 0);
+        if (window.innerWidth < bp) return Math.max(0.001, mobileScale);
+      }
+      return base;
+    };
+    let EFFECTIVE_SCALE = getEffectiveScale();
     const HUE = hueShift || 0;
     const CFREQ = Math.max(0.0, colorFrequency || 1);
     const BLOOM = Math.max(0.0, bloom || 1);
@@ -180,7 +201,7 @@ const Prism = ({
           wob = mat2(c0, c1, c2, c0);
         }
 
-        const int STEPS = 100;
+        const int STEPS = 50;
         for (int i = 0; i < STEPS; i++) {
           p = vec3(f, z);
           p.xz = p.xz * wob;
@@ -228,7 +249,7 @@ const Prism = ({
         uOffsetPx: { value: offsetPxBuf },
         uNoise: { value: NOISE },
         uSaturation: { value: SAT },
-        uScale: { value: SCALE },
+        uScale: { value: EFFECTIVE_SCALE },
         uHueShift: { value: HUE },
         uColorFreq: { value: CFREQ },
         uBloom: { value: BLOOM },
@@ -237,7 +258,7 @@ const Prism = ({
         uInvHeight: { value: 1 / H },
         uMinAxis: { value: Math.min(BASE_HALF, H) },
         uPxScale: {
-          value: 1 / ((gl.drawingBufferHeight || 1) * 0.1 * SCALE),
+          value: 1 / ((gl.drawingBufferHeight || 1) * 0.1 * EFFECTIVE_SCALE),
         },
         uTimeScale: { value: TS },
       },
@@ -252,8 +273,11 @@ const Prism = ({
       iResBuf[1] = gl.drawingBufferHeight;
       offsetPxBuf[0] = offX * dpr;
       offsetPxBuf[1] = offY * dpr;
+      // Update effective scale on viewport size changes
+      EFFECTIVE_SCALE = getEffectiveScale();
+      program.uniforms.uScale.value = EFFECTIVE_SCALE;
       program.uniforms.uPxScale.value =
-        1 / ((gl.drawingBufferHeight || 1) * 0.1 * SCALE);
+        1 / ((gl.drawingBufferHeight || 1) * 0.1 * EFFECTIVE_SCALE);
     };
     const ro = new ResizeObserver(resize);
     ro.observe(container);
@@ -342,6 +366,25 @@ const Prism = ({
       pointer.inside = false;
     };
 
+    // Scroll tracking for scroll animation
+    const scrollState = { position: 0, max: 1 };
+    const updateScrollPosition = () => {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      scrollState.max = Math.max(1, scrollHeight);
+      scrollState.position = Math.max(0, Math.min(scrollState.max, scrollTop));
+    };
+    // Throttle scroll events to RAF (60fps max instead of 200+ events/sec)
+    let scrollRAF: number | null = null;
+    const onScroll = () => {
+      if (scrollRAF !== null) return; // Already scheduled
+      scrollRAF = requestAnimationFrame(() => {
+        updateScrollPosition();
+        startRAF();
+        scrollRAF = null;
+      });
+    };
+
     let onPointerMove: ((e: PointerEvent) => void) | null = null;
     if (animationType === "hover") {
       onPointerMove = (e: PointerEvent) => {
@@ -353,6 +396,10 @@ const Prism = ({
       window.addEventListener("blur", onBlur);
       program.uniforms.uUseBaseWobble.value = 0;
     } else if (animationType === "3drotate") {
+      program.uniforms.uUseBaseWobble.value = 0;
+    } else if (animationType === "scroll") {
+      updateScrollPosition();
+      window.addEventListener("scroll", onScroll, { passive: true });
       program.uniforms.uUseBaseWobble.value = 0;
     } else {
       program.uniforms.uUseBaseWobble.value = 1;
@@ -387,6 +434,45 @@ const Prism = ({
             Math.abs(yaw - targetYaw) < 1e-4 &&
             Math.abs(pitch - targetPitch) < 1e-4 &&
             Math.abs(roll) < 1e-4;
+          if (settled) continueRAF = false;
+        }
+      } else if (animationType === "scroll") {
+        // Map scroll position (0 to max) to rotation angles
+        const scrollProgress = scrollState.position / scrollState.max;
+        const SCROLL_SENS = Math.max(0, scrollSensitivity || 1);
+
+        // Yaw: Full rotation based on scroll (0 to 2π * sensitivity)
+        targetYaw = scrollProgress * Math.PI * 2 * SCROLL_SENS;
+
+        // Pitch: Oscillate based on scroll for depth effect
+        const pitchPhase = scrollProgress * Math.PI * 4 * SCROLL_SENS;
+        targetPitch = Math.sin(pitchPhase) * 0.4;
+
+        // Roll: Gentle tilt based on scroll
+        const rollPhase = scrollProgress * Math.PI * 3 * SCROLL_SENS;
+        const targetRoll = Math.sin(rollPhase) * 0.3;
+
+        // Smooth interpolation for fluid motion
+        const prevYaw = yaw;
+        const prevPitch = pitch;
+        const prevRoll = roll;
+        yaw = lerp(prevYaw, targetYaw, 0.1);
+        pitch = lerp(prevPitch, targetPitch, 0.1);
+        roll = lerp(prevRoll, targetRoll, 0.1);
+
+        program.uniforms.uRot.value = setMat3FromEuler(
+          yaw,
+          pitch,
+          roll,
+          rotBuf
+        );
+
+        // Check if settled
+        if (NOISE_IS_ZERO) {
+          const settled =
+            Math.abs(yaw - targetYaw) < 1e-4 &&
+            Math.abs(pitch - targetPitch) < 1e-4 &&
+            Math.abs(roll - targetRoll) < 1e-4;
           if (settled) continueRAF = false;
         }
       } else if (animationType === "3drotate") {
@@ -431,7 +517,7 @@ const Prism = ({
       });
       io.observe(container);
       startRAF();
-      (container as any).__prismIO = io;
+      container.__prismIO = io;
     } else {
       startRAF();
     }
@@ -448,10 +534,16 @@ const Prism = ({
         window.removeEventListener("mouseleave", onLeave);
         window.removeEventListener("blur", onBlur);
       }
+      if (animationType === "scroll") {
+        window.removeEventListener("scroll", onScroll);
+        if (scrollRAF !== null) {
+          cancelAnimationFrame(scrollRAF);
+        }
+      }
       if (suspendWhenOffscreen) {
-        const io = (container as any).__prismIO
-        if (io) io.disconnect();
-        delete (container as any).__prismIO;
+        const ioRef = container.__prismIO;
+        if (ioRef) ioRef.disconnect();
+        delete container.__prismIO;
       }
       if (gl.canvas.parentElement === container)
         container.removeChild(gl.canvas);
@@ -465,6 +557,8 @@ const Prism = ({
     offset?.x,
     offset?.y,
     scale,
+    mobileScale,
+    mobileBreakpoint,
     transparent,
     hueShift,
     colorFrequency,
@@ -473,6 +567,7 @@ const Prism = ({
     inertia,
     bloom,
     suspendWhenOffscreen,
+    scrollSensitivity,
   ]);
 
   return <div className="w-full h-full relative" ref={containerRef} />;

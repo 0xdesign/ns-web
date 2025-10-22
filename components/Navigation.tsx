@@ -1,63 +1,109 @@
 'use client'
 
-import { MemberStatus, getAvatarUrl } from '@/lib/supabase'
+import Image from 'next/image'
+import Link from 'next/link'
+import { ProgressiveBlur } from '@/components/ui/progressive-blur'
+import type { DiscordSessionUser } from '@/lib/current-user'
 
 interface NavigationProps {
   memberCount: number
-  topMembers: MemberStatus[]
+  discordUser?: DiscordSessionUser | null
+  discordAuthUrl?: string
+  showMemberCount?: boolean
+  onConnectDiscord?: () => void
 }
 
-export function Navigation({ memberCount, topMembers }: NavigationProps) {
-  const handleMemberPillClick = () => {
-    const toggle = document.querySelector('[data-member-sidebar-toggle]') as HTMLButtonElement
-    toggle?.click()
-  }
+export function Navigation({
+  memberCount,
+  discordUser,
+  discordAuthUrl,
+  showMemberCount = false,
+  onConnectDiscord,
+}: NavigationProps) {
+  const profileLink = discordUser ? `https://discord.com/users/${discordUser.id}` : undefined
+  const avatarUrl =
+    discordUser?.avatar && discordUser.id
+      ? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png?size=64`
+      : null
+  const displayName = discordUser
+    ? `${discordUser.username}${
+        discordUser.discriminator && discordUser.discriminator !== '0'
+          ? `#${discordUser.discriminator}`
+          : ''
+      }`
+    : null
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-40 bg-neutral-950/80 backdrop-blur-sm border-b border-white/10">
-      <div className="flex items-center justify-between h-[69px] px-6">
-        {/* Logo */}
-        <h1 className="text-sm font-extrabold text-white/74 tracking-tight [text-shadow:2px_4px_8px_rgba(0,0,0,0.08)]">
-          NO/SHOP
-        </h1>
+    <>
+      {/* Progressive blur at top for nav bar */}
+      <ProgressiveBlur
+        position="top"
+        backgroundColor="#09090b"
+        height="100px"
+        blurAmount="4px"
+        zIndex={60}
+        fixed
+      />
 
-        {/* Member pill */}
-        <button
-          data-member-pill
-          onClick={handleMemberPillClick}
-          className="
-            group
-            backdrop-blur-[3px] bg-white/10 hover:bg-white/20
-            border border-white rounded-[48px]
-            px-2 py-2 pr-4
-            flex items-center gap-3
-            transition-all duration-200
-            hover:scale-105
-          "
-        >
-          {/* Avatar stack */}
-          <div className="flex items-center pr-1.5">
-            {topMembers.slice(0, 3).map((member, i) => (
-              <div
-                key={member.user_id}
-                className="w-6 h-6 rounded-full border border-white overflow-hidden -mr-1.5 relative bg-neutral-800"
-                style={{ zIndex: 3 - i }}
+      <ProgressiveBlur
+        position="bottom"
+        backgroundColor="#09090b"
+        height="100px"
+        blurAmount="4px"
+        zIndex={60}
+        fixed
+      />
+
+      {/* Nav content above blur; no background fill */}
+      <nav className="fixed top-0 left-0 right-0 z-80 h-[69px]">
+        <div className="flex items-center justify-between h-full px-6">
+          {/* Logo */}
+          <Link href="/" className="text-sm font-extrabold text-white/74 tracking-tight [text-shadow:2px_4px_8px_rgba(0,0,0,0.08)] hover:text-white/90 transition-colors cursor-pointer">
+            NO/SHOP
+          </Link>
+
+          <div className="flex items-center gap-3 sm:gap-4">
+            {showMemberCount && (
+              <span className="hidden md:block text-sm font-medium tracking-tight text-white/80">
+                Members — {memberCount}
+              </span>
+            )}
+            {discordUser ? (
+              <a
+                href={profileLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/80 transition-colors hover:border-white/35 hover:text-white sm:text-sm"
               >
-                <img
-                  src={getAvatarUrl(member.user_id, member.avatar_url)}
-                  alt={member.display_name || member.username}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ))}
+                {avatarUrl ? (
+                  <Image
+                    src={avatarUrl}
+                    alt={displayName ?? 'Discord user'}
+                    width={24}
+                    height={24}
+                    className="h-6 w-6 rounded-full object-cover"
+                  />
+                ) : (
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/10 text-xs font-semibold uppercase">
+                    {discordUser.username.slice(0, 1)}
+                  </span>
+                )}
+                <span>{displayName}</span>
+              </a>
+            ) : (
+              discordAuthUrl && (
+                <a
+                  href={discordAuthUrl}
+                  onClick={onConnectDiscord}
+                  className="inline-flex items-center rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white/80 transition-colors hover:border-white/35 hover:text-white sm:px-4 sm:text-sm"
+                >
+                  Connect Discord
+                </a>
+              )
+            )}
           </div>
-
-          {/* Count */}
-          <span className="text-sm font-medium text-white tracking-tight">
-            {memberCount}
-          </span>
-        </button>
-      </div>
-    </nav>
+        </div>
+      </nav>
+    </>
   )
 }

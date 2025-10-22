@@ -5,11 +5,12 @@
  */
 
 import { z } from 'zod'
+import { EXPERIENCE_LEVEL_VALUES } from './experience-levels'
 
 /**
- * Application form validation schema (create)
+ * Application form validation schema
  */
-export const applicationCreateSchema = z.object({
+export const applicationSchema = z.object({
   email: z
     .string()
     .email('Invalid email address')
@@ -25,35 +26,34 @@ export const applicationCreateSchema = z.object({
     .min(50, 'Please provide at least 50 characters describing what you\'re building')
     .max(1000, 'Please keep your response under 1000 characters'),
 
+  experience_level: z.enum(EXPERIENCE_LEVEL_VALUES, {
+    errorMap: () => ({
+      message: 'Please select the option that best matches your AI experience level',
+    }),
+  }),
+
   social_links: z
     .array(z.string().url('Invalid URL'))
     .min(1, 'Please provide at least one social link (GitHub, Twitter, portfolio, etc.)')
     .max(5, 'Maximum 5 social links allowed'),
 
-  experience_level: z.string().optional(),
-  project_links: z.array(z.string().url('Invalid URL')).max(5, 'Maximum 5 project links allowed').optional(),
+  project_links: z
+    .array(z.string().url('Invalid URL'))
+    .max(5, 'Maximum 5 project links allowed')
+    .default([]),
 })
 
-/**
- * Application form validation schema (partial updates)
- */
-export const applicationUpdateSchema = applicationCreateSchema.partial()
-
-export type ApplicationFormData = z.infer<typeof applicationCreateSchema>
-export type ApplicationUpdateData = z.infer<typeof applicationUpdateSchema>
+export type ApplicationFormData = z.infer<typeof applicationSchema>
 
 /**
  * Validate application form data
  */
-function validateWithSchema<T extends z.ZodTypeAny>(
-  schema: T,
-  data: unknown
-): {
+export function validateApplicationForm(data: unknown): {
   success: boolean
-  data?: z.infer<T>
+  data?: ApplicationFormData
   errors?: Record<string, string[]>
 } {
-  const result = schema.safeParse(data)
+  const result = applicationSchema.safeParse(data)
 
   if (!result.success) {
     const errors: Record<string, string[]> = {}
@@ -64,16 +64,9 @@ function validateWithSchema<T extends z.ZodTypeAny>(
       }
       errors[path].push(err.message)
     })
+
     return { success: false, errors }
   }
 
   return { success: true, data: result.data }
-}
-
-export function validateApplicationForm(data: unknown) {
-  return validateWithSchema(applicationCreateSchema, data)
-}
-
-export function validateApplicationUpdate(data: unknown) {
-  return validateWithSchema(applicationUpdateSchema, data)
 }

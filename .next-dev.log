@@ -1,0 +1,800 @@
+
+> membership-platform@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.5.4
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.228:3000
+   - Environments: .env
+   - Experiments (use with caution):
+     · serverActions
+
+ ✓ Starting...
+ ✓ Ready in 1347ms
+ ○ Compiling / ...
+ ✓ Compiled / in 2.2s (990 modules)
+🔍 [DEBUG] Database: SELECT on member_status
+Context: {
+  operation: 'SELECT',
+  table: 'member_status',
+  filter: 'exclude GHOST'
+}
+ℹ️ [INFO] Successfully fetched members
+Context: { count: 43 }
+🔍 [DEBUG] Database: SELECT on daily_digests
+Context: { operation: 'SELECT', table: 'daily_digests', filter: 'latest' }
+ℹ️ [INFO] Successfully fetched latest digest
+Context: { date: '2025-10-17' }
+ GET / 200 in 3258ms
+ ✓ Compiled /api/cron/sync-roles in 407ms (1012 modules)
+ GET /api/cron/sync-roles 401 in 550ms
+ GET /api/cron/sync-roles 401 in 9ms
+ GET /api/cron/sync-roles 401 in 9ms
+ GET /api/cron/sync-roles 200 in 636ms
+ ✓ Compiled in 270ms (392 modules)
+ ○ Compiling /apply ...
+ ✓ Compiled /apply in 1561ms (935 modules)
+🔍 [DEBUG] Database: SELECT on member_status
+Context: {
+  operation: 'SELECT',
+  table: 'member_status',
+  filter: 'exclude GHOST'
+}
+ℹ️ [INFO] Successfully fetched members
+Context: { count: 43 }
+ GET /apply 200 in 2132ms
+ ✓ Compiled in 296ms (397 modules)
+🔍 [DEBUG] Database: SELECT on member_status
+Context: {
+  operation: 'SELECT',
+  table: 'member_status',
+  filter: 'exclude GHOST'
+}
+ℹ️ [INFO] Successfully fetched members
+Context: { count: 43 }
+ GET /apply 200 in 70ms
+ ✓ Compiled /admin/login in 487ms (941 modules)
+ GET /admin/login 200 in 826ms
+ ○ Compiling /members ...
+ ✓ Compiled /members in 1081ms (976 modules)
+🔍 [DEBUG] Database: SELECT on member_status
+Context: {
+  operation: 'SELECT',
+  table: 'member_status',
+  filter: 'exclude GHOST'
+}
+ℹ️ [INFO] Successfully fetched members
+Context: { count: 43 }
+ GET /members 200 in 1607ms
+ ✓ Compiled in 230ms (415 modules)
+🔍 [DEBUG] Database: SELECT on member_status
+Context: {
+  operation: 'SELECT',
+  table: 'member_status',
+  filter: 'exclude GHOST'
+}
+ℹ️ [INFO] Successfully fetched members
+Context: { count: 43 }
+ GET /members 200 in 70ms
+ ✓ Compiled in 177ms (415 modules)
+🔍 [DEBUG] Database: SELECT on member_status
+Context: {
+  operation: 'SELECT',
+  table: 'member_status',
+  filter: 'exclude GHOST'
+}
+ℹ️ [INFO] Successfully fetched members
+Context: { count: 43 }
+ GET /apply 200 in 413ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 693ms (981 modules)
+ GET /apple-touch-icon-precomposed.png 404 in 864ms
+ GET /apple-touch-icon.png 404 in 35ms
+ ✓ Compiled /api/auth/discord/callback in 410ms (1004 modules)
+ GET /api/auth/discord/callback?error=access_denied&error_description=The+resource+owner+or+authorization+server+denied+the+request 307 in 504ms
+🔍 [DEBUG] Database: SELECT on member_status
+Context: {
+  operation: 'SELECT',
+  table: 'member_status',
+  filter: 'exclude GHOST'
+}
+ℹ️ [INFO] Successfully fetched members
+Context: { count: 43 }
+ GET /apply?error=access_denied 200 in 433ms
+🔍 [DEBUG] Database: SELECT on member_status
+Context: {
+  operation: 'SELECT',
+  table: 'member_status',
+  filter: 'exclude GHOST'
+}
+ℹ️ [INFO] Successfully fetched members
+Context: { count: 43 }
+ GET /apply?error=access_denied 200 in 183ms
+ GET /api/auth/discord/callback?code=0Qk6Ulr3YKIwsAQJgu0Pjjvmw4xgGJ 307 in 1483ms
+ ○ Compiling /apply/form ...
+ ✓ Compiled /apply/form in 925ms (1154 modules)
+🔍 [DEBUG] Database: SELECT on member_status
+Context: {
+  operation: 'SELECT',
+  table: 'member_status',
+  filter: 'exclude GHOST'
+}
+ℹ️ [INFO] Successfully fetched members
+Context: { count: 43 }
+ GET /apply/form 200 in 1405ms
+🔍 [DEBUG] Database: SELECT on member_status
+Context: {
+  operation: 'SELECT',
+  table: 'member_status',
+  filter: 'exclude GHOST'
+}
+ℹ️ [INFO] Successfully fetched members
+Context: { count: 43 }
+ POST /apply/form 200 in 229ms
+ ✓ Compiled in 491ms (1140 modules)
+🔍 [DEBUG] Database: SELECT on member_status
+Context: {
+  operation: 'SELECT',
+  table: 'member_status',
+  filter: 'exclude GHOST'
+}
+ℹ️ [INFO] Successfully fetched members
+Context: { count: 43 }
+ GET /apply/form 200 in 174ms
+ ✓ Compiled in 114ms (419 modules)
+🔍 [DEBUG] Database: SELECT on member_status
+Context: {
+  operation: 'SELECT',
+  table: 'member_status',
+  filter: 'exclude GHOST'
+}
+ℹ️ [INFO] Successfully fetched members
+Context: { count: 43 }
+ GET /apply/form 200 in 25ms
+ ✓ Compiled in 401ms (1140 modules)
+🔍 [DEBUG] Database: SELECT on member_status
+Context: {
+  operation: 'SELECT',
+  table: 'member_status',
+  filter: 'exclude GHOST'
+}
+ℹ️ [INFO] Successfully fetched members
+Context: { count: 43 }
+ GET /apply/form 200 in 112ms
+ ✓ Compiled in 144ms (419 modules)
+🔍 [DEBUG] Database: SELECT on member_status
+Context: {
+  operation: 'SELECT',
+  table: 'member_status',
+  filter: 'exclude GHOST'
+}
+ℹ️ [INFO] Successfully fetched members
+Context: { count: 43 }
+ GET /apply/form 200 in 28ms
+ ✓ Compiled in 108ms (419 modules)
+🔍 [DEBUG] Database: SELECT on member_status
+Context: {
+  operation: 'SELECT',
+  table: 'member_status',
+  filter: 'exclude GHOST'
+}
+ℹ️ [INFO] Successfully fetched members
+Context: { count: 43 }
+ GET /apply/form 200 in 27ms
+ ✓ Compiled in 213ms (420 modules)
+🔍 [DEBUG] Database: SELECT on member_status
+Context: {
+  operation: 'SELECT',
+  table: 'member_status',
+  filter: 'exclude GHOST'
+}
+ℹ️ [INFO] Successfully fetched members
+Context: { count: 43 }
+ GET /apply/form 200 in 28ms
+ ✓ Compiled in 110ms (420 modules)
+🔍 [DEBUG] Database: SELECT on member_status
+Context: {
+  operation: 'SELECT',
+  table: 'member_status',
+  filter: 'exclude GHOST'
+}
+ℹ️ [INFO] Successfully fetched members
+Context: { count: 43 }
+ GET /apply/form 200 in 28ms
+ ✓ Compiled in 102ms (420 modules)
+🔍 [DEBUG] Database: SELECT on member_status
+Context: {
+  operation: 'SELECT',
+  table: 'member_status',
+  filter: 'exclude GHOST'
+}
+ℹ️ [INFO] Successfully fetched members
+Context: { count: 43 }
+ GET /apply/form 200 in 24ms
+ ✓ Compiled in 101ms (420 modules)
+🔍 [DEBUG] Database: SELECT on member_status
+Context: {
+  operation: 'SELECT',
+  table: 'member_status',
+  filter: 'exclude GHOST'
+}
+ℹ️ [INFO] Successfully fetched members
+Context: { count: 43 }
+ GET /apply/form 200 in 25ms
+ ✓ Compiled in 93ms (420 modules)
+🔍 [DEBUG] Database: SELECT on member_status
+Context: {
+  operation: 'SELECT',
+  table: 'member_status',
+  filter: 'exclude GHOST'
+}
+ℹ️ [INFO] Successfully fetched members
+Context: { count: 43 }
+ GET /apply/form 200 in 29ms
+ ✓ Compiled in 96ms (420 modules)
+🔍 [DEBUG] Database: SELECT on member_status
+Context: {
+  operation: 'SELECT',
+  table: 'member_status',
+  filter: 'exclude GHOST'
+}
+ℹ️ [INFO] Successfully fetched members
+Context: { count: 43 }
+ GET /apply/form 200 in 28ms
+ ✓ Compiled in 100ms (420 modules)
+ ✓ Compiled in 121ms (420 modules)
+ ✓ Compiled in 119ms (420 modules)
+ ✓ Compiled in 121ms (420 modules)
+ ✓ Compiled in 121ms (420 modules)
+ ✓ Compiled in 108ms (420 modules)
+ ✓ Compiled in 152ms (420 modules)
+ ✓ Compiled in 112ms (420 modules)
+ ✓ Compiled in 697ms (1141 modules)
+ ✓ Compiled in 453ms (1141 modules)
+ ✓ Compiled in 503ms (1141 modules)
+ ✓ Compiled in 276ms (1141 modules)
+ ⨯ ./app/apply/form/FormClient.tsx
+Error:   [31mx[0m Expected '</', got 'jsx text (
+  [31m|[0m             )'
+     ,-[[36;1;4m/Users/yazinakkawi/experiments/noshop/ns-web/app/apply/form/FormClient.tsx[0m:265:1]
+ [2m262[0m |                         <SubmitButton />
+ [2m263[0m |                       </div>
+ [2m264[0m |                     </form>
+ [2m265[0m | [35;1m,[0m[35;1m-[0m[35;1m>[0m               </div>
+ [2m266[0m | [35;1m`[0m[35;1m-[0m[35;1m>[0m             </BlurIn>
+ [2m267[0m |               </div>
+ [2m268[0m |             </div>
+ [2m269[0m |           </main>
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/apply/form/FormClient.tsx
+./app/apply/form/page.tsx
+ ✓ Compiled in 648ms (1128 modules)
+ ✓ Compiled in 381ms (1142 modules)
+ ✓ Compiled in 206ms (420 modules)
+ ✓ Compiled in 982ms (1142 modules)
+ ✓ Compiled in 277ms (1142 modules)
+ ✓ Compiled in 255ms (1142 modules)
+ ✓ Compiled in 364ms (1142 modules)
+ ✓ Compiled in 451ms (1142 modules)
+ ✓ Compiled in 482ms (1142 modules)
+ ✓ Compiled in 272ms (1142 modules)
+ ✓ Compiled in 269ms (1142 modules)
+ ✓ Compiled in 90ms (420 modules)
+ ✓ Compiled in 262ms (1142 modules)
+ ✓ Compiled in 201ms (420 modules)
+ ✓ Compiled in 114ms (420 modules)
+ ✓ Compiled in 170ms (420 modules)
+ ✓ Compiled in 112ms (420 modules)
+ ✓ Compiled in 90ms (420 modules)
+ ✓ Compiled in 597ms (1142 modules)
+ ✓ Compiled in 96ms (420 modules)
+ ✓ Compiled in 176ms (420 modules)
+ ✓ Compiled in 99ms (420 modules)
+ ✓ Compiled in 479ms (1142 modules)
+ ✓ Compiled in 265ms (1142 modules)
+ ✓ Compiled in 196ms (420 modules)
+ ✓ Compiled in 124ms (420 modules)
+ ⨯ Error: ENOENT: no such file or directory, open '/Users/yazinakkawi/experiments/noshop/ns-web/.next/routes-manifest.json'
+    at async L (.next/server/app/apply/form/page.js:34:149823) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/yazinakkawi/experiments/noshop/ns-web/.next/routes-manifest.json',
+  page: '/apply/form'
+}
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /apply/form 500 in 311ms
+ ⨯ Error: ENOENT: no such file or directory, open '/Users/yazinakkawi/experiments/noshop/ns-web/.next/routes-manifest.json'
+    at async L (.next/server/app/apply/form/page.js:34:149823) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/yazinakkawi/experiments/noshop/ns-web/.next/routes-manifest.json',
+  page: '/apply/form'
+}
+ ○ Compiling /_error ...
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ✓ Compiled /_error in 1894ms (1468 modules)
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/yazinakkawi/experiments/noshop/ns-web/.next/routes-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/yazinakkawi/experiments/noshop/ns-web/.next/routes-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/yazinakkawi/experiments/noshop/ns-web/.next/routes-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/yazinakkawi/experiments/noshop/ns-web/.next/routes-manifest.json'
+}
+Error: ENOENT: no such file or directory, open '/Users/yazinakkawi/experiments/noshop/ns-web/.next/routes-manifest.json'
+    at async L (.next/server/app/apply/form/page.js:34:149823) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/yazinakkawi/experiments/noshop/ns-web/.next/routes-manifest.json',
+  page: '/apply/form'
+}
+Error: ENOENT: no such file or directory, open '/Users/yazinakkawi/experiments/noshop/ns-web/.next/routes-manifest.json'
+    at async L (.next/server/app/apply/form/page.js:34:149823) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/yazinakkawi/experiments/noshop/ns-web/.next/routes-manifest.json',
+  page: '/apply/form'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/yazinakkawi/experiments/noshop/ns-web/.next/routes-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/yazinakkawi/experiments/noshop/ns-web/.next/routes-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/yazinakkawi/experiments/noshop/ns-web/.next/routes-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/yazinakkawi/experiments/noshop/ns-web/.next/routes-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/Users/yazinakkawi/experiments/noshop/ns-web/.next/routes-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/yazinakkawi/experiments/noshop/ns-web/.next/routes-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open '/Users/yazinakkawi/experiments/noshop/ns-web/.next/routes-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/yazinakkawi/experiments/noshop/ns-web/.next/routes-manifest.json'
+}
+ GET /apply/form 500 in 6246ms
+ GET /apply/form 500 in 325ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development-fallback/0.pack.gz_' -> '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development-fallback/0.pack.gz'
+ ✓ Compiled in 234ms (571 modules)
+ ✓ Compiled in 762ms (1389 modules)
+ ✓ Compiled in 221ms (571 modules)
+ ✓ Compiled in 571ms (1389 modules)
+ ✓ Compiled in 115ms (571 modules)
+ ✓ Compiled in 111ms (571 modules)
+ ⨯ ./components/MemberCard.tsx
+Error:   [31mx[0m The "use client" directive must be placed before other expressions. Move it to the top of the file to resolve this issue.
+   ,-[[36;1;4m/Users/yazinakkawi/experiments/noshop/ns-web/components/MemberCard.tsx[0m:2:1]
+ [2m1[0m | import Image from 'next/image'
+ [2m2[0m | 'use client'
+   : [35;1m^^^^^^^^^^^^[0m
+ [2m3[0m | 
+ [2m4[0m | import { MemberStatus, getAvatarUrl } from '@/lib/supabase'
+ [2m5[0m | import { GlassCard } from '@/components/ui/glass-card'
+   `----
+
+Import trace for requested module:
+./components/MemberCard.tsx
+./components/MemberSidebar.tsx
+./components/HomeClient.tsx
+ ✓ Compiled in 116ms (573 modules)
+ ✓ Compiled in 111ms (573 modules)
+ ✓ Compiled in 97ms (573 modules)
+ ✓ Compiled in 94ms (573 modules)
+ ✓ Compiled in 99ms (573 modules)
+ ✓ Compiled in 112ms (573 modules)
+ ✓ Compiled in 104ms (573 modules)
+ ✓ Compiled in 720ms (1391 modules)
+ ✓ Compiled in 287ms (1391 modules)
+ ✓ Compiled in 298ms (1391 modules)
+ ✓ Compiled in 265ms (1391 modules)
+ ✓ Compiled in 307ms (1391 modules)
+ ✓ Compiled in 369ms (1391 modules)
+ ✓ Compiled in 194ms (573 modules)
+ ✓ Compiled in 112ms (573 modules)
+ ✓ Compiled in 121ms (573 modules)
+ ✓ Compiled in 107ms (573 modules)
+ ✓ Compiled in 101ms (573 modules)
+ ✓ Compiled in 656ms (1391 modules)
+ ✓ Compiled in 269ms (1391 modules)
+ ✓ Compiled in 110ms (573 modules)
+ ✓ Compiled in 131ms (573 modules)
+ ✓ Compiled in 123ms (573 modules)
+ ✓ Compiled in 169ms (573 modules)
+ ✓ Compiled in 110ms (573 modules)
+ ✓ Compiled in 98ms (573 modules)
+ ✓ Compiled in 93ms (573 modules)
+ ✓ Compiled in 195ms (573 modules)
+ ✓ Compiled in 211ms (573 modules)
+ ✓ Compiled in 330ms (573 modules)
+ ✓ Compiled in 125ms (573 modules)
+ ⚠ ./app/apply/ApplyClient.tsx
+Attempted import error: 'LiquidButton' is not exported from '@/components/ui/liquid-glass-button' (imported as 'LiquidButton').
+
+Import trace for requested module:
+./app/apply/ApplyClient.tsx
+
+./app/apply/form/FormClient.tsx
+Attempted import error: 'LiquidButton' is not exported from '@/components/ui/liquid-glass-button' (imported as 'LiquidButton').
+
+Import trace for requested module:
+./app/apply/form/FormClient.tsx
+
+./components/HomeClient.tsx
+Attempted import error: 'LiquidButton' is not exported from '@/components/ui/liquid-glass-button' (imported as 'LiquidButton').
+
+Import trace for requested module:
+./components/HomeClient.tsx
+
+./app/apply/ApplyClient.tsx
+Attempted import error: 'LiquidButton' is not exported from '@/components/ui/liquid-glass-button' (imported as 'LiquidButton').
+
+Import trace for requested module:
+./app/apply/ApplyClient.tsx
+
+./app/apply/form/FormClient.tsx
+Attempted import error: 'LiquidButton' is not exported from '@/components/ui/liquid-glass-button' (imported as 'LiquidButton').
+
+Import trace for requested module:
+./app/apply/form/FormClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (398:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development-fallback/0.pack.gz_' -> '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development-fallback/0.pack.gz'
+ ⨯ ./components/ui/liquid-glass-button.tsx
+Module parse failed: Duplicate export 'MetalButton' (406:69)
+| _c5 = MetalButton;
+| MetalButton.displayName = "MetalButton";
+> export { Button, buttonVariants, liquidbuttonVariants, LiquidButton, MetalButton };
+| var _c, _c1, _c2, _c3, _c4, _c5;
+| $RefreshReg$(_c, "Button$React.forwardRef");
+
+Import trace for requested module:
+./components/ui/liquid-glass-button.tsx
+./components/HomeClient.tsx
+ ✓ Compiled in 758ms (1393 modules)
+ ✓ Compiled in 156ms (574 modules)
+ ✓ Compiled in 200ms (574 modules)
+ ✓ Compiled in 124ms (574 modules)
+ ✓ Compiled in 103ms (574 modules)
+ ✓ Compiled in 575ms (1393 modules)
+ ✓ Compiled in 665ms (1393 modules)
+ ✓ Compiled in 113ms (574 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development-fallback/0.pack.gz_' -> '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development-fallback/0.pack.gz'
+ ✓ Compiled in 673ms (1393 modules)
+ ✓ Compiled in 226ms (574 modules)
+ ✓ Compiled in 254ms (574 modules)
+ ✓ Compiled in 137ms (575 modules)
+ ○ Compiling /api/auth/discord/callback ...
+ ✓ Compiled /api/auth/discord/callback in 514ms (842 modules)
+ GET /api/auth/discord/callback?code=JwvDCLwoo40itqcHKLfBdO9R0BXFHO 307 in 969ms
+ ⨯ Error: ENOENT: no such file or directory, open '/Users/yazinakkawi/experiments/noshop/ns-web/.next/server/vendor-chunks/@swc.js'
+    at <unknown> (.next/server/app/apply/form/page.js:617:47)
+    at Object.<anonymous> (.next/server/app/apply/form/page.js:620:3) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/yazinakkawi/experiments/noshop/ns-web/.next/server/vendor-chunks/@swc.js',
+  page: '/apply/form'
+}
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 803ms (1496 modules)
+ ⨯ Error: Cannot find module './611.js'
+Require stack:
+- /Users/yazinakkawi/experiments/noshop/ns-web/.next/server/webpack-runtime.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/.next/server/pages/_document.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/server/require.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/server/load-components.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/build/utils.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/build/swc/options.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/build/swc/index.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/server/lib/start-server.js
+    at <unknown> (.next/server/pages/_document.js:1:325)
+    at Object.<anonymous> (.next/server/pages/_document.js:1:371) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+Error: ENOENT: no such file or directory, open '/Users/yazinakkawi/experiments/noshop/ns-web/.next/server/vendor-chunks/@swc.js'
+    at <unknown> (.next/server/app/apply/form/page.js:617:47)
+    at Object.<anonymous> (.next/server/app/apply/form/page.js:620:3) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/yazinakkawi/experiments/noshop/ns-web/.next/server/vendor-chunks/@swc.js',
+  page: '/apply/form'
+}
+ ⨯ Error: Cannot find module './611.js'
+Require stack:
+- /Users/yazinakkawi/experiments/noshop/ns-web/.next/server/webpack-runtime.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/.next/server/pages/_document.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/server/require.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/server/load-components.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/build/utils.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/build/swc/options.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/build/swc/index.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/server/lib/router-server.js
+- /Users/yazinakkawi/experiments/noshop/ns-web/node_modules/next/dist/server/lib/start-server.js
+    at <unknown> (.next/server/pages/_document.js:1:325)
+    at Object.<anonymous> (.next/server/pages/_document.js:1:371) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+[Error: ENOENT: no such file or directory, open '/Users/yazinakkawi/experiments/noshop/ns-web/.next/fallback-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/yazinakkawi/experiments/noshop/ns-web/.next/fallback-build-manifest.json'
+}
+ GET /apply/form 500 in 1347ms
+ GET /apply/form 500 in 242ms
+ ✓ Compiled in 1312ms (1400 modules)
+ ✓ Compiled in 2.1s (1400 modules)
+ ✓ Compiled in 4.9s (1400 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 3s (1400 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 2.1s (1400 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 3.3s (1400 modules)
+ ✓ Compiled in 2.1s (1400 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1343ms (1400 modules)
+ ✓ Compiled in 1764ms (1400 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 2.9s (1400 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development/0.pack.gz_' -> '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development/0.pack.gz'
+ ✓ Compiled in 2.2s (1400 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development/0.pack.gz_' -> '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development/0.pack.gz'
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1634ms (1400 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development/0.pack.gz_' -> '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development/0.pack.gz'
+ ✓ Compiled in 1978ms (1400 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development/0.pack.gz_' -> '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development/0.pack.gz'
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1879ms (1394 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 908ms (575 modules)
+ ✓ Compiled in 427ms (576 modules)
+ ✓ Compiled in 189ms (576 modules)
+ ✓ Compiled in 273ms (576 modules)
+ ✓ Compiled in 259ms (576 modules)
+ ✓ Compiled in 270ms (575 modules)
+ ✓ Compiled in 3.3s (810 modules)
+ ✓ Compiled in 5.5s (575 modules)
+   Reload env: .env
+ ✓ Compiled in 913ms (1371 modules)
+   Reload env: .env
+ ✓ Compiled in 215ms (1371 modules)
+ ✓ Compiled in 274ms (1371 modules)
+ ✓ Compiled in 165ms (575 modules)
+ ✓ Compiled in 357ms (575 modules)
+ ✓ Compiled in 896ms (1384 modules)
+ ✓ Compiled in 446ms (1384 modules)
+ ✓ Compiled in 295ms (1384 modules)
+ ✓ Compiled in 291ms (1384 modules)
+ ✓ Compiled in 500ms (1385 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 228ms (575 modules)
+ ✓ Compiled in 521ms (1386 modules)
+ ✓ Compiled in 668ms (1386 modules)
+ ✓ Compiled in 665ms (1386 modules)
+ ✓ Compiled in 107ms (575 modules)
+ ✓ Compiled in 908ms (1386 modules)
+ ✓ Compiled in 409ms (1388 modules)
+ ✓ Compiled in 453ms (1388 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 678ms (1388 modules)
+ ✓ Compiled in 372ms (1388 modules)
+ ✓ Compiled in 163ms (576 modules)
+ ✓ Compiled in 113ms (576 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 136ms (576 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development/3.pack.gz_' -> '/Users/yazinakkawi/experiments/noshop/ns-web/.next/cache/webpack/client-development/3.pack.gz'
+ ✓ Compiled in 2.2s (1388 modules)
+ ✓ Compiled in 797ms (1388 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1352ms (1388 modules)
+ ✓ Compiled in 687ms (1388 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1179ms (1388 modules)
+ ✓ Compiled in 452ms (1388 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1074ms (1388 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1955ms (1388 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1239ms (1388 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1186ms (1388 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1172ms (1388 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1535ms (1388 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1119ms (1388 modules)
+ ✓ Compiled in 515ms (1388 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1607ms (1388 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 2.3s (1388 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 1316ms (1388 modules)
+ ✓ Compiled in 308ms (576 modules)

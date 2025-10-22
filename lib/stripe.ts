@@ -40,6 +40,7 @@ export async function createSubscriptionCheckout(params: {
   applicationId: string
   successUrl: string
   cancelUrl: string
+  metadata?: Record<string, string>
 }): Promise<Stripe.Checkout.Session> {
   return await stripe.checkout.sessions.create({
     customer: params.customerId,
@@ -54,6 +55,8 @@ export async function createSubscriptionCheckout(params: {
     cancel_url: params.cancelUrl,
     metadata: {
       application_id: params.applicationId,
+      // Include any additional metadata passed from caller
+      ...params.metadata,
     },
     subscription_data: {
       metadata: {

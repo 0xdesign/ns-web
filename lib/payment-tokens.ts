@@ -108,3 +108,18 @@ export async function hasValidPaymentToken(
 
   return !error && data !== null
 }
+
+export async function revokeActivePaymentTokens(
+  applicationId: string
+): Promise<void> {
+  const { error } = await supabase
+    .from('payment_tokens')
+    .delete()
+    .eq('application_id', applicationId)
+    .is('used_at', null)
+
+  if (error) {
+    console.error('Failed to revoke payment tokens:', error)
+    throw new Error('Failed to revoke payment tokens')
+  }
+}

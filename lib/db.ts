@@ -154,6 +154,10 @@ export async function getApplicationByDiscordId(
 
 /**
  * Create application
+ *
+ * Note: The applications table has a unique constraint on discord_user_id
+ * to prevent duplicate submissions. This function handles the constraint
+ * violation gracefully by throwing a descriptive error.
  */
 export async function createApplication(data: {
   discord_user_id: string
@@ -173,7 +177,13 @@ export async function createApplication(data: {
     .select()
     .single()
 
-  if (error) throw error
+  if (error) {
+    // Handle unique constraint violation (PostgreSQL error code 23505)
+    if (error.code === '23505' && error.message?.includes('discord_user_id')) {
+      throw new Error('DUPLICATE_APPLICATION')
+    }
+    throw error
+  }
   return application
 }
 
@@ -229,6 +239,23 @@ export async function updateApplicationStatus(
   return data
 }
 
+export async function resetApplicationToPending(id: string): Promise<Application> {
+  const { data, error } = await supabase
+    .from('applications')
+    .update({
+      status: 'pending',
+      reviewed_by: null,
+      reviewed_at: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
+}
+
 /**
  * Get applications by status
  */
@@ -239,6 +266,16 @@ export async function getApplicationsByStatus(
     .from('applications')
     .select('*')
     .eq('status', status)
+    .order('created_at', { ascending: false })
+
+  if (error) throw error
+  return data || []
+}
+
+export async function getAllApplications(): Promise<Application[]> {
+  const { data, error } = await supabase
+    .from('applications')
+    .select('*')
     .order('created_at', { ascending: false })
 
   if (error) throw error
@@ -496,6 +533,29 @@ export async function isAdmin(discordUserId: string): Promise<boolean> {
 }
 
 /**
+ * Get latest subscription for a customer
+ * Used by Discord join callback to verify current membership
+ */
+export async function getLatestSubscriptionForCustomer(
+  customerId: string
+): Promise<Subscription | null> {
+  const { data, error } = await supabase
+    .from('subscriptions')
+    .select('*')
+    .eq('customer_id', customerId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single()
+
+  if (error) {
+    if (error.code === 'PGRST116') return null // No rows found
+    throw error
+  }
+
+  return data
+}
+
+/**
  * Get all subscriptions (for daily sync job)
  */
 export async function getAllSubscriptions(): Promise<
@@ -507,5 +567,6 @@ export async function getAllSubscriptions(): Promise<
     .in('status', ['active', 'past_due', 'canceled'])
 
   if (error) throw error
-  return data as any
+  const rows = (data ?? []) as Array<Subscription & { customer: Customer | null }>
+  return rows.filter((row): row is Subscription & { customer: Customer } => row.customer !== null)
 }

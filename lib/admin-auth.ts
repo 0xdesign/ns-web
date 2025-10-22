@@ -2,13 +2,15 @@
  * Admin authentication utilities
  *
  * Verifies admin access based on Discord user ID whitelist
+ * Uses signed cookies to prevent forgery attacks
  */
 
 import { cookies } from 'next/headers'
+import { verifyCookieValue } from './signed-cookies'
 
 /**
  * Check if the current user is an admin
- * Reads Discord user from cookie and compares against ADMIN_DISCORD_ID
+ * Reads Discord user from signed cookie and compares against ADMIN_DISCORD_ID
  */
 export async function isAdmin(): Promise<boolean> {
   try {
@@ -19,7 +21,14 @@ export async function isAdmin(): Promise<boolean> {
       return false
     }
 
-    const discordUser = JSON.parse(discordUserCookie.value)
+    // Verify signed cookie to prevent tampering
+    const verifiedValue = verifyCookieValue(discordUserCookie.value)
+    if (!verifiedValue) {
+      console.warn('Invalid or tampered admin cookie detected')
+      return false
+    }
+
+    const discordUser = JSON.parse(verifiedValue)
     const adminId = process.env.ADMIN_DISCORD_ID
 
     return discordUser.id === adminId
@@ -30,7 +39,7 @@ export async function isAdmin(): Promise<boolean> {
 }
 
 /**
- * Get the current Discord user from cookie
+ * Get the current Discord user from signed cookie
  */
 export async function getCurrentDiscordUser() {
   try {
@@ -41,7 +50,14 @@ export async function getCurrentDiscordUser() {
       return null
     }
 
-    return JSON.parse(discordUserCookie.value)
+    // Verify signed cookie to prevent tampering
+    const verifiedValue = verifyCookieValue(discordUserCookie.value)
+    if (!verifiedValue) {
+      console.warn('Invalid or tampered Discord user cookie detected')
+      return null
+    }
+
+    return JSON.parse(verifiedValue)
   } catch (error) {
     console.error('Get Discord user error:', error)
     return null

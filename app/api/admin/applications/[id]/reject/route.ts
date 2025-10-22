@@ -17,6 +17,17 @@ export async function POST(
     // Require admin access
     await requireAdmin()
 
+    let sendEmail = true
+    try {
+      const form = await request.formData()
+      const formValue = form.get('sendEmail')
+      if (typeof formValue === 'string') {
+        sendEmail = !['false', '0', 'off'].includes(formValue.toLowerCase())
+      }
+    } catch {
+      // Ignore body parse errors
+    }
+
     const { id } = await params
 
     // Get application
@@ -44,21 +55,28 @@ export async function POST(
     await updateApplicationStatus(id, 'rejected', adminId)
 
     // Send rejection email
-    try {
-      await sendRejectionEmail({
-        to: application.email,
-        username: application.discord_username,
-      })
-      console.log('Rejection email sent successfully to:', application.email)
-    } catch (emailError) {
-      console.error('Failed to send rejection email:', emailError)
-      // Don't fail the whole rejection if email fails
+    if (sendEmail) {
+      try {
+        await sendRejectionEmail({
+          to: application.email,
+          username: application.discord_username,
+        })
+        console.log('Rejection email sent', { applicationId: application.id })
+      } catch (emailError) {
+        console.error('Failed to send rejection email', {
+          applicationId: application.id,
+          error: emailError instanceof Error ? emailError.message : String(emailError),
+        })
+        // Don't fail the whole rejection if email fails
+      }
     }
 
     return NextResponse.json(
       {
         success: true,
-        message: 'Application rejected and email sent',
+        message: sendEmail
+          ? 'Application rejected and email sent'
+          : 'Application rejected (email skipped)',
         email: application.email,
       },
       { status: 200 }

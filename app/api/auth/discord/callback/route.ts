@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { exchangeCode, getDiscordUser } from '@/lib/discord'
 import { cookies } from 'next/headers'
+import { signCookieValue } from '@/lib/signed-cookies'
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
@@ -35,7 +36,7 @@ export async function GET(request: NextRequest) {
     // Get user data from Discord
     const user = await getDiscordUser(tokenData.access_token)
 
-    // Store user data in cookie (encrypted session would be better in production)
+    // Store user data in signed cookie to prevent tampering
     const cookieStore = await cookies()
     const userData = {
       id: user.id,
@@ -44,7 +45,10 @@ export async function GET(request: NextRequest) {
       avatar: user.avatar,
     }
 
-    cookieStore.set('discord_user', JSON.stringify(userData), {
+    const userDataJson = JSON.stringify(userData)
+    const signedValue = signCookieValue(userDataJson)
+
+    cookieStore.set('discord_user', signedValue, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',

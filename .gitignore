@@ -15,6 +15,7 @@ test-results
 /.next/
 /.next-dev.pid
 /out/
+*.pid
 
 # production
 /build

@@ -17,6 +17,17 @@ export async function POST(
     // Require admin access
     await requireAdmin()
 
+    let sendEmail = true
+    try {
+      const form = await request.formData()
+      const formValue = form.get('sendEmail')
+      if (typeof formValue === 'string') {
+        sendEmail = !['false', '0', 'off'].includes(formValue.toLowerCase())
+      }
+    } catch {
+      // Ignore body parse errors
+    }
+
     const { id } = await params
 
     // Get application
@@ -44,20 +55,24 @@ export async function POST(
     await updateApplicationStatus(id, 'waitlisted', adminId)
 
     // Send waitlist email (best-effort)
-    try {
-      await sendWaitlistEmail({
-        to: application.email,
-        username: application.discord_username,
-      })
-      console.log('Waitlist email sent successfully to:', application.email)
-    } catch (emailError) {
-      console.error('Failed to send waitlist email:', emailError)
+    if (sendEmail) {
+      try {
+        await sendWaitlistEmail({
+          to: application.email,
+          username: application.discord_username,
+        })
+        console.log('Waitlist email sent successfully to:', application.email)
+      } catch (emailError) {
+        console.error('Failed to send waitlist email:', emailError)
+      }
     }
 
     return NextResponse.json(
       {
         success: true,
-        message: 'Application waitlisted and email sent',
+        message: sendEmail
+          ? 'Application waitlisted and email sent'
+          : 'Application waitlisted (email skipped)',
         email: application.email,
       },
       { status: 200 }
@@ -75,4 +90,3 @@ export async function POST(
     )
   }
 }
-

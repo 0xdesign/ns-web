@@ -8,25 +8,9 @@ import {
 import {
   getCustomerByDiscordId,
   getApplicationByDiscordId,
+  getLatestSubscriptionForCustomer,
 } from '@/lib/db'
 import { assignRoleWithRetry } from '@/lib/bot-api'
-import { createClient } from '@supabase/supabase-js'
-
-// Local helper to fetch latest subscription (including canceled with period end)
-async function getLatestSubscriptionForCustomer(customerId: string) {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  const supabase = createClient(url, key)
-  const { data, error } = await supabase
-    .from('subscriptions')
-    .select('*')
-    .eq('customer_id', customerId)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .single()
-  if (error) return null
-  return data as any
-}
 
 export async function GET(request: NextRequest) {
   const url = new URL(request.url)

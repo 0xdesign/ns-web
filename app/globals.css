@@ -18,9 +18,59 @@ body {
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
 
+/* Editorial Design System - Minimal Typography Scale */
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Display - Hero headings */
+  .display {
+    font-family: var(--font-instrument-serif), Georgia, serif;
+    font-size: 96px;
+    font-weight: 400;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+  }
+
+  /* Heading - Section headings */
+  .heading {
+    font-family: var(--font-instrument-serif), Georgia, serif;
+    font-size: 34px;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  /* Body - All body text */
+  .body {
+    font-family: var(--font-geist-sans), system-ui, sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.6;
+    letter-spacing: 0;
+  }
+
+  /* Small - Captions and meta text */
+  .small {
+    font-family: var(--font-geist-sans), system-ui, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: 0;
+  }
+
+  /* Content Container - Optimal reading width */
+  .content-container {
+    width: 80%;
+  }
+
+  @media (min-width: 768px) {
+    .content-container {
+      width: auto;
+      min-width: 33%;
+      max-width: 560px;
+    }
   }
 }
 
@@ -44,6 +94,13 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Scrollbar hiding - outside @layer for maximum specificity */
+.member-list-scroll::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
 /* Better mobile tap highlights */
 * {
   -webkit-tap-highlight-color: transparent;
@@ -54,4 +111,29 @@ html {
   outline: 2px solid #6366f1;
   outline-offset: 2px;
   border-radius: inherit;
+}
+
+/* Glass scrollbar styling */
+.glass-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.glass-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.glass-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  transition: background 0.2s;
+}
+
+.glass-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Firefox scrollbar */
+.glass-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }

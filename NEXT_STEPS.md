@@ -1,8 +1,8 @@
 # Next Steps - Creative Technologists Platform
 
-**Status:** Happy path tested and working! 🎉
+**Status:** Security hardening complete ✅ | Edge case testing in progress
 
-**Date:** October 6, 2025
+**Date:** October 16, 2025
 
 > **Testing caveats (Oct 2025):** Latest automated suites rely on mocked services. Real Stripe Checkout/webhook delivery, Discord bot role sync, and Resend email flows still need live integration runs before go-live.
 
@@ -38,6 +38,8 @@ The complete membership flow is fully functional:
 ---
 
 ## 🔴 Critical: Edge Cases to Test
+
+**📋 Full Testing Guide:** See `TESTING_GUIDE.md` for step-by-step instructions for all 27 test scenarios
 
 These scenarios are **untested** and may have bugs:
 
@@ -266,6 +268,45 @@ if (authHeader !== expectedAuth) {
 - [ ] One-time payment tokens expire after 7 days ✅
 - [ ] Admin authentication via Discord ID whitelist ✅
 - [ ] Bot API key authentication enabled ✅
+- [ ] Admin cookies signed with HMAC-SHA256 ✅ (prevents forgery)
+- [ ] CRON_SECRET required for production ✅ (prevents unauthorized access)
+- [ ] Payment tokens invalidated after successful payment ✅ (supports retry on abandoned checkout)
+- [ ] Discord join callback uses centralized Supabase client ✅ (consistent RLS behavior)
+- [ ] vercel.json configured for cron scheduling ✅
+
+### Security Improvements Implemented (October 2025)
+
+The following critical security vulnerabilities were identified and fixed before production deployment:
+
+1. **Admin Cookie Forgery Prevention** ✅
+   - **Issue**: Admin authentication relied on unsigned `discord_user` cookie that could be forged
+   - **Fix**: Implemented HMAC-SHA256 signing/verification using `NEXTAUTH_SECRET`
+   - **Files**: `lib/signed-cookies.ts`, `lib/admin-auth.ts`, `app/api/auth/discord/callback/route.ts`
+
+2. **Cron Endpoint Security** ✅
+   - **Issue**: `/api/cron/sync-roles` had optional authentication, allowing unauthorized role sync
+   - **Fix**: Made `CRON_SECRET` required, endpoint returns 500 if not set
+   - **Files**: `app/api/cron/sync-roles/route.ts`, `CLAUDE.md`
+
+3. **Payment Token Retry Support** ✅
+   - **Issue**: Tokens invalidated when checkout created, stranding users on abandoned/failed sessions
+   - **Fix**: Token invalidation moved to `checkout.session.completed` webhook (after successful payment)
+   - **Files**: `app/pay/[token]/page.tsx`, `app/api/webhooks/stripe/route.ts`, `lib/stripe.ts`
+
+4. **Exposed Secrets in Documentation** ✅
+   - **Issue**: Real secrets committed to `NEXT_STEPS.md` (BOT_API_KEY, NEXTAUTH_SECRET, etc.)
+   - **Fix**: Replaced all exposed values with placeholders and generation instructions
+   - **Files**: `NEXT_STEPS.md`
+
+5. **Discord Join Database Access** ✅
+   - **Issue**: Join callback created duplicate Supabase client, potential RLS issues
+   - **Fix**: Centralized subscription query in `lib/db.ts` for consistent client usage
+   - **Files**: `app/api/discord/join/callback/route.ts`, `lib/db.ts`
+
+6. **Cron Job Scheduling** ✅
+   - **Issue**: vercel.json missing - cron job wouldn't run in production
+   - **Fix**: Created vercel.json with daily 3 AM UTC schedule
+   - **Files**: `vercel.json` (new file)
 
 ---
 
@@ -430,6 +471,7 @@ Before considering the platform "production-ready":
 
 ## 📚 Related Documentation
 
+- **Testing Guide:** `./TESTING_GUIDE.md` ← Start here for edge case testing
 - **Monorepo Overview:** `../CLAUDE.md`
 - **Bot Documentation:** `../ns-bot/CLAUDE.md`
 - **Web App README:** `./README.md`
@@ -440,24 +482,42 @@ Before considering the platform "production-ready":
 
 ## 🚀 Quick Start for Next Session
 
-1. **Test edge cases** (subscription cancellation, rejection flow)
-2. **Set up and test cron job** locally
-3. **Prepare production environment** (Stripe live mode, domains)
-4. **Deploy to production** (Vercel + Railway)
-5. **Monitor first real transactions**
+**Current Priority: Edge Case Testing**
+
+1. **Test subscription lifecycle** ← START HERE
+   - Subscription cancellation (webhook + role removal)
+   - Subscription expiration (cron job)
+   - Payment failure grace period (past_due keeps role)
+   - Manual Discord removal + rejoin
+
+2. **Test cron job locally**
+   - Set CRON_SECRET in .env.local
+   - Run: `curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/sync-roles`
+   - Verify role sync logs
+
+3. **Test application edge cases**
+   - Rejection flow
+   - Waitlist flow
+   - Duplicate application blocking
+   - Rate limiting (4th attempt blocked)
+
+**After Testing Complete:**
+4. **Prepare production environment** (Stripe live mode, domains)
+5. **Deploy to production** (Vercel + Railway)
+6. **Monitor first real transactions**
 
 ---
 
-**Last Updated:** October 6, 2025
-**Current Phase:** Post-MVP Testing & Production Prep
+**Last Updated:** October 16, 2025
+**Current Phase:** Security Hardening Complete → Edge Case Testing
 
 ---
 ---
 
 # Production Deployment Checklist
 
-**Last Updated:** October 6, 2025
-**Current Status:** Development/Testing → Production Deployment
+**Last Updated:** October 16, 2025
+**Current Status:** Security Complete → Edge Case Testing → Production Deployment
 
 ---
 
@@ -887,21 +947,21 @@ STRIPE_PRICE_ID=price_live_...
 
 # Bot API
 BOT_API_URL=https://your-bot.railway.app
-BOT_API_KEY=385145904bd641c42d7fb8ddc9951cf59cabfb5de2df35b37d0e96522714c66c
+BOT_API_KEY=your_bot_api_key_here  # Generate with: openssl rand -hex 32
 
 # Discord Server
-DISCORD_GUILD_ID=1391977792421232700
-MEMBER_ROLE_ID=1392932107549933631
+DISCORD_GUILD_ID=your_discord_server_id
+MEMBER_ROLE_ID=your_member_role_id
 
 # Admin
-ADMIN_DISCORD_ID=827964581850513408
+ADMIN_DISCORD_ID=your_discord_user_id
 
 # NextAuth
 NEXTAUTH_URL=https://yourdomain.com
-NEXTAUTH_SECRET=0z8U+wDp+5sR7Bx7GC9D9aVOJDYgWsifIvbCK3sSm/g=
+NEXTAUTH_SECRET=your_nextauth_secret  # Generate with: openssl rand -base64 32
 
 # Resend (Email)
-RESEND_API_KEY=re_8sCdkLFH_8bgWkSeY7g9KM4deGrBNDa8A
+RESEND_API_KEY=re_your_resend_api_key
 FROM_EMAIL=noreply@yourdomain.com
 
 # Rate Limiting
@@ -918,7 +978,7 @@ TURNSTILE_SECRET_KEY=0x4AAA...
 ```bash
 # Discord
 DISCORD_TOKEN=MTM5NDA4MTc3NTA0MjU2MDA4MA.G1JDaj...
-DISCORD_GUILD_ID=1391977792421232700
+DISCORD_GUILD_ID=your_discord_server_id
 
 # OpenAI
 OPENAI_API_KEY=sk-...
@@ -936,7 +996,7 @@ DIGEST_TIMEZONE=America/New_York
 # Bot API
 BOT_API_HOST=0.0.0.0
 BOT_API_PORT=8000
-BOT_API_KEY=385145904bd641c42d7fb8ddc9951cf59cabfb5de2df35b37d0e96522714c66c
+BOT_API_KEY=your_bot_api_key_here  # Generate with: openssl rand -hex 32
 ```
 
 ---
