@@ -72,6 +72,7 @@ export function ApplyClient({ membersData, error, discordAuthUrl, discordUser }:
         memberCount={membersData.total}
         discordUser={discordUser}
         discordAuthUrl={discordAuthUrl}
+        showAuthActions={false}
       />
 
       {/* Main content - Split layout */}

@@ -75,9 +75,19 @@ interface FormClientProps {
   discordUser: DiscordSessionUser | null
   discordAuthUrl: string
   existingApplication: Application | null
+  navigationAuthUrls?: {
+    disconnect?: string
+    switchAccount?: string
+  }
 }
 
-export function FormClient({ membersData, discordUser, discordAuthUrl, existingApplication }: FormClientProps) {
+export function FormClient({
+  membersData,
+  discordUser,
+  discordAuthUrl,
+  existingApplication,
+  navigationAuthUrls,
+}: FormClientProps) {
   const [formData, setFormData] = useState({
     email: '',
     why_join: '',
@@ -367,6 +377,7 @@ export function FormClient({ membersData, discordUser, discordAuthUrl, existingA
         memberCount={membersData.total}
         discordUser={discordUser}
         discordAuthUrl={discordAuthUrl}
+        authUrls={navigationAuthUrls}
         onConnectDiscord={hasExistingApplication ? undefined : persistDraft}
       />
 

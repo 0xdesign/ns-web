@@ -10,6 +10,11 @@ interface NavigationProps {
   discordUser?: DiscordSessionUser | null
   discordAuthUrl?: string
   showMemberCount?: boolean
+  showAuthActions?: boolean
+  authUrls?: {
+    disconnect?: string
+    switchAccount?: string
+  }
   onConnectDiscord?: () => void
 }
 
@@ -18,6 +23,8 @@ export function Navigation({
   discordUser,
   discordAuthUrl,
   showMemberCount = false,
+  showAuthActions = true,
+  authUrls,
   onConnectDiscord,
 }: NavigationProps) {
   const profileLink = discordUser ? `https://discord.com/users/${discordUser.id}` : undefined
@@ -69,28 +76,51 @@ export function Navigation({
               </span>
             )}
             {discordUser ? (
-              <a
-                href={profileLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/80 transition-colors hover:border-white/35 hover:text-white sm:text-sm"
-              >
-                {avatarUrl ? (
-                  <Image
-                    src={avatarUrl}
-                    alt={displayName ?? 'Discord user'}
-                    width={24}
-                    height={24}
-                    className="h-6 w-6 rounded-full object-cover"
-                  />
-                ) : (
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/10 text-xs font-semibold uppercase">
-                    {discordUser.username.slice(0, 1)}
-                  </span>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <a
+                  href={profileLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/80 transition-colors hover:border-white/35 hover:text-white sm:text-sm"
+                >
+                  {avatarUrl ? (
+                    <Image
+                      src={avatarUrl}
+                      alt={displayName ?? 'Discord user'}
+                      width={24}
+                      height={24}
+                      className="h-6 w-6 rounded-full object-cover"
+                    />
+                  ) : (
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/10 text-xs font-semibold uppercase">
+                      {discordUser.username.slice(0, 1)}
+                    </span>
+                  )}
+                  <span>{displayName}</span>
+                </a>
+                {showAuthActions && (authUrls?.switchAccount || authUrls?.disconnect) && (
+                  <div className="flex items-center gap-1 sm:gap-2 text-[11px] font-medium text-white/70 sm:text-xs">
+                    {authUrls?.switchAccount && (
+                      <a
+                        href={authUrls.switchAccount}
+                        className="rounded-full border border-white/15 bg-white/5 px-2 py-1 transition-colors hover:border-white/30 hover:text-white"
+                      >
+                        Switch
+                      </a>
+                    )}
+                    {authUrls?.disconnect && (
+                      <a
+                        href={authUrls.disconnect}
+                        className="rounded-full border border-white/15 bg-white/5 px-2 py-1 transition-colors hover:border-white/30 hover:text-white"
+                      >
+                        Disconnect
+                      </a>
+                    )}
+                  </div>
                 )}
-                <span>{displayName}</span>
-              </a>
+              </div>
             ) : (
+              showAuthActions &&
               discordAuthUrl && (
                 <a
                   href={discordAuthUrl}

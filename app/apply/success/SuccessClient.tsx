@@ -15,9 +15,18 @@ interface SuccessClientProps {
   membersData: MembersResponse | null | undefined
   discordUser: DiscordSessionUser | null
   discordAuthUrl: string
+  navigationAuthUrls?: {
+    disconnect?: string
+    switchAccount?: string
+  }
 }
 
-export function SuccessClient({ membersData, discordUser, discordAuthUrl }: SuccessClientProps) {
+export function SuccessClient({
+  membersData,
+  discordUser,
+  discordAuthUrl,
+  navigationAuthUrls,
+}: SuccessClientProps) {
   const memberCount = membersData?.total ?? 0
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -74,6 +83,7 @@ export function SuccessClient({ membersData, discordUser, discordAuthUrl }: Succ
         memberCount={memberCount}
         discordUser={discordUser}
         discordAuthUrl={discordAuthUrl}
+        authUrls={navigationAuthUrls}
       />
 
       {/* Main content */}
