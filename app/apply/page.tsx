@@ -20,7 +20,7 @@ export default async function ApplyPage({
   const cookieStore = await cookies()
   const discordCookie = cookieStore.get('discord_user')
   const discordUser = parseDiscordUserCookie(discordCookie?.value)
-  const discordAuthUrl = getDiscordAuthUrl('/apply')
+  const discordAuthUrl = getDiscordAuthUrl('/apply/form')
 
   return (
     <ApplyClient
