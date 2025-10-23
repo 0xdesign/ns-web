@@ -95,15 +95,29 @@ export async function POST(request: NextRequest) {
         if (!customerId || !subscriptionId) break
 
         const customer = await stripe.customers.retrieve(customerId)
-        const discordUserId = getDiscordUserIdFromCustomer(customer)
-        const email = isStripeCustomer(customer) && customer.email ? customer.email : null
+        let discordUserId = getDiscordUserIdFromCustomer(customer)
+        let email = isStripeCustomer(customer) && customer.email ? customer.email : null
 
-        if (!discordUserId) break
+        if (!discordUserId) {
+          const existingCustomer = await getCustomerByStripeId(customerId)
+          if (existingCustomer?.discord_user_id) {
+            discordUserId = existingCustomer.discord_user_id
+            email = email ?? existingCustomer.email ?? null
+            console.warn(
+              `ℹ️  Stripe customer ${maskIdentifier(customerId)} missing metadata.discord_user_id; fell back to Supabase record`
+            )
+          } else {
+            console.error(
+              `❌  Unable to resolve Discord user for Stripe customer ${maskIdentifier(customerId)}`
+            )
+            throw new Error('STRIPE_CUSTOMER_MISSING_DISCORD_ID')
+          }
+        }
 
         const dbCustomer = await upsertCustomer({
           discord_user_id: discordUserId,
           stripe_customer_id: customerId,
-          email: email || 'unknown@example.com',
+          email: email ?? 'unknown@example.com',
         })
 
         const subscription = (await stripe.subscriptions.retrieve(
