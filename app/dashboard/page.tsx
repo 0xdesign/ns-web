@@ -50,10 +50,14 @@ function formatCurrency(
   currency: string | null | undefined
 ): string {
   if (typeof amountInMinorUnits !== 'number' || !currency) return '—'
-  return new Intl.NumberFormat('en-US', {
+  const normalizedCurrency = currency.toUpperCase()
+  const formatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: currency.toUpperCase(),
-  }).format(amountInMinorUnits / 100)
+    currency: normalizedCurrency,
+  })
+  const fractionDigits = formatter.resolvedOptions().maximumFractionDigits ?? 2
+  const divisor = 10 ** fractionDigits
+  return formatter.format(amountInMinorUnits / divisor)
 }
 
 type ApplicationMeta = {
@@ -414,7 +418,7 @@ export default async function DashboardPage() {
                 <div className="mt-6">
                   <Link
                     href={applicationMeta.action.href}
-                    className="inline-flex items-center rounded-md border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 transition hover:border-white/35 hover:text-white"
+                    className="inline-flex min-h-11 items-center rounded-md border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 transition hover:border-white/35 hover:text-white"
                   >
                     {applicationMeta.action.label}
                   </Link>
@@ -473,7 +477,7 @@ export default async function DashboardPage() {
                 {membershipActive && joinUrl && (
                   <a
                     href={joinUrl}
-                    className="inline-flex items-center justify-center rounded-md bg-[#5865F2] px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-[#4752C4]"
+                    className="inline-flex min-h-11 items-center justify-center rounded-md bg-[#5865F2] px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-[#4752C4]"
                   >
                     Join Discord server
                   </a>
@@ -483,7 +487,7 @@ export default async function DashboardPage() {
                     href={inviteUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center rounded-md border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 transition hover:border-white/35 hover:text-white"
+                    className="inline-flex min-h-11 items-center justify-center rounded-md border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 transition hover:border-white/35 hover:text-white"
                   >
                     Open invite link
                   </a>

@@ -7,12 +7,17 @@
 import Stripe from 'stripe'
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY ?? null
+const stripeApiVersion =
+  (process.env.STRIPE_API_VERSION ??
+    '2025-09-30') as Stripe.StripeConfig['apiVersion']
 
 let stripeClient: Stripe | null = null
 
 if (stripeSecretKey) {
   stripeClient = new Stripe(stripeSecretKey, {
     typescript: true,
+    apiVersion: stripeApiVersion,
+    maxNetworkRetries: 2,
   })
 } else if (process.env.NODE_ENV !== 'production') {
   console.warn(
@@ -36,8 +41,6 @@ export function isStripeConfigured(): boolean {
 export function getStripeClient(): Stripe {
   return requireStripe()
 }
-
-export const stripe = stripeClient
 
 /**
  * Create Stripe customer

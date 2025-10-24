@@ -1,11 +1,12 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { GlassCard } from '@/components/ui/glass-card'
 import { AdminTools } from '@/components/admin/AdminTools'
 import { PendingApplicationsSection } from '@/components/admin/PendingApplicationsSection'
 import { FollowupActions } from '@/components/admin/FollowupActions'
 import { ExpiredMemberCard } from '@/components/admin/ExpiredMemberCard'
+import { AutoRefresher } from '@/components/admin/AutoRefresher'
+import { GlassCard } from '@/components/ui/glass-card'
 import { isAdmin } from '@/lib/admin-auth'
 import {
   getPendingApplications,
@@ -61,6 +62,14 @@ const getDiscordAvatarUrl = (discordUserId: string, avatarHash: string | null): 
   if (!avatarHash) return null
   const extension = avatarHash.startsWith('a_') ? 'gif' : 'png'
   return `https://cdn.discordapp.com/avatars/${discordUserId}/${avatarHash}.${extension}`
+}
+
+const getFallbackAvatarIndex = (discordUserId: string): number => {
+  try {
+    return Number(BigInt(discordUserId) % 6n)
+  } catch {
+    return 0
+  }
 }
 
 const buildFallbackMember = (
@@ -313,12 +322,14 @@ export default async function AdminPage() {
     )
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-neutral-950 text-white">
-      <div className="absolute inset-0 bg-gradient-to-br from-neutral-950 via-neutral-900 to-slate-950" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(99,102,241,0.22),_transparent_55%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,_rgba(14,165,233,0.18),_transparent_55%)]" />
-      <div className="absolute inset-0 bg-black/70" />
-      <div className="relative z-10">
+    <>
+      <AutoRefresher intervalMs={30_000} />
+      <main className="relative min-h-screen overflow-hidden bg-neutral-950 text-white">
+        <div className="absolute inset-0 bg-gradient-to-br from-neutral-950 via-neutral-900 to-slate-950" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(99,102,241,0.22),_transparent_55%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,_rgba(14,165,233,0.18),_transparent_55%)]" />
+        <div className="absolute inset-0 bg-black/70" />
+        <div className="relative z-10">
         <header className="border-b border-white/10 bg-neutral-950/70 backdrop-blur">
           <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-6">
             <div>
@@ -652,7 +663,7 @@ export default async function AdminPage() {
                         <Image
                           src={
                             member.avatar_url ||
-                            `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(member.user_id) % 6n)}.png`
+                            `https://cdn.discordapp.com/embed/avatars/${getFallbackAvatarIndex(member.user_id)}.png`
                           }
                           alt={member.display_name || member.username}
                           width={48}
@@ -708,5 +719,6 @@ export default async function AdminPage() {
         </div>
       </div>
     </main>
+  </>
   )
 }
