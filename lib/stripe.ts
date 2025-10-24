@@ -141,9 +141,21 @@ export async function createPortalSession(
   returnUrl: string
 ): Promise<Stripe.BillingPortal.Session> {
   const client = requireStripe()
+  let configuration: Stripe.BillingPortal.Configuration | null = null
+
+  try {
+    configuration = await getPortalConfiguration()
+  } catch (error) {
+    // If configuration lookup fails we continue without it; Stripe will surface a meaningful error.
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn('Failed to load Stripe billing portal configuration:', error)
+    }
+  }
+
   return await client.billingPortal.sessions.create({
     customer: customerId,
     return_url: returnUrl,
+    ...(configuration ? { configuration: configuration.id } : {}),
   })
 }
 
