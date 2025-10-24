@@ -6,13 +6,38 @@
 
 import Stripe from 'stripe'
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY is not configured')
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY ?? null
+
+let stripeClient: Stripe | null = null
+
+if (stripeSecretKey) {
+  stripeClient = new Stripe(stripeSecretKey, {
+    typescript: true,
+  })
+} else if (process.env.NODE_ENV !== 'production') {
+  console.warn(
+    'Stripe secret key missing; billing features are disabled until STRIPE_SECRET_KEY is set.'
+  )
 }
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  typescript: true,
-})
+function requireStripe(): Stripe {
+  if (!stripeClient) {
+    throw new Error(
+      'Stripe is not configured. Set STRIPE_SECRET_KEY to enable billing features.'
+    )
+  }
+  return stripeClient
+}
+
+export function isStripeConfigured(): boolean {
+  return stripeClient !== null
+}
+
+export function getStripeClient(): Stripe {
+  return requireStripe()
+}
+
+export const stripe = stripeClient
 
 /**
  * Create Stripe customer
@@ -22,7 +47,8 @@ export async function createCustomer(
   discordUserId: string,
   discordUsername: string
 ): Promise<Stripe.Customer> {
-  return await stripe.customers.create({
+  const client = requireStripe()
+  return await client.customers.create({
     email,
     metadata: {
       discord_user_id: discordUserId,
@@ -42,7 +68,8 @@ export async function createSubscriptionCheckout(params: {
   cancelUrl: string
   metadata?: Record<string, string>
 }): Promise<Stripe.Checkout.Session> {
-  return await stripe.checkout.sessions.create({
+  const client = requireStripe()
+  return await client.checkout.sessions.create({
     customer: params.customerId,
     mode: 'subscription',
     line_items: [
@@ -72,7 +99,8 @@ export async function createSubscriptionCheckout(params: {
 export async function getSubscription(
   subscriptionId: string
 ): Promise<Stripe.Subscription> {
-  return await stripe.subscriptions.retrieve(subscriptionId)
+  const client = requireStripe()
+  return await client.subscriptions.retrieve(subscriptionId)
 }
 
 /**
@@ -81,7 +109,8 @@ export async function getSubscription(
 export async function cancelSubscription(
   subscriptionId: string
 ): Promise<Stripe.Subscription> {
-  return await stripe.subscriptions.update(subscriptionId, {
+  const client = requireStripe()
+  return await client.subscriptions.update(subscriptionId, {
     cancel_at_period_end: true,
   })
 }
@@ -92,7 +121,8 @@ export async function cancelSubscription(
 export async function reactivateSubscription(
   subscriptionId: string
 ): Promise<Stripe.Subscription> {
-  return await stripe.subscriptions.update(subscriptionId, {
+  const client = requireStripe()
+  return await client.subscriptions.update(subscriptionId, {
     cancel_at_period_end: false,
   })
 }
@@ -104,7 +134,8 @@ export async function createPortalSession(
   customerId: string,
   returnUrl: string
 ): Promise<Stripe.BillingPortal.Session> {
-  return await stripe.billingPortal.sessions.create({
+  const client = requireStripe()
+  return await client.billingPortal.sessions.create({
     customer: customerId,
     return_url: returnUrl,
   })
@@ -118,22 +149,50 @@ export function verifyWebhookSignature(
   signature: string,
   secret: string
 ): Stripe.Event {
-  return stripe.webhooks.constructEvent(payload, signature, secret)
+  const client = requireStripe()
+  return client.webhooks.constructEvent(payload, signature, secret)
+}
+
+/**
+ * Retrieve a Stripe customer with default payment method expanded
+ */
+export async function getCustomerWithDefaultPaymentMethod(
+  customerId: string
+): Promise<Stripe.Customer> {
+  const client = requireStripe()
+  return (await client.customers.retrieve(customerId, {
+    expand: ['invoice_settings.default_payment_method'],
+  })) as Stripe.Customer
+}
+
+/**
+ * List recent invoices for a customer
+ */
+export async function listInvoicesForCustomer(params: {
+  customerId: string
+  limit?: number
+}): Promise<Stripe.ApiList<Stripe.Invoice>> {
+  const client = requireStripe()
+  return await client.invoices.list({
+    customer: params.customerId,
+    limit: params.limit ?? 10,
+  })
 }
 
 /**
  * Get customer portal configuration
  */
 export async function getPortalConfiguration(): Promise<Stripe.BillingPortal.Configuration> {
+  const client = requireStripe()
   // Get or create default portal configuration
-  const configurations = await stripe.billingPortal.configurations.list({ limit: 1 })
+  const configurations = await client.billingPortal.configurations.list({ limit: 1 })
 
   if (configurations.data.length > 0) {
     return configurations.data[0]
   }
 
   // Create default configuration
-  return await stripe.billingPortal.configurations.create({
+  return await client.billingPortal.configurations.create({
     business_profile: {
       headline: 'Manage your membership',
     },

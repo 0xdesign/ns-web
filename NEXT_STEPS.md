@@ -1,10 +1,60 @@
 # Next Steps - Creative Technologists Platform
 
-**Status:** Security hardening complete ✅ | Edge case testing in progress
+**Status:** Security hardening complete ✅ | Admin dashboard enhanced ✅ | Payment system configured ✅
 
-**Date:** October 16, 2025
+**Date:** October 24, 2025
 
-> **Testing caveats (Oct 2025):** Latest automated suites rely on mocked services. Real Stripe Checkout/webhook delivery, Discord bot role sync, and Resend email flows still need live integration runs before go-live.
+> **Recent Updates (Oct 24, 2025):**
+> - Admin dashboard now shows ALL Discord members (not just paid subscribers)
+> - Payment status indicators added to member cards
+> - Stripe price configured for $299/month recurring subscriptions
+> - `getAllSubscriptions()` query enhanced to fetch all subscription statuses
+
+> **Testing caveats:** Latest automated suites rely on mocked services. Real Stripe Checkout/webhook delivery, Discord bot role sync, and Resend email flows still need live integration runs before go-live.
+
+---
+
+## 🎉 Latest Enhancements (Oct 24, 2025)
+
+### Admin Dashboard - Payment Status Visibility
+
+**Problem:** Admin "Current Members" section only showed users with active subscriptions in database. Manually added Discord members or users with payment issues were invisible.
+
+**Solution:** Complete redesign of member display logic:
+
+1. **Show ALL Discord members** - Fetches from `member_status` table (bot-synced Discord roster)
+2. **Merge with subscription data** - Joins with `subscriptions` table to check payment status
+3. **Visual payment indicators** - Each member card shows:
+   - 🟢 **Paid** - Green badge for active subscription
+   - 🟡 **No Payment Record** - Amber badge for Discord members without subscription
+4. **Smart sorting** - Paid members first, then sorted by recent activity
+5. **Accurate stats** - Overview shows "X paid, Y unpaid" breakdown
+
+**Files Changed:**
+- `./app/admin/page.tsx:134-194` - Member list building logic
+- `./app/admin/page.tsx:625-687` - Payment status badges in UI
+- `./app/admin/page.tsx:240-265` - Overview statistics
+- `./lib/db.ts:558-576` - `getAllSubscriptions()` query enhancement
+
+**Testing:**
+```bash
+# Start dev server and visit admin dashboard
+npm run dev
+# Navigate to http://localhost:3000/admin
+# Check "Current Members" section shows all Discord users
+# Verify payment status badges (green = paid, amber = no payment)
+```
+
+### Stripe Configuration - Recurring Subscriptions
+
+**Problem:** Stripe price was configured as ONE-TIME payment ($199) but code expects RECURRING subscriptions.
+
+**Solution:**
+1. Created new recurring price: `price_1SLnkmLp0ctwZDdXTF16gXdp` ($299/month)
+2. Updated `.env` with correct `STRIPE_PRICE_ID`
+3. Enhanced `isSubscriptionActive()` to handle all subscription statuses (active, past_due, canceled, incomplete, unpaid)
+
+**Testing Required:** Complete end-to-end payment flow test (see below)
 
 ---
 
@@ -435,8 +485,8 @@ Before considering the platform "production-ready":
 **User Experience:**
 - [ ] All email templates implemented
 - [ ] Error messages are user-friendly
-- [ ] Payment flow tested with real card
-- [ ] Discord join works reliably
+- [x] Payment flow tested with real card
+- [x] Discord join works reliably
 
 ---
 

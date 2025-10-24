@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { stripe, verifyWebhookSignature } from '@/lib/stripe'
+import {
+  getStripeClient,
+  isStripeConfigured,
+  verifyWebhookSignature,
+} from '@/lib/stripe'
 import {
   isWebhookProcessed,
   markWebhookProcessed,
@@ -67,6 +71,11 @@ const maskIdentifier = (value: string, visible = 4) => {
 
 export async function POST(request: NextRequest) {
   try {
+    if (!isStripeConfigured()) {
+      console.error('Received Stripe webhook but STRIPE_SECRET_KEY is not configured.')
+      return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 })
+    }
+
     const sig = request.headers.get('stripe-signature')
     const secret = process.env.STRIPE_WEBHOOK_SECRET
 
@@ -76,6 +85,7 @@ export async function POST(request: NextRequest) {
 
     const payload = await request.text()
     const event = verifyWebhookSignature(payload, sig, secret)
+    const stripe = getStripeClient()
 
     // Idempotency check
     const alreadyProcessed = await isWebhookProcessed(event.id)
