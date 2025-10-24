@@ -556,7 +556,11 @@ export async function getLatestSubscriptionForCustomer(
 }
 
 /**
- * Get all subscriptions (for daily sync job)
+ * Get all subscriptions (for daily sync job and admin display)
+ *
+ * Fetches ALL subscriptions regardless of status to ensure admin
+ * can see complete payment history. The admin page filters by
+ * isSubscriptionActive() to determine display logic.
  */
 export async function getAllSubscriptions(): Promise<
   (Subscription & { customer: Customer })[]
@@ -564,7 +568,7 @@ export async function getAllSubscriptions(): Promise<
   const { data, error } = await supabase
     .from('subscriptions')
     .select('*, customer:customers(*)')
-    .in('status', ['active', 'past_due', 'canceled'])
+    // Removed status filter - get ALL subscriptions for full visibility
 
   if (error) throw error
   const rows = (data ?? []) as Array<Subscription & { customer: Customer | null }>

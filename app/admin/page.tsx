@@ -1,18 +1,20 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { GlassCard } from '@/components/ui/glass-card'
 import { AdminTools } from '@/components/admin/AdminTools'
 import { PendingApplicationsSection } from '@/components/admin/PendingApplicationsSection'
 import { FollowupActions } from '@/components/admin/FollowupActions'
 import { ExpiredMemberCard } from '@/components/admin/ExpiredMemberCard'
+import { AutoRefresher } from '@/components/admin/AutoRefresher'
+import { GlassCard } from '@/components/ui/glass-card'
 import { isAdmin } from '@/lib/admin-auth'
 import {
   getPendingApplications,
   getApplicationsByStatus,
   getAllSubscriptions,
+  type Application,
 } from '@/lib/db'
-import { getMembers } from '@/lib/supabase'
+import { getMembers, type MemberStatus } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
 import { formatDateTime, getInitials } from '@/lib/admin-dashboard'
 
@@ -21,6 +23,84 @@ const STATUS_BADGE_STYLES: Record<'pending' | 'approved' | 'waitlisted' | 'rejec
   approved: 'border-emerald-400/25 bg-emerald-500/15 text-emerald-100',
   waitlisted: 'border-blue-400/25 bg-blue-500/15 text-blue-100',
   rejected: 'border-rose-400/30 bg-rose-500/15 text-rose-100',
+}
+
+type SubscriptionWithCustomer = Awaited<ReturnType<typeof getAllSubscriptions>>[number]
+
+const isSubscriptionActive = (subscription: SubscriptionWithCustomer, now: Date) => {
+  // Active and past_due subscriptions are considered active
+  if (subscription.status === 'active' || subscription.status === 'past_due') {
+    return true
+  }
+
+  // Canceled subscriptions are active until period ends
+  if (subscription.status === 'canceled') {
+    return new Date(subscription.current_period_end) > now
+  }
+
+  // Incomplete/unpaid subscriptions are active if period hasn't ended
+  // This handles edge cases where payment succeeded but webhook hasn't updated status
+  if (subscription.status === 'incomplete' || subscription.status === 'unpaid') {
+    return new Date(subscription.current_period_end) > now
+  }
+
+  return false
+}
+
+const getSubscriptionStartTime = (subscription: SubscriptionWithCustomer) => {
+  const timestamp =
+    subscription.current_period_start ||
+    subscription.created_at ||
+    subscription.updated_at ||
+    subscription.customer.created_at ||
+    subscription.customer.updated_at
+
+  return timestamp ? new Date(timestamp).getTime() : Date.now()
+}
+
+const getDiscordAvatarUrl = (discordUserId: string, avatarHash: string | null): string | null => {
+  if (!avatarHash) return null
+  const extension = avatarHash.startsWith('a_') ? 'gif' : 'png'
+  return `https://cdn.discordapp.com/avatars/${discordUserId}/${avatarHash}.${extension}`
+}
+
+const getFallbackAvatarIndex = (discordUserId: string): number => {
+  try {
+    return Number(BigInt(discordUserId) % 6n)
+  } catch {
+    return 0
+  }
+}
+
+const buildFallbackMember = (
+  subscription: SubscriptionWithCustomer,
+  application: Application | undefined,
+  nowIso: string
+): MemberStatus => {
+  const joinedAt =
+    subscription.current_period_start || subscription.created_at || subscription.updated_at || null
+
+  return {
+    user_id: subscription.customer.discord_user_id,
+    username: application?.discord_username || subscription.customer.discord_user_id,
+    display_name: application?.discord_username || null,
+    joined_at: joinedAt,
+    activity_status: 'NEW',
+    messages_7d: 0,
+    messages_30d: 0,
+    reactions_7d: 0,
+    reactions_30d: 0,
+    current_projects: [],
+    conversation_topics: [],
+    status_summary: 'Payment received — awaiting Discord activity sync.',
+    last_message_at: null,
+    avatar_url: getDiscordAvatarUrl(
+      subscription.customer.discord_user_id,
+      application?.discord_avatar ?? null
+    ),
+    updated_at: subscription.updated_at || nowIso,
+    created_at: subscription.created_at || nowIso,
+  }
 }
 
 // Force dynamic rendering (uses cookies for auth)
@@ -43,10 +123,110 @@ export default async function AdminPage() {
     getMembers(),
     getAllSubscriptions(),
   ])
-  const applications = pending
-  const currentMembers = membersResp.members
-  const totalMembersCount = membersResp.total ?? currentMembers.length
   const now = new Date()
+  const nowIso = now.toISOString()
+
+  const applicationByDiscordId = new Map<string, Application>()
+  for (const app of approved) {
+    if (!applicationByDiscordId.has(app.discord_user_id)) {
+      applicationByDiscordId.set(app.discord_user_id, app)
+    }
+  }
+  for (const app of pending) {
+    if (!applicationByDiscordId.has(app.discord_user_id)) {
+      applicationByDiscordId.set(app.discord_user_id, app)
+    }
+  }
+  for (const app of waitlisted) {
+    if (!applicationByDiscordId.has(app.discord_user_id)) {
+      applicationByDiscordId.set(app.discord_user_id, app)
+    }
+  }
+  for (const app of rejected) {
+    if (!applicationByDiscordId.has(app.discord_user_id)) {
+      applicationByDiscordId.set(app.discord_user_id, app)
+    }
+  }
+
+  const supabaseMembers = membersResp.members
+  const activeSubscriptions = subs.filter((subscription) => isSubscriptionActive(subscription, now))
+  const sortedActiveSubscriptions = [...activeSubscriptions].sort(
+    (a, b) => getSubscriptionStartTime(b) - getSubscriptionStartTime(a)
+  )
+
+  // Build map of Discord IDs to subscription data for payment status tracking
+  const subscriptionByDiscordId = new Map<string, typeof sortedActiveSubscriptions[0]>()
+  for (const subscription of sortedActiveSubscriptions) {
+    const discordId = subscription.customer.discord_user_id
+    if (discordId && !subscriptionByDiscordId.has(discordId)) {
+      subscriptionByDiscordId.set(discordId, subscription)
+    }
+  }
+
+  // Build comprehensive member list:
+  // 1. Start with ALL Discord members (from bot sync)
+  // 2. Add paid members who haven't synced to Discord yet
+  // 3. Mark each with payment status
+  const membersByDiscordId = new Map<string, MemberStatus>()
+
+  // Add all Discord members first
+  for (const member of supabaseMembers) {
+    membersByDiscordId.set(member.user_id, member)
+  }
+
+  // Add fallback members for subscriptions without Discord sync
+  for (const subscription of sortedActiveSubscriptions) {
+    const discordId = subscription.customer.discord_user_id
+    if (!discordId || membersByDiscordId.has(discordId)) continue
+
+    const existingApplication = applicationByDiscordId.get(discordId)
+    const fallbackMember = buildFallbackMember(subscription, existingApplication, nowIso)
+    membersByDiscordId.set(discordId, fallbackMember)
+  }
+
+  // Convert to array and sort: paid members first, then by activity
+  const currentMembers = Array.from(membersByDiscordId.values()).sort((a, b) => {
+    const aHasSub = subscriptionByDiscordId.has(a.user_id)
+    const bHasSub = subscriptionByDiscordId.has(b.user_id)
+
+    // Paid members first
+    if (aHasSub !== bHasSub) return bHasSub ? 1 : -1
+
+    // Then by recent activity
+    const aActivity = a.messages_7d + a.reactions_7d
+    const bActivity = b.messages_7d + b.reactions_7d
+    return bActivity - aActivity
+  })
+
+  // Track subscription metadata for admin display
+  const subscriptionStartTimes = new Map<string, number>()
+  const prioritizedMemberIds = new Set<string>()
+  for (const subscription of sortedActiveSubscriptions) {
+    const discordId = subscription.customer.discord_user_id
+    if (discordId) {
+      subscriptionStartTimes.set(discordId, getSubscriptionStartTime(subscription))
+      prioritizedMemberIds.add(discordId)
+    }
+  }
+  const totalMembersCount = currentMembers.length
+  const approvedApplications = [...approved].sort((a, b) => {
+    const aHasSubscription = subscriptionStartTimes.has(a.discord_user_id)
+    const bHasSubscription = subscriptionStartTimes.has(b.discord_user_id)
+
+    if (aHasSubscription !== bHasSubscription) {
+      return aHasSubscription ? -1 : 1
+    }
+
+    const aTime =
+      subscriptionStartTimes.get(a.discord_user_id) ??
+      new Date(a.reviewed_at ?? a.updated_at).getTime()
+    const bTime =
+      subscriptionStartTimes.get(b.discord_user_id) ??
+      new Date(b.reviewed_at ?? b.updated_at).getTime()
+
+    return bTime - aTime
+  })
+  const pendingApplications = pending
   const expiredMembers = subs.filter(
     (s) => s.status === 'canceled' && new Date(s.current_period_end) <= now
   )
@@ -54,24 +234,32 @@ export default async function AdminPage() {
   const acceptanceRate =
     processedCount > 0 ? Math.round((approved.length / processedCount) * 100) : null
   const pendingSummary =
-    applications.length === 0
+    pendingApplications.length === 0
       ? 'All pending applications have been reviewed. Check back soon for new submissions.'
-      : `Start with the ${applications.length === 1 ? 'one application' : `${applications.length} applications`} waiting on a decision.`
+      : `Start with the ${
+          pendingApplications.length === 1
+            ? 'one application'
+            : `${pendingApplications.length} applications`
+        } waiting on a decision.`
   const expiredSummary =
     expiredMembers.length === 0
       ? 'All active memberships are current.'
       : `Follow up with ${expiredMembers.length === 1 ? 'one member' : `${expiredMembers.length} members`} whose billing period ended.`
 
+  // Calculate payment status counts for stats display
+  const paidMembersCount = Array.from(subscriptionByDiscordId.keys()).length
+  const unpaidMembersCount = currentMembers.length - paidMembersCount
+
   const overviewStats = [
     {
       label: 'Pending reviews',
-      value: applications.length,
-      helper: applications.length ? 'Ready for a decision' : 'All clear',
+      value: pendingApplications.length,
+      helper: pendingApplications.length ? 'Ready for a decision' : 'All clear',
     },
     {
-      label: 'Active members',
+      label: 'Discord members',
       value: totalMembersCount,
-      helper: 'Synced from Supabase',
+      helper: `${paidMembersCount} paid, ${unpaidMembersCount} unpaid`,
     },
     {
       label: 'Expired memberships',
@@ -91,7 +279,11 @@ export default async function AdminPage() {
     { href: '#waitlisted', label: 'Waitlist', helper: 'Check-in periodically' },
     { href: '#rejected', label: 'Rejected', helper: 'Closed out applications' },
     { href: '#expired', label: 'Expired members', helper: 'Subscriptions to follow up' },
-    { href: '#members', label: 'Current members', helper: 'Top 30 from Supabase' },
+    {
+      href: '#members',
+      label: 'Current members',
+      helper: `${paidMembersCount} paid, ${unpaidMembersCount} without payment`,
+    },
   ] as const
 
   const decisionSections = [
@@ -100,7 +292,7 @@ export default async function AdminPage() {
       title: 'Approved',
       description: 'Members ready to onboard or already active.',
       status: 'approved' as const,
-      items: approved,
+      items: approvedApplications,
       emptyLabel: 'No approved applications yet.',
     },
     {
@@ -130,12 +322,14 @@ export default async function AdminPage() {
     )
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-neutral-950 text-white">
-      <div className="absolute inset-0 bg-gradient-to-br from-neutral-950 via-neutral-900 to-slate-950" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(99,102,241,0.22),_transparent_55%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,_rgba(14,165,233,0.18),_transparent_55%)]" />
-      <div className="absolute inset-0 bg-black/70" />
-      <div className="relative z-10">
+    <>
+      <AutoRefresher intervalMs={30_000} />
+      <main className="relative min-h-screen overflow-hidden bg-neutral-950 text-white">
+        <div className="absolute inset-0 bg-gradient-to-br from-neutral-950 via-neutral-900 to-slate-950" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(99,102,241,0.22),_transparent_55%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,_rgba(14,165,233,0.18),_transparent_55%)]" />
+        <div className="absolute inset-0 bg-black/70" />
+        <div className="relative z-10">
         <header className="border-b border-white/10 bg-neutral-950/70 backdrop-blur">
           <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-6">
             <div>
@@ -238,7 +432,7 @@ export default async function AdminPage() {
             </div>
           </section>
 
-          <PendingApplicationsSection applications={applications} />
+          <PendingApplicationsSection applications={pendingApplications} />
 
           {decisionSections.map((section) => (
             <section key={section.id} id={section.id} className="space-y-6 scroll-mt-36">
@@ -266,56 +460,66 @@ export default async function AdminPage() {
                 </GlassCard>
               ) : (
                 <div className="grid gap-4 md:grid-cols-2">
-                  {section.items.map((app) => (
-                    <GlassCard
-                      key={app.id}
-                      className="rounded-2xl border border-white/10 bg-white/5"
-                      contentClassName="p-5"
-                    >
-                      <div className="flex items-start gap-3">
-                        {app.discord_avatar ? (
-                          <Image
-                            src={`https://cdn.discordapp.com/avatars/${app.discord_user_id}/${app.discord_avatar}.png`}
-                            alt={app.discord_username}
-                            width={48}
-                            height={48}
-                            className="h-12 w-12 rounded-full border border-white/10 object-cover"
-                            sizes="48px"
-                            unoptimized
-                          />
-                        ) : (
-                          <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/10 text-xs font-semibold uppercase text-white/70">
-                            {getInitials(app.discord_username)}
-                          </div>
-                        )}
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium text-white">{app.discord_username}</p>
-                          <p className="text-xs text-white/60 break-all">{app.email}</p>
-                          <div className="mt-3 flex flex-wrap gap-2">
-                            <span
-                              className={cn(
-                                'inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide',
-                                STATUS_BADGE_STYLES[section.status]
+                  {section.items.map((app) => {
+                    const isActiveMember = prioritizedMemberIds.has(app.discord_user_id)
+
+                    return (
+                      <GlassCard
+                        key={app.id}
+                        className="rounded-2xl border border-white/10 bg-white/5"
+                        contentClassName="p-5"
+                      >
+                        <div className="flex items-start gap-3">
+                          {app.discord_avatar ? (
+                            <Image
+                              src={`https://cdn.discordapp.com/avatars/${app.discord_user_id}/${app.discord_avatar}.png`}
+                              alt={app.discord_username}
+                              width={48}
+                              height={48}
+                              className="h-12 w-12 rounded-full border border-white/10 object-cover"
+                              sizes="48px"
+                              unoptimized
+                            />
+                          ) : (
+                            <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/10 text-xs font-semibold uppercase text-white/70">
+                              {getInitials(app.discord_username)}
+                            </div>
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium text-white">{app.discord_username}</p>
+                            <p className="text-xs text-white/60 break-all">{app.email}</p>
+                            <div className="mt-3 flex flex-wrap gap-2">
+                              <span
+                                className={cn(
+                                  'inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide',
+                                  STATUS_BADGE_STYLES[section.status]
+                                )}
+                              >
+                                {section.title}
+                              </span>
+                              <span className="inline-flex items-center rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs text-white/65">
+                                Reviewed {formatDateTime(app.reviewed_at ?? app.updated_at)}
+                              </span>
+                              {isActiveMember && (
+                                <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-500/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-100">
+                                  <span className="h-2 w-2 rounded-full bg-emerald-300" aria-hidden />
+                                  Active member
+                                </span>
                               )}
-                            >
-                              {section.title}
-                            </span>
-                            <span className="inline-flex items-center rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs text-white/65">
-                              Reviewed {formatDateTime(app.reviewed_at ?? app.updated_at)}
-                            </span>
+                            </div>
+                            <p className="mt-3 text-sm text-white/70 whitespace-pre-line">
+                              {app.why_join || 'No additional context provided.'}
+                            </p>
                           </div>
-                          <p className="mt-3 text-sm text-white/70 whitespace-pre-line">
-                            {app.why_join || 'No additional context provided.'}
-                          </p>
                         </div>
-                      </div>
-                      <FollowupActions
-                        applicationId={app.id}
-                        applicantName={app.discord_username}
-                        status={section.status}
-                      />
-                    </GlassCard>
-                  ))}
+                        <FollowupActions
+                          applicationId={app.id}
+                          applicantName={app.discord_username}
+                          status={section.status}
+                        />
+                      </GlassCard>
+                    )
+                  })}
                 </div>
               )}
             </section>
@@ -424,12 +628,17 @@ export default async function AdminPage() {
               <div>
                 <h2 className="text-2xl font-semibold text-white">Current members</h2>
                 <p className="mt-1 text-sm text-white/60">
-                  Top 30 members by recent activity from Supabase.
+                  All Discord server members sorted by payment status and activity. Shows paid subscribers and members without payment records.
                 </p>
               </div>
-              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/25 bg-emerald-500/15 px-4 py-1.5 text-sm font-medium text-emerald-100">
-                {currentMembers.length} showing
-              </span>
+              <div className="flex flex-col items-end gap-2">
+                <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/25 bg-emerald-500/15 px-4 py-1.5 text-sm font-medium text-emerald-100">
+                  {currentMembers.length} total
+                </span>
+                <span className="text-xs text-white/55">
+                  {Array.from(subscriptionByDiscordId.keys()).length} with active subscriptions
+                </span>
+              </div>
             </div>
             {currentMembers.length === 0 ? (
               <GlassCard
@@ -441,54 +650,75 @@ export default async function AdminPage() {
               </GlassCard>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {currentMembers.slice(0, 30).map((member) => (
-                  <GlassCard
-                    key={member.user_id}
-                    className="rounded-2xl border border-white/10 bg-white/5"
-                    contentClassName="p-5"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Image
-                        src={
-                          member.avatar_url ||
-                          `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(member.user_id) % 6n)}.png`
-                        }
-                        alt={member.display_name || member.username}
-                        width={48}
-                        height={48}
-                        className="h-12 w-12 rounded-full border border-white/10 object-cover"
-                        sizes="48px"
-                        unoptimized
-                      />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium text-white">
-                          {member.display_name || member.username}
-                        </p>
-                        <p className="truncate text-xs text-white/60">
-                          {member.activity_status.replace(/_/g, ' ').toLowerCase()}
-                        </p>
+                {currentMembers.slice(0, 30).map((member) => {
+                  const hasPaidSubscription = subscriptionByDiscordId.has(member.user_id)
+
+                  return (
+                    <GlassCard
+                      key={member.user_id}
+                      className="rounded-2xl border border-white/10 bg-white/5"
+                      contentClassName="p-5"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Image
+                          src={
+                            member.avatar_url ||
+                            `https://cdn.discordapp.com/embed/avatars/${getFallbackAvatarIndex(member.user_id)}.png`
+                          }
+                          alt={member.display_name || member.username}
+                          width={48}
+                          height={48}
+                          className="h-12 w-12 rounded-full border border-white/10 object-cover"
+                          sizes="48px"
+                          unoptimized
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium text-white">
+                            {member.display_name || member.username}
+                          </p>
+                          <p className="truncate text-xs text-white/60">
+                            {member.activity_status.replace(/_/g, ' ').toLowerCase()}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                    {member.status_summary && (
-                      <p className="mt-3 text-xs text-white/65">{member.status_summary}</p>
-                    )}
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {member.current_projects.slice(0, 2).map((project, index) => (
-                        <span
-                          key={`${member.user_id}-project-${index}`}
-                          className="inline-flex items-center rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] uppercase tracking-wide text-white/55"
-                        >
-                          {project}
-                        </span>
-                      ))}
-                    </div>
-                  </GlassCard>
-                ))}
+
+                      {/* Payment status indicator */}
+                      <div className="mt-3 flex items-center gap-2">
+                        {hasPaidSubscription ? (
+                          <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-500/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-100">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" aria-hidden />
+                            Paid
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-400/30 bg-amber-500/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-100">
+                            <span className="h-1.5 w-1.5 rounded-full bg-amber-400" aria-hidden />
+                            No Payment Record
+                          </span>
+                        )}
+                      </div>
+
+                      {member.status_summary && (
+                        <p className="mt-3 text-xs text-white/65">{member.status_summary}</p>
+                      )}
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {member.current_projects.slice(0, 2).map((project, index) => (
+                          <span
+                            key={`${member.user_id}-project-${index}`}
+                            className="inline-flex items-center rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] uppercase tracking-wide text-white/55"
+                          >
+                            {project}
+                          </span>
+                        ))}
+                      </div>
+                    </GlassCard>
+                  )
+                })}
               </div>
             )}
           </section>
         </div>
       </div>
     </main>
+  </>
   )
 }

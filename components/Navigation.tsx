@@ -11,6 +11,10 @@ interface NavigationProps {
   discordAuthUrl?: string
   showMemberCount?: boolean
   showAuthActions?: boolean
+  loginLabel?: string
+  dashboardHref?: string
+  dashboardLabel?: string
+  logoutUrl?: string
   authUrls?: {
     disconnect?: string
     switchAccount?: string
@@ -24,6 +28,10 @@ export function Navigation({
   discordAuthUrl,
   showMemberCount = false,
   showAuthActions = true,
+  loginLabel = 'Connect Discord',
+  dashboardHref,
+  dashboardLabel = 'Dashboard',
+  logoutUrl,
   authUrls,
   onConnectDiscord,
 }: NavigationProps) {
@@ -98,6 +106,22 @@ export function Navigation({
                   )}
                   <span>{displayName}</span>
                 </a>
+                {showAuthActions && dashboardHref && (
+                  <Link
+                    href={dashboardHref}
+                    className="inline-flex items-center rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white/80 transition-colors hover:border-white/35 hover:text-white sm:px-4 sm:text-sm"
+                  >
+                    {dashboardLabel}
+                  </Link>
+                )}
+                {showAuthActions && logoutUrl && (
+                  <a
+                    href={logoutUrl}
+                    className="text-xs font-medium text-white/70 transition-colors hover:text-white sm:text-sm"
+                  >
+                    Log out
+                  </a>
+                )}
                 {showAuthActions &&
                   discordAuthUrl &&
                   (authUrls?.switchAccount || authUrls?.disconnect) && (
@@ -129,7 +153,7 @@ export function Navigation({
                   onClick={onConnectDiscord}
                   className="inline-flex items-center rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white/80 transition-colors hover:border-white/35 hover:text-white sm:px-4 sm:text-sm"
                 >
-                  Connect Discord
+                  {loginLabel}
                 </a>
               )
             )}

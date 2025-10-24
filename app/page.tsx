@@ -23,7 +23,7 @@ export default async function Home() {
   const cookieStore = await cookies()
   const discordCookie = cookieStore.get('discord_user')
   const discordUser = parseDiscordUserCookie(discordCookie?.value)
-  const discordAuthUrl = getDiscordAuthUrl('/')
+  const discordAuthUrl = getDiscordAuthUrl('/dashboard')
 
   return (
     <HomeClient
