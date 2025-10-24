@@ -7,18 +7,21 @@
 import Stripe from 'stripe'
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY ?? null
-const stripeApiVersion =
-  (process.env.STRIPE_API_VERSION ??
-    '2025-09-30') as Stripe.StripeConfig['apiVersion']
+const stripeApiVersion = process.env.STRIPE_API_VERSION ?? null
 
 let stripeClient: Stripe | null = null
 
 if (stripeSecretKey) {
-  stripeClient = new Stripe(stripeSecretKey, {
+  const stripeConfig: Stripe.StripeConfig = {
     typescript: true,
-    apiVersion: stripeApiVersion,
     maxNetworkRetries: 2,
-  })
+  }
+
+  if (stripeApiVersion) {
+    stripeConfig.apiVersion = stripeApiVersion as Stripe.StripeConfig['apiVersion']
+  }
+
+  stripeClient = new Stripe(stripeSecretKey, stripeConfig)
 } else if (process.env.NODE_ENV !== 'production') {
   console.warn(
     'Stripe secret key missing; billing features are disabled until STRIPE_SECRET_KEY is set.'

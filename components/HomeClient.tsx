@@ -168,9 +168,19 @@ export function HomeClient({ membersData, latestDigest, discordUser, discordAuth
                 <h1 className="display text-white mb-6">
                   A home for next-gen creators
                 </h1>
-                <LiquidButton asChild size="xxl" className="text-white font-medium tracking-tight">
-                  <Link href="/apply">Apply to join</Link>
-                </LiquidButton>
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                  <LiquidButton asChild size="xxl" className="text-white font-medium tracking-tight">
+                    <Link href="/apply">Apply to join</Link>
+                  </LiquidButton>
+                  {discordAuthUrl && (
+                    <a
+                      href={discordAuthUrl}
+                      className="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/10 px-6 py-2 text-sm font-semibold text-white/80 transition hover:border-white/35 hover:text-white sm:text-base"
+                    >
+                      Log in
+                    </a>
+                  )}
+                </div>
               </div>
             </section>
 
