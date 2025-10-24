@@ -7,7 +7,7 @@
 import Stripe from 'stripe'
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY ?? null
-const stripeApiVersion = process.env.STRIPE_API_VERSION ?? null
+const stripeApiVersion = process.env.STRIPE_API_VERSION?.trim() || null
 
 let stripeClient: Stripe | null = null
 
