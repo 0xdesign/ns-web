@@ -7,7 +7,18 @@
 import Stripe from 'stripe'
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY ?? null
-const stripeApiVersion = process.env.STRIPE_API_VERSION?.trim() || null
+
+const normalizedApiVersion = process.env.STRIPE_API_VERSION?.trim() ?? null
+const stripeApiVersion =
+  normalizedApiVersion && /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(normalizedApiVersion)
+    ? (normalizedApiVersion as Stripe.StripeConfig['apiVersion'])
+    : null
+
+if (normalizedApiVersion && !stripeApiVersion && process.env.NODE_ENV !== 'production') {
+  console.warn(
+    `Invalid STRIPE_API_VERSION "${normalizedApiVersion}" provided. Expected format YYYY-MM-DD. Falling back to account default.`
+  )
+}
 
 let stripeClient: Stripe | null = null
 
