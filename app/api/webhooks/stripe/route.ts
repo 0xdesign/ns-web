@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
   try {
     if (!isStripeConfigured()) {
       console.error('Received Stripe webhook but STRIPE_SECRET_KEY is not configured.')
-      return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 })
+      return NextResponse.json({ error: 'Stripe not configured' }, { status: 503 })
     }
 
     const sig = request.headers.get('stripe-signature')

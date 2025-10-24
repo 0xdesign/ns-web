@@ -44,7 +44,11 @@ export async function openBillingPortal(): Promise<BillingPortalResult | void> {
     )
     redirect(portalSession.url)
   } catch (error) {
-    console.error('Failed to create Stripe portal session:', error)
+    const { logger } = await import('@/lib/logger')
+    logger.error('Failed to create Stripe portal session', error as Error, {
+      operation: 'openBillingPortal',
+      customerId: customer.stripe_customer_id,
+    })
     return { error: 'Unable to open billing portal. Please try again later.' }
   }
 }
