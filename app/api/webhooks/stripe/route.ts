@@ -24,6 +24,7 @@ type StripeCustomer = Stripe.Customer | Stripe.DeletedCustomer
 type SubscriptionWithPeriodFields = Stripe.Subscription & {
   current_period_start: number | null
   current_period_end: number | null
+  cancel_at: number | null
 }
 
 const isStripeCustomer = (customer: StripeCustomer): customer is Stripe.Customer =>
@@ -221,12 +222,51 @@ export async function POST(request: NextRequest) {
         if (!stripeCustomerId) break
 
         const normalizedStatus = normalizeSubscriptionStatus(subscription.status)
-        const currentPeriodEndDate = subscription.current_period_end
-          ? new Date(subscription.current_period_end * 1000)
-          : new Date()
-        const currentPeriodStartIso = subscription.current_period_start
-          ? new Date(subscription.current_period_start * 1000).toISOString()
-          : new Date().toISOString()
+
+        // Debug logging for period fields
+        console.log(`🔍 Subscription update webhook payload inspection:`)
+        console.log(`   - subscription.current_period_end: ${subscription.current_period_end}`)
+        console.log(`   - subscription.current_period_start: ${subscription.current_period_start}`)
+        console.log(`   - subscription.cancel_at: ${subscription.cancel_at}`)
+
+        // Handle missing period fields - fetch from Stripe API if needed
+        let currentPeriodEndTimestamp = subscription.current_period_end
+        let currentPeriodStartTimestamp = subscription.current_period_start
+
+        if (!currentPeriodEndTimestamp || !currentPeriodStartTimestamp) {
+          console.warn(
+            `⚠️  Period fields missing from webhook payload, fetching fresh subscription from Stripe API`
+          )
+          try {
+            const freshSub = (await stripe.subscriptions.retrieve(
+              subscription.id
+            )) as unknown as SubscriptionWithPeriodFields
+            currentPeriodEndTimestamp = freshSub.current_period_end ?? currentPeriodEndTimestamp
+            currentPeriodStartTimestamp =
+              freshSub.current_period_start ?? currentPeriodStartTimestamp
+            console.log(
+              `✅ Fetched period fields from API: end=${currentPeriodEndTimestamp}, start=${currentPeriodStartTimestamp}`
+            )
+          } catch (e) {
+            console.error(`❌ Failed to fetch subscription from Stripe:`, e)
+          }
+
+          // Validate period fields are now available
+          if (!currentPeriodEndTimestamp || !currentPeriodStartTimestamp) {
+            const missingFields = []
+            if (!currentPeriodEndTimestamp) missingFields.push('current_period_end')
+            if (!currentPeriodStartTimestamp) missingFields.push('current_period_start')
+            console.error(
+              `❌ Critical: Unable to determine subscription period fields for ${subscription.id}. Missing: ${missingFields.join(', ')}`
+            )
+            throw new Error(
+              `SUBSCRIPTION_PERIOD_FIELDS_UNAVAILABLE: ${missingFields.join(', ')} missing for ${subscription.id}`
+            )
+          }
+        }
+
+        const currentPeriodEndDate = new Date(currentPeriodEndTimestamp * 1000)
+        const currentPeriodStartIso = new Date(currentPeriodStartTimestamp * 1000).toISOString()
 
         const dbCustomer = await getCustomerByStripeId(stripeCustomerId)
         if (!dbCustomer) {

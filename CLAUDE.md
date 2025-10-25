@@ -149,6 +149,56 @@ Web App → Supabase (SQL) ← Discord Bot (member data)
 - Handles edge cases: manual Discord removals, expired subscriptions, data drift
 - **Required**: `CRON_SECRET` for production security (prevents unauthorized access)
 
+### Production Deployment Architecture
+
+**Current Production Stack**:
+- **Web App**: Vercel → https://rasp.club (redirects to www.rasp.club)
+- **Bot API**: Railway → https://daily-digest-bot-production-5e9c.up.railway.app
+- **Database**: Supabase (shared between web app and bot)
+
+**Service Communication Flow**:
+```
+Vercel Web App
+  ├─ Reads from Supabase (member_status, messages, etc.)
+  ├─ Writes to Supabase (applications, customers, subscriptions, etc.)
+  └─ Calls Railway Bot API (role assignment/removal)
+      └─ Railway Bot
+          ├─ Writes to Supabase (member activity data)
+          └─ Calls Discord API (role management)
+```
+
+**Domain Behavior**:
+- Production domain: `rasp.club` → redirects to `www.rasp.club` (307 permanent redirect)
+- **Important**: HTTP 307 redirects strip `Authorization` headers (browser/proxy security)
+- Vercel cron jobs use **internal routing** (not affected by redirect)
+- Manual API testing: use `www.rasp.club` directly to preserve auth headers
+
+**Environment Variables Synchronization**:
+Must match between Vercel and Railway:
+- `BOT_API_KEY` - Shared secret for web app → bot API authentication
+- `DISCORD_GUILD_ID` - Production Discord server ID
+- `DISCORD_TOKEN` / `DISCORD_BOT_TOKEN` - Same bot token on both services
+- `SUPABASE_URL` - Shared database URL
+
+**Health Checks**:
+```bash
+# Bot API health
+curl https://daily-digest-bot-production-5e9c.up.railway.app/health
+# Expected: {"status":"healthy","bot_ready":true,"timestamp":"..."}
+
+# Cron endpoint (use www to avoid redirect stripping auth header)
+curl -H "Authorization: Bearer <CRON_SECRET>" \
+  https://www.rasp.club/api/cron/sync-roles
+# Expected: {"ok":true,"processed":N}
+```
+
+**Deployment Verification Checklist**:
+- [ ] Vercel Dashboard → Settings → Environment Variables (verify all secrets set)
+- [ ] Vercel Dashboard → Functions → Cron Jobs (verify schedule visible)
+- [ ] Railway bot health check returns 200
+- [ ] Environment variables match between Vercel and Railway
+- [ ] First cron execution logged in Vercel after 3 AM UTC
+
 ### Data Layer Organization
 
 All database operations are centralized in `./lib/db.ts`:
@@ -335,12 +385,16 @@ stripe listen --forward-to localhost:3000/api/webhooks/stripe
 
 **Cron Job (Manual)**:
 ```bash
-# Test role synchronization endpoint
+# Local testing
 curl http://localhost:3000/api/cron/sync-roles
 
-# With CRON_SECRET (if configured)
+# With CRON_SECRET (local)
 curl -H "Authorization: Bearer your_cron_secret" \
   http://localhost:3000/api/cron/sync-roles
+
+# Production testing (use www subdomain to avoid redirect stripping auth header)
+curl -H "Authorization: Bearer your_cron_secret" \
+  https://www.rasp.club/api/cron/sync-roles
 ```
 
 **Complete Testing**: See `NEXT_STEPS.md` for comprehensive edge case scenarios (subscription cancellation, expiration, payment failures, etc.)
