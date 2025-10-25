@@ -8,31 +8,14 @@ import Stripe from 'stripe'
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY ?? null
 
-const normalizedApiVersion = process.env.STRIPE_API_VERSION?.trim() ?? null
-const stripeApiVersion =
-  normalizedApiVersion && /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(normalizedApiVersion)
-    ? (normalizedApiVersion as Stripe.StripeConfig['apiVersion'])
-    : null
-
-if (normalizedApiVersion && !stripeApiVersion && process.env.NODE_ENV !== 'production') {
-  console.warn(
-    `Invalid STRIPE_API_VERSION "${normalizedApiVersion}" provided. Expected format YYYY-MM-DD. Falling back to account default.`
-  )
-}
-
 let stripeClient: Stripe | null = null
 
 if (stripeSecretKey) {
-  const stripeConfig: Stripe.StripeConfig = {
+  stripeClient = new Stripe(stripeSecretKey, {
+    apiVersion: '2025-09-30.clover',
     typescript: true,
     maxNetworkRetries: 2,
-  }
-
-  if (stripeApiVersion) {
-    stripeConfig.apiVersion = stripeApiVersion as Stripe.StripeConfig['apiVersion']
-  }
-
-  stripeClient = new Stripe(stripeSecretKey, stripeConfig)
+  })
 } else if (process.env.NODE_ENV !== 'production') {
   console.warn(
     'Stripe secret key missing; billing features are disabled until STRIPE_SECRET_KEY is set.'

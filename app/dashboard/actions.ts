@@ -5,6 +5,7 @@ import { cookies } from 'next/headers'
 import { parseDiscordUserCookie } from '@/lib/current-user'
 import { getCustomerByDiscordId } from '@/lib/db'
 import { createPortalSession } from '@/lib/stripe'
+import Stripe from 'stripe'
 
 type BillingPortalResult = {
   error?: string
@@ -49,6 +50,32 @@ export async function openBillingPortal(): Promise<BillingPortalResult | void> {
       operation: 'openBillingPortal',
       customerId: customer.stripe_customer_id,
     })
+
+    // Parse Stripe errors for user-friendly messages
+    // Customer portal not activated in Stripe Dashboard
+    if (error instanceof Stripe.errors.StripeInvalidRequestError &&
+        (error.message?.includes('No configuration provided') || error.message?.includes('portal'))) {
+      return {
+        error: 'Billing portal is not activated. Please contact support.'
+      }
+    }
+
+    // Customer not found
+    if (error instanceof Stripe.errors.StripeInvalidRequestError &&
+        error.message?.includes('customer')) {
+      return {
+        error: 'Billing profile not found. Please contact support.'
+      }
+    }
+
+    // Generic Stripe API error with code
+    if (error instanceof Stripe.errors.StripeError && error.code) {
+      return {
+        error: `Unable to open billing portal (${error.code}). Please try again or contact support.`
+      }
+    }
+
+    // Generic fallback
     return { error: 'Unable to open billing portal. Please try again later.' }
   }
 }
