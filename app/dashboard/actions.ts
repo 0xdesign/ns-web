@@ -46,9 +46,26 @@ export async function openBillingPortal(): Promise<BillingPortalResult | void> {
     redirect(portalSession.url)
   } catch (error) {
     const { logger } = await import('@/lib/logger')
+
+    // Detailed error logging for debugging
+    const unknownError = error as { message?: string; code?: string; type?: string }
+
+    console.error('=== Billing Portal Error Debug ===')
+    console.error('Error type:', error?.constructor?.name)
+    console.error('Error instanceof StripeError:', error instanceof Stripe.errors.StripeError)
+    console.error('Error instanceof StripeInvalidRequestError:', error instanceof Stripe.errors.StripeInvalidRequestError)
+    console.error('Error message:', unknownError?.message)
+    console.error('Error code:', unknownError?.code)
+    console.error('Error type field:', unknownError?.type)
+    console.error('Full error:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2))
+    console.error('=== End Debug ===')
+
     logger.error('Failed to create Stripe portal session', error as Error, {
       operation: 'openBillingPortal',
       customerId: customer.stripe_customer_id,
+      errorType: error?.constructor?.name,
+      errorCode: unknownError?.code,
+      errorMessage: unknownError?.message,
     })
 
     // Parse Stripe errors for user-friendly messages
@@ -75,7 +92,11 @@ export async function openBillingPortal(): Promise<BillingPortalResult | void> {
       }
     }
 
-    // Generic fallback
-    return { error: 'Unable to open billing portal. Please try again later.' }
+    // Generic fallback with error type for debugging
+    const errorType = error?.constructor?.name || 'Unknown'
+    const errorMsg = unknownError?.message || 'Unknown error'
+    return {
+      error: `Unable to open billing portal (${errorType}: ${errorMsg}). Please try again later.`
+    }
   }
 }

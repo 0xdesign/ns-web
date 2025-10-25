@@ -193,32 +193,19 @@ export async function listInvoicesForCustomer(params: {
 
 /**
  * Get customer portal configuration
+ *
+ * Returns the first active portal configuration.
+ * Portal must be configured in Stripe Dashboard before use.
  */
 export async function getPortalConfiguration(): Promise<Stripe.BillingPortal.Configuration> {
   const client = requireStripe()
-  // Get or create default portal configuration
+
+  // List portal configurations (should exist if portal is activated in dashboard)
   const configurations = await client.billingPortal.configurations.list({ limit: 1 })
 
-  if (configurations.data.length > 0) {
-    return configurations.data[0]
+  if (configurations.data.length === 0) {
+    throw new Error('No portal configuration found. Please activate and configure the Customer Portal in your Stripe Dashboard.')
   }
 
-  // Create default configuration
-  return await client.billingPortal.configurations.create({
-    business_profile: {
-      headline: 'Manage your membership',
-    },
-    features: {
-      payment_method_update: {
-        enabled: true,
-      },
-      subscription_cancel: {
-        enabled: true,
-        mode: 'at_period_end',
-      },
-      invoice_history: {
-        enabled: true,
-      },
-    },
-  })
+  return configurations.data[0]
 }
