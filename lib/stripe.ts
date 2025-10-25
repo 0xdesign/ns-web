@@ -12,7 +12,7 @@ let stripeClient: Stripe | null = null
 
 if (stripeSecretKey) {
   stripeClient = new Stripe(stripeSecretKey, {
-    apiVersion: '2025-09-30.clover',
+    apiVersion: '2025-08-27.basil',
     typescript: true,
     maxNetworkRetries: 2,
   })
