@@ -19,12 +19,19 @@ const instrumentSerif = Instrument_Serif({
 })
 
 export const metadata: Metadata = {
-  title: 'Creative Technologist Community - Apply to Join',
-  description: 'Join a community of high-potential creative technologists building the future with AI and code.',
+  title: 'Rasp',
+  description: 'A home for next-gen creators.',
+  applicationName: 'Rasp',
   openGraph: {
-    title: 'Creative Technologist Community',
-    description: 'Join a community of high-potential creative technologists building the future with AI and code.',
+    title: 'Rasp',
+    description: 'A home for next-gen creators.',
     type: 'website',
+    siteName: 'Rasp',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Rasp',
+    description: 'A home for next-gen creators.',
   },
 }
 

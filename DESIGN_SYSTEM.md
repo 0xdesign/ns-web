@@ -1,6 +1,6 @@
 # Design System
 
-This document defines the design system for the Creative Technologists community platform.
+This document defines the design system for the Rasp community platform.
 
 ## Typography
 

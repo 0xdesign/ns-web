@@ -333,7 +333,7 @@ export default async function AdminPage() {
         <header className="border-b border-white/10 bg-neutral-950/70 backdrop-blur">
           <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-6">
             <div>
-              <p className="text-xs uppercase tracking-[0.35em] text-white/40">Creative Technologists</p>
+              <p className="text-xs uppercase tracking-[0.35em] text-white/40">Rasp</p>
               <h1 className="mt-2 text-3xl font-semibold text-white">Admin control center</h1>
               <p className="mt-2 max-w-2xl text-sm text-white/60">
                 Review applications, monitor churn, and keep the membership pipeline healthy.

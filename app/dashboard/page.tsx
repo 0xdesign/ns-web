@@ -594,7 +594,7 @@ export default async function DashboardPage() {
                 <p className="text-xs uppercase tracking-[0.25em] text-white/40">
                   Plan
                 </p>
-                <p className="mt-2 text-sm font-semibold text-white">Creative Technologists · Monthly</p>
+                <p className="mt-2 text-sm font-semibold text-white">Rasp · Monthly</p>
                 <p className="mt-1 text-xs text-white/45">
                   USD $299 per month, billed through Stripe.
                 </p>

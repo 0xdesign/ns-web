@@ -1,6 +1,6 @@
-# Noshop - Web Application
+# Rasp - Web Application
 
-Next.js 15 web application for the Noshop community membership platform.
+Next.js 15 web application for the Rasp community membership platform.
 
 This repository contains the **web frontend** for the membership platform. The Discord bot backend is maintained in a separate repository: [ns-bot](https://github.com/0xdesign/ns-bot)
 

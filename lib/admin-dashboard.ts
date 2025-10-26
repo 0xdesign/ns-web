@@ -71,9 +71,9 @@ export function buildApplicationReminderIcs(
   return [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Creative Technologists//Admin Dashboard//EN',
+    'PRODID:-//Rasp//Admin Dashboard//EN',
     'BEGIN:VEVENT',
-    `UID:${application.id}@creative-technologists`,
+    `UID:${application.id}@rasp`,
     `DTSTAMP:${formatIcsDate(new Date())}`,
     `DTSTART:${start}`,
     `DTEND:${end}`,
@@ -98,9 +98,9 @@ export function buildExpiredMemberReminderIcs(
   return [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Creative Technologists//Admin Dashboard//EN',
+    'PRODID:-//Rasp//Admin Dashboard//EN',
     'BEGIN:VEVENT',
-    `UID:expired-${discordId}-${periodEnd}@creative-technologists`,
+    `UID:expired-${discordId}-${periodEnd}@rasp`,
     `DTSTAMP:${formatIcsDate(new Date())}`,
     `DTSTART:${start}`,
     `DTEND:${end}`,

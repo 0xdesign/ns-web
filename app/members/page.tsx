@@ -14,7 +14,7 @@ export default async function MembersPage() {
         <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 justify-between items-center">
             <Link href="/" className="flex items-center">
-              <h1 className="text-xl font-bold">Creative Technologists</h1>
+              <h1 className="text-xl font-bold">Rasp</h1>
             </Link>
             <div className="flex items-center gap-4">
               <Link
@@ -35,7 +35,7 @@ export default async function MembersPage() {
             Community Members
           </h1>
           <p className="mt-4 text-lg text-gray-600 dark:text-gray-300">
-            Meet the creative technologists building the future
+            Meet the Rasp community building the future
           </p>
         </div>
 

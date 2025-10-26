@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Next.js 15 web application for the Creative Technologists community membership platform. This is part of a monorepo - see `../CLAUDE.md` for full system architecture.
+Next.js 15 web application for the Rasp community membership platform. This is part of a monorepo - see `../CLAUDE.md` for full system architecture.
 
 ## Development Commands
 

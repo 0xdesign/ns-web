@@ -1,58 +1,38 @@
-/**
- * Resend email client
- *
- * Centralized email sending service using Resend
- */
+import { NextRequest, NextResponse } from 'next/server'
 
-import { Resend } from 'resend'
+export const dynamic = 'force-dynamic'
 
-// Allow missing Resend config during development
-// Email functions will throw errors if called without proper config
-const RESEND_API_KEY = process.env.RESEND_API_KEY || 'dev-placeholder'
-const FROM_EMAIL = process.env.FROM_EMAIL || 'dev@placeholder.com'
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams
+  const type = searchParams.get('type') || 'approval'
+  const username = searchParams.get('username') || 'Alex'
+  const paymentUrl = searchParams.get('paymentUrl') || 'https://rasp.club/pay/demo-token-123'
 
-export const resend = new Resend(RESEND_API_KEY)
+  let html = ''
 
-// Helper to check if Resend is properly configured
-function isResendConfigured(): boolean {
-  return (
-    !!process.env.RESEND_API_KEY &&
-    process.env.RESEND_API_KEY !== 'dev-placeholder' &&
-    !!process.env.FROM_EMAIL &&
-    process.env.FROM_EMAIL !== 'dev@placeholder.com'
-  )
+  switch (type) {
+    case 'approval':
+      html = getApprovalEmailHTML(username, paymentUrl)
+      break
+    case 'rejection':
+      html = getRejectionEmailHTML(username)
+      break
+    case 'waitlist':
+      html = getWaitlistEmailHTML(username)
+      break
+    default:
+      return NextResponse.json({ error: 'Invalid type. Use: approval, rejection, or waitlist' }, { status: 400 })
+  }
+
+  return new NextResponse(html, {
+    headers: {
+      'Content-Type': 'text/html',
+    },
+  })
 }
 
-/**
- * Send approval email with payment link
- */
-export async function sendApprovalEmail({
-  to,
-  username,
-  paymentUrl,
-}: {
-  to: string
-  username: string
-  paymentUrl: string
-}) {
-  if (!isResendConfigured()) {
-    throw new Error(
-      'Resend is not configured. Please set RESEND_API_KEY and FROM_EMAIL environment variables.'
-    )
-  }
-  const subject = 'Your Rasp application — approved'
-
-  const text = `${username},
-
-You're in. Complete payment to unlock Discord.
-
-${paymentUrl}
-
-Link expires in 7 days.
-
-— Rasp`
-
-  const html = `<!DOCTYPE html>
+function getApprovalEmailHTML(username: string, paymentUrl: string): string {
+  return `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
@@ -79,40 +59,10 @@ Link expires in 7 days.
   </div>
 </body>
 </html>`
-
-  return resend.emails.send({
-    from: FROM_EMAIL,
-    to,
-    subject,
-    text,
-    html,
-  })
 }
 
-/**
- * Send rejection email
- */
-export async function sendRejectionEmail({
-  to,
-  username,
-}: {
-  to: string
-  username: string
-}) {
-  if (!isResendConfigured()) {
-    throw new Error(
-      'Resend is not configured. Please set RESEND_API_KEY and FROM_EMAIL environment variables.'
-    )
-  }
-  const subject = 'Your Rasp application'
-
-  const text = `${username},
-
-We've decided not to move forward with your application. You're welcome to reapply with updated work.
-
-— Rasp`
-
-  const html = `<!DOCTYPE html>
+function getRejectionEmailHTML(username: string): string {
+  return `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
@@ -131,41 +81,10 @@ We've decided not to move forward with your application. You're welcome to reapp
   </div>
 </body>
 </html>`
-
-  return resend.emails.send({
-    from: FROM_EMAIL,
-    to,
-    subject,
-    text,
-    html,
-  })
 }
 
-/**
- * Send waitlist email
- */
-export async function sendWaitlistEmail({
-  to,
-  username,
-}: {
-  to: string
-  username: string
-}) {
-  if (!isResendConfigured()) {
-    throw new Error(
-      'Resend is not configured. Please set RESEND_API_KEY and FROM_EMAIL environment variables.'
-    )
-  }
-
-  const subject = 'Your Rasp application — waitlisted'
-
-  const text = `${username},
-
-You're on the waitlist. We'll notify you if a spot opens. Keep building in the meantime.
-
-— Rasp`
-
-  const html = `<!DOCTYPE html>
+function getWaitlistEmailHTML(username: string): string {
+  return `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
@@ -184,12 +103,4 @@ You're on the waitlist. We'll notify you if a spot opens. Keep building in the m
   </div>
 </body>
 </html>`
-
-  return resend.emails.send({
-    from: FROM_EMAIL,
-    to,
-    subject,
-    text,
-    html,
-  })
 }

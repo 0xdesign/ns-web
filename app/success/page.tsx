@@ -105,4 +105,3 @@ export default async function SuccessPage({
     </main>
   )
 }
-
