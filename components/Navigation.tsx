@@ -73,8 +73,19 @@ export function Navigation({
       <nav className="fixed top-0 left-0 right-0 z-80 h-[69px]">
         <div className="flex items-center justify-between h-full px-6">
           {/* Logo */}
-          <Link href="/" className="text-sm font-extrabold text-white/74 tracking-tight [text-shadow:2px_4px_8px_rgba(0,0,0,0.08)] hover:text-white/90 transition-colors cursor-pointer">
-            NO/SHOP
+          <Link
+            href="/"
+            className="flex items-center transition-opacity hover:opacity-90"
+            aria-label="Home"
+          >
+            <Image
+              src="/logo.svg"
+              alt="No Shop logo"
+              width={644}
+              height={378}
+              className="h-6 w-auto sm:h-7"
+              priority
+            />
           </Link>
 
           <div className="flex items-center gap-3 sm:gap-4">
