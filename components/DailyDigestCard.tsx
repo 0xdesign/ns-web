@@ -33,11 +33,11 @@ export function DailyDigestCard({ digest }: DailyDigestCardProps) {
           </div>
 
           {/* Activity Summary */}
-          {digest.activity_summary && (
+          {(digest.activity_summary_short || digest.activity_summary) && (
             <div className="space-y-2">
               <h4 className="text-sm font-bold text-white/80">Today&rsquo;s Activity</h4>
               <p className="body text-white/90 whitespace-pre-wrap">
-                {parseMarkdownLinks(digest.activity_summary)}
+                {parseMarkdownLinks(digest.activity_summary_short || digest.activity_summary)}
               </p>
             </div>
           )}
@@ -61,37 +61,6 @@ export function DailyDigestCard({ digest }: DailyDigestCardProps) {
                   </div>
                 ))}
               </div>
-            </div>
-          )}
-
-          {/* Top Contributors */}
-          {digest.top_contributors && digest.top_contributors.length > 0 && (
-            <div className="space-y-3">
-              <h4 className="text-sm font-bold text-white/80">Top Contributors</h4>
-              <div className="flex flex-wrap gap-2">
-                {digest.top_contributors.slice(0, 5).map((contributor, index) => {
-                  const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`
-                  return (
-                    <div
-                      key={contributor.author_id}
-                      className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs text-white/80"
-                    >
-                      {medal} <span className="font-semibold">{contributor.author_name}</span> - {contributor.message_count} messages
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Stats */}
-          {digest.stats && (
-            <div className="flex gap-4 text-xs text-white/50 pt-2 border-t border-white/10">
-              <span>{digest.stats.total_messages} messages</span>
-              <span>·</span>
-              <span>{digest.stats.active_channels} channels</span>
-              <span>·</span>
-              <span>{digest.stats.active_members} members</span>
             </div>
           )}
       </GlassCard>

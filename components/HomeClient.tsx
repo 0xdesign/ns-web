@@ -9,7 +9,6 @@ import { MemberDock } from '@/components/MemberDock'
 import Prism from '@/components/ui/prism'
 import { LiquidButton } from '@/components/ui/liquid-glass-button'
 import { BlurIn } from '@/components/ui/blur-in'
-import { GlassCard } from '@/components/ui/glass-card'
 import type { MembersResponse, DailyDigest } from '@/lib/supabase'
 import { DailyDigestCard } from '@/components/DailyDigestCard'
 import { hasVisited, markVisited } from '@/lib/visit-cache'
@@ -35,55 +34,49 @@ export function HomeClient({ membersData, latestDigest, discordUser, discordAuth
   }
 
   const topMembers = membersData.members?.slice(0, 3) ?? []
-  const featureCards = [
-    {
-      title: 'High-signal chat',
-      description:
-        'Your starting point for finding and sharing new tools, new workflows and new ways of thinking.',
-      delay: 30,
-    },
-    {
-      title: 'Shared goals and ambitions',
-      description: 'Everyone wants to build, create and express at the bleeding edge.',
-      delay: 60,
-    },
-    {
-      title: 'Non-performative',
-      description:
-        'A safe place to show work-in-progress without performative Twitter energy. The messy stuff is the good stuff.',
-      delay: 90,
-    },
-    {
-      title: 'Learning as a side effect',
-      description: 'The space moves fast. Skills accrue because the only way to learn is by doing.',
-      delay: 120,
-    },
-  ] as const
 
   const faqItems = [
     {
-      question: 'What does the application process look like?',
+      question: 'Who is a strong fit for the community?',
       answer:
-        'Apply with your work and what you are building. Our team reviews applications every few days. If approved you will receive a payment link; once complete, Discord access unlocks immediately.',
+        'People actively building with AI. Designers, writers, founders, engineers, researchers, artists—anyone using AI to create.',
       delay: 30,
     },
     {
-      question: 'Who is a strong fit for the community?',
+      question: 'Do I need to be technical or know how to code?',
       answer:
-        'Independent creators, founders, designers, engineers and researchers who actively use AI in their work. We prioritise people shipping projects, not spectators.',
+        'No. The only skill that matters is a willingness to make useful things with AI and grow that skillset.',
       delay: 60,
+    },
+    {
+      question: 'What kinds of backgrounds do members have?',
+      answer:
+        'Product designers, indie founders, content creators, writers, researchers, engineers, artists. The common thread: they\'re all using AI daily to build real projects. Some code, some don\'t.',
+      delay: 90,
     },
     {
       question: 'What do members get access to?',
       answer:
-        'High-signal chat, in-progress build reviews, curated drops, the daily digest, small-format salons and direct access to peers solving similar problems.',
-      delay: 90,
+        'A private Discord with people who create with AI and will share what actually works. You can ask the group for help or advice, share new insights and workflows, or simply discuss trends.',
+      delay: 120,
+    },
+    {
+      question: 'How active do I need to be?',
+      answer:
+        'As much as you can. You\'ll get out what you put in.',
+      delay: 150,
     },
     {
       question: 'What does membership cost?',
       answer:
-        '$299/month. Subscriptions renew monthly and you can cancel anytime in Stripe. If you run into issues, the team will help you on Discord.',
-      delay: 120,
+        '$99/month, billed monthly through Stripe. You can cancel anytime. If you run into billing issues or need help, 0xdesigner will sort it out on Discord. Access continues through your current billing period even if you cancel.',
+      delay: 180,
+    },
+    {
+      question: 'What if I want to cancel or get a refund?',
+      answer:
+        'If after 7 days you\'re not having a great experience, you\'ll get a full refund. No questions asked.',
+      delay: 210,
     },
   ] as const
 
@@ -182,63 +175,25 @@ export function HomeClient({ membersData, latestDigest, discordUser, discordAuth
                 <div className="h-16 md:h-24" /> {/* Spacer */}
                 <div className="body text-white space-y-5 md:space-y-6">
                   <BlurIn delay={0} duration={800} amount={10}>
-                    <p>Before the Renaissance, craft lived in crowded workshops—the bottegas.</p>
+                    <p>AI generates the block. You wield the rasp.</p>
                   </BlurIn>
 
                   <BlurIn delay={30} duration={800} amount={10}>
-                    <p>Paintings were collaborative efforts. The master sketched compositions. Assistants and apprentices ground pigments and painted backgrounds.</p>
+                    <p>Prompts produce abundant material—text, images, code. But output is generic, unfocused, overly smooth. Your craft is cutting away what doesn&apos;t serve. Adding texture and voice. Finding form through deliberate shaping.</p>
                   </BlurIn>
 
                   <BlurIn delay={60} duration={800} amount={10}>
-                    <p>Then everything changed. Renaissance artists broke free from the workshop model and became complete creators—studying anatomy, writing poetry, designing machines.</p>
+                    <p>Anyone can prompt AI. Shaping it into art requires judgment.</p>
                   </BlurIn>
 
                   <BlurIn delay={90} duration={800} amount={10}>
-                    <p>They claimed authorship. The center shifted from collective output to the singular creator.</p>
-                  </BlurIn>
-
-                  <BlurIn delay={120} duration={800} amount={10}>
-                    <p>The same shift is happening now. Code is the marble. The prompt is the chisel. The tools are moving the center again from teams of specialists to single creators.</p>
-                  </BlurIn>
-
-                  <BlurIn delay={150} duration={800} amount={10}>
-                    <p>One person can build a game, cut a film, build a business, create art, ship an app and publish a book.</p>
-                  </BlurIn>
-
-                  <BlurIn delay={180} duration={800} amount={10}>
-                    <p>This is not a bottega. It&apos;s a commons for those discovering the ultimate ways of creating and expressing with AI.</p>
+                    <p>This is a commons for creators who know the real work isn&apos;t generation—it&apos;s knowing what to cut, what to refine, where to leave your mark.</p>
                   </BlurIn>
                 </div>
 
                 {/* Daily Digest Card - Integrated within Editorial */}
                 <div className="mt-12 md:mt-16">
                   <DailyDigestCard digest={latestDigest} />
-                </div>
-              </div>
-            </section>
-
-            {/* Features Section */}
-            <section className="min-h-screen flex flex-col justify-center px-4 sm:px-6 md:px-8 lg:px-12 py-20 md:py-32 lg:py-40">
-              <div className="content-container">
-                {/* Feature list */}
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:gap-8">
-                  {featureCards.map((feature) => (
-                    <GlassCard
-                      key={feature.title}
-                      blurAmount="3px"
-                      className="rounded-xl p-6 md:p-8 h-[280px] md:h-[320px]"
-                      contentClassName="h-full"
-                    >
-                      <BlurIn delay={feature.delay} duration={800} amount={8}>
-                        <div className="flex h-full flex-col justify-between">
-                          <div>
-                            <h3 className="heading text-white">{feature.title}</h3>
-                          </div>
-                          <p className="body text-white">{feature.description}</p>
-                        </div>
-                      </BlurIn>
-                    </GlassCard>
-                  ))}
                 </div>
               </div>
             </section>
@@ -257,13 +212,10 @@ export function HomeClient({ membersData, latestDigest, discordUser, discordAuth
 
                 {/* FAQ list */}
                 <div className="space-y-0">
-                  {faqItems.map((item, index) => (
+                  {faqItems.map((item) => (
                     <BlurIn key={item.question} delay={item.delay} duration={800} amount={8}>
                       <div className="border-b border-dashed border-white/30 py-3">
-                        <div className="relative mb-3">
-                          <span className="absolute -left-7 md:-left-8 top-1/2 -translate-y-1/2 text-xs tracking-tight text-white/70">
-                            {String(index + 1).padStart(2, '0')} ::
-                          </span>
+                        <div className="mb-3">
                           <h3 className="text-sm font-bold leading-tight tracking-tight text-white md:text-base">
                             {item.question}
                           </h3>

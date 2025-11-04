@@ -41,7 +41,8 @@ export interface MembersResponse {
 export interface DailyDigest {
   id: string
   digest_date: string // YYYY-MM-DD
-  activity_summary: string | null
+  activity_summary: string | null // Medium paragraph (100-150 words) for Discord
+  activity_summary_short?: string | null // Short paragraph (60-100 words) for web
   top_messages: TopMessage[]
   top_contributors: TopContributor[]
   stats: DigestStats
