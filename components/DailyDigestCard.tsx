@@ -37,7 +37,7 @@ export function DailyDigestCard({ digest }: DailyDigestCardProps) {
             <div className="space-y-2">
               <h4 className="text-sm font-bold text-white/80">Today&rsquo;s Activity</h4>
               <p className="body text-white/90 whitespace-pre-wrap">
-                {parseMarkdownLinks(digest.activity_summary_short || digest.activity_summary)}
+                {parseMarkdownLinks(digest.activity_summary_short || digest.activity_summary || '')}
               </p>
             </div>
           )}
