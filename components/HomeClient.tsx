@@ -7,6 +7,7 @@ import { Navigation } from '@/components/Navigation'
 import { MemberSidebar } from '@/components/MemberSidebar'
 import { MemberDock } from '@/components/MemberDock'
 import Prism from '@/components/ui/prism'
+import { ShapeBlur } from '@/components/ui/ShapeBlur'
 import { LiquidButton } from '@/components/ui/liquid-glass-button'
 import { BlurIn } from '@/components/ui/blur-in'
 import type { MembersResponse, DailyDigest } from '@/lib/supabase'
@@ -69,7 +70,7 @@ export function HomeClient({ membersData, latestDigest, discordUser, discordAuth
     {
       question: 'What does membership cost?',
       answer:
-        '$99/month, billed monthly through Stripe. You can cancel anytime. If you run into billing issues or need help, 0xdesigner will sort it out on Discord. Access continues through your current billing period even if you cancel.',
+        '$199/month, billed monthly through Stripe. You can cancel anytime. If you run into billing issues or need help, 0xdesigner will sort it out on Discord. Access continues through your current billing period even if you cancel.',
       delay: 180,
     },
     {
@@ -179,15 +180,15 @@ export function HomeClient({ membersData, latestDigest, discordUser, discordAuth
                   </BlurIn>
 
                   <BlurIn delay={30} duration={800} amount={10}>
-                    <p>Prompts produce abundant material—text, images, code. But output is generic, unfocused, overly smooth. Your craft is cutting away what doesn&apos;t serve. Adding texture and voice. Finding form through deliberate shaping.</p>
+                    <p>Prompts produce abundant material—text, images, videos and code. But output is generic, unfocused, overly smooth. Your craft is finding form through deliberate shaping.</p>
                   </BlurIn>
 
                   <BlurIn delay={60} duration={800} amount={10}>
-                    <p>Anyone can prompt AI. Shaping it into art requires judgment.</p>
+                    <p>Anyone can prompt AI. Shaping it into something useful requires judgment, taste and technique. There is no right or wrong way, and method is always changing.</p>
                   </BlurIn>
 
                   <BlurIn delay={90} duration={800} amount={10}>
-                    <p>This is a commons for creators who know the real work isn&apos;t generation—it&apos;s knowing what to cut, what to refine, where to leave your mark.</p>
+                    <p>This is a commons for creators discovering the ultimate ways of creating and expressing with AI.</p>
                   </BlurIn>
                 </div>
 
@@ -230,24 +231,33 @@ export function HomeClient({ membersData, latestDigest, discordUser, discordAuth
               </div>
             </section>
 
-            {/* Bottom CTA */}
-            <section className="px-4 sm:px-6 md:px-8 lg:px-12 py-20 md:py-32 lg:py-40">
+            {/* Bottom CTA - hidden on mobile where dock is visible */}
+            <section className="hidden md:block px-4 sm:px-6 md:px-8 lg:px-12 py-20 md:py-32 lg:py-40">
               <div className="content-container">
                 <BlurIn delay={0} duration={800} amount={12}>
-                  <Link
-                    href="/apply"
-                    className="
-                      block
-                      border border-dashed border-white rounded-[20px]
-                      py-16 md:py-20 lg:py-24
-                      text-center
-                      heading text-white
-                      hover:bg-white/5
-                      transition-colors duration-200
-                    "
-                  >
-                    Apply to join
-                  </Link>
+                  <div className="relative w-full overflow-hidden rounded-[20px] cursor-pointer">
+                    {/* Text Layer (with padding to match original button size) */}
+                    <div className="relative z-10 py-16 md:py-20 lg:py-24 flex justify-center items-center pointer-events-none">
+                      <h2 className="heading text-center select-none text-white">
+                        Apply to join
+                      </h2>
+                    </div>
+
+                    {/* ShapeBlur Layer */}
+                    <div className="absolute inset-0 z-0 pointer-events-none">
+                      <ShapeBlur
+                        variation={0}
+                        pixelRatioProp={typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1}
+                        shapeSize={2.0}
+                        roundness={0.5}
+                        borderSize={0.01}
+                        circleEdge={3.0}
+                      />
+                    </div>
+
+                    {/* Clickable Overlay */}
+                    <Link href="/apply" className="absolute inset-0 z-20" aria-label="Apply to join" />
+                  </div>
                 </BlurIn>
               </div>
             </section>

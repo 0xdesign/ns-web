@@ -105,8 +105,16 @@ void main() {
     float rawShapeDist;
     float strokeIntensity;
 
+    // Calculate aspect ratio corrected shape size
+    vec2 shape_scale = vec2(shape_size_prop);
+    if (u_resolution.x > u_resolution.y) {
+        shape_scale.x *= u_resolution.x / u_resolution.y;
+    } else {
+        shape_scale.y *= u_resolution.y / u_resolution.x;
+    }
+
     if (VAR == 0) {
-        rawShapeDist = sdRoundRect(st, vec2(shape_size_prop), roundness);
+        rawShapeDist = sdRoundRect(st, shape_scale, roundness);
         strokeIntensity = strokeAA(rawShapeDist, 0.0, border_size_prop, sdfCircleEffect);
     } else if (VAR == 1) {
         rawShapeDist = sdCircle(st, vec2(0.5));
