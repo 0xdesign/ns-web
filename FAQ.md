@@ -20,10 +20,10 @@ A private Discord with people who create with AI and will share what actually wo
 
 As much as you can. You'll get out what you put in.
 
-### 7. What does membership cost?
+### 6. What does membership cost?
 
-$99/month, billed monthly through Stripe. You can cancel anytime. If you run into billing issues or need help, 0xdesigner will sort it out on Discord. Access continues through your current billing period even if you cancel.
+$199/month, billed monthly through Stripe. You can cancel anytime. If you run into billing issues or need help, 0xdesigner will sort it out on Discord. Access continues through your current billing period even if you cancel.
 
-### 8. What if I want to cancel or get a refund?
+### 7. What if I want to cancel or get a refund?
 
 If after 7 days you're not having a great experience, you'll get a full refund. No questions asked.
