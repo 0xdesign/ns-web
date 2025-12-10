@@ -2,7 +2,7 @@ import { cookies } from 'next/headers'
 import { getMembers } from '@/lib/supabase'
 import { getDiscordAuthUrl } from '@/lib/discord'
 import { parseDiscordUserCookie } from '@/lib/current-user'
-import { getApplicationByDiscordId } from '@/lib/db'
+import { getApplicationByDiscordId, getDraftByDiscordId } from '@/lib/db'
 import { FormClient } from './FormClient'
 
 export default async function ApplicationFormPage() {
@@ -13,6 +13,13 @@ export default async function ApplicationFormPage() {
   const existingApplication = discordUser
     ? await getApplicationByDiscordId(discordUser.id)
     : null
+
+  // Load draft if authenticated and no existing application
+  const savedDraft =
+    discordUser && !existingApplication
+      ? await getDraftByDiscordId(discordUser.id)
+      : null
+
   const discordAuthUrl = getDiscordAuthUrl('/apply/form')
   const navigationAuthUrls = {
     disconnect: `/api/auth/discord/logout?redirect=${encodeURIComponent('/apply/form')}`,
@@ -26,6 +33,7 @@ export default async function ApplicationFormPage() {
       discordAuthUrl={discordAuthUrl}
       existingApplication={existingApplication}
       navigationAuthUrls={navigationAuthUrls}
+      initialDraft={savedDraft?.form_data ?? null}
     />
   )
 }

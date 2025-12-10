@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useActionState, useEffect, useCallback } from 'react'
+import { useState, useActionState, useEffect, useCallback, useRef } from 'react'
 import { useFormStatus } from 'react-dom'
 import Link from 'next/link'
 import { Navigation } from '@/components/Navigation'
@@ -9,11 +9,12 @@ import { BlurIn } from '@/components/ui/blur-in'
 import Prism from '@/components/ui/prism'
 import { EXPERIENCE_LEVELS, EXPERIENCE_LEVEL_VALUES, type ExperienceLevel } from '@/lib/experience-levels'
 import type { MembersResponse } from '@/lib/supabase'
-import type { Application } from '@/lib/db'
+import type { Application, ApplicationDraftData } from '@/lib/db'
 import type { DiscordSessionUser } from '@/lib/current-user'
 import { APPLY_FORM_DRAFT_STORAGE_KEY } from '@/lib/storage-keys'
 import type { ApplyFormState } from './actions'
 import { submitApplication } from './actions'
+import { saveDraft } from './draft-actions'
 
 type SocialLinkType = 'twitter' | 'github' | 'instagram' | 'portfolio'
 
@@ -79,6 +80,42 @@ interface FormClientProps {
     disconnect?: string
     switchAccount?: string
   }
+  initialDraft: ApplicationDraftData | null
+}
+
+type DraftStatus = 'idle' | 'saving' | 'saved' | 'error'
+
+/**
+ * Custom hook for debounced callbacks
+ */
+function useDebouncedCallback<T extends (...args: Parameters<T>) => void>(
+  callback: T,
+  delay: number
+): T {
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  const debouncedFn = useCallback(
+    (...args: Parameters<T>) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+      timeoutRef.current = setTimeout(() => {
+        callback(...args)
+      }, delay)
+    },
+    [callback, delay]
+  ) as T
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [])
+
+  return debouncedFn
 }
 
 export function FormClient({
@@ -87,21 +124,39 @@ export function FormClient({
   discordAuthUrl,
   existingApplication,
   navigationAuthUrls,
+  initialDraft,
 }: FormClientProps) {
-  const [formData, setFormData] = useState({
-    email: '',
-    why_join: '',
-    what_building: '',
-  })
-  const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel>(
-    EXPERIENCE_LEVELS[0].value
-  )
-  const [socialLinks, setSocialLinks] = useState<SocialLinkEntry[]>(() => [
-    createSocialLink('twitter'),
-  ])
-  const [projectLinks, setProjectLinks] = useState<ProjectLinkEntry[]>([])
-  const [showLinkOptions, setShowLinkOptions] = useState(false)
+  // Draft save status for UI indicator
+  const [draftStatus, setDraftStatus] = useState<DraftStatus>('idle')
   const [draftHydrated, setDraftHydrated] = useState(false)
+
+  // Initialize form state from server-loaded draft or defaults
+  const [formData, setFormData] = useState(() => ({
+    email: initialDraft?.email ?? '',
+    why_join: initialDraft?.why_join ?? '',
+    what_building: initialDraft?.what_building ?? '',
+  }))
+  const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel>(
+    () => (initialDraft?.experience_level as ExperienceLevel) ?? EXPERIENCE_LEVELS[0].value
+  )
+  const [socialLinks, setSocialLinks] = useState<SocialLinkEntry[]>(() => {
+    if (initialDraft?.social_links?.length) {
+      return initialDraft.social_links.map((link) =>
+        createSocialLink(link.type as SocialLinkType, link.value)
+      )
+    }
+    return [createSocialLink('twitter')]
+  })
+  const [projectLinks, setProjectLinks] = useState<ProjectLinkEntry[]>(() => {
+    if (initialDraft?.project_links?.length) {
+      return initialDraft.project_links.map((value) => ({
+        id: `project-${Math.random().toString(36).slice(2, 9)}`,
+        value,
+      }))
+    }
+    return []
+  })
+  const [showLinkOptions, setShowLinkOptions] = useState(false)
   const [state, formAction] = useActionState<ApplyFormState, FormData>(
     async (prevState: ApplyFormState, formData: FormData) => {
       const result = await submitApplication(prevState, formData)
@@ -164,6 +219,43 @@ export function FormClient({
     setProjectLinks((links) => links.filter((link) => link.id !== id))
   }
 
+  // Server action for saving draft to database
+  const saveToDatabase = useCallback(async () => {
+    if (!discordUser || existingApplication) return
+
+    setDraftStatus('saving')
+
+    const draftData: ApplicationDraftData = {
+      email: formData.email,
+      why_join: formData.why_join,
+      what_building: formData.what_building,
+      experience_level: experienceLevel,
+      social_links: socialLinks.map((link) => ({ type: link.type, value: link.value })),
+      project_links: projectLinks.map((link) => link.value).filter(Boolean),
+    }
+
+    const result = await saveDraft(draftData)
+
+    if (result.success) {
+      setDraftStatus('saved')
+      // Reset to idle after 2s
+      setTimeout(() => setDraftStatus('idle'), 2000)
+    } else {
+      setDraftStatus('error')
+      // Fallback to sessionStorage
+      try {
+        window.sessionStorage.setItem(APPLY_FORM_DRAFT_STORAGE_KEY, JSON.stringify(draftData))
+      } catch {
+        /* ignore */
+      }
+      // Reset error state after 3s
+      setTimeout(() => setDraftStatus('idle'), 3000)
+    }
+  }, [discordUser, existingApplication, formData, experienceLevel, socialLinks, projectLinks])
+
+  // Debounced save (1500ms delay)
+  const debouncedSave = useDebouncedCallback(saveToDatabase, 1500)
+
   useEffect(() => {
     if (existingApplication) {
       setDraftHydrated(true)
@@ -173,10 +265,17 @@ export function FormClient({
       return
     }
 
+    // If we have a server-loaded draft, mark as hydrated immediately
+    if (initialDraft) {
+      setDraftHydrated(true)
+      return
+    }
+
     if (typeof window === 'undefined') {
       return
     }
 
+    // Fallback: try sessionStorage for unauthenticated users
     try {
       const rawDraft = window.sessionStorage.getItem(APPLY_FORM_DRAFT_STORAGE_KEY)
       if (rawDraft) {
@@ -241,7 +340,7 @@ export function FormClient({
     } finally {
       setDraftHydrated(true)
     }
-  }, [existingApplication])
+  }, [existingApplication, initialDraft])
 
   const persistDraft = useCallback(() => {
     if (existingApplication) {
@@ -268,6 +367,7 @@ export function FormClient({
     }
   }, [existingApplication, experienceLevel, formData.email, formData.what_building, formData.why_join, projectLinks, socialLinks])
 
+  // Trigger auto-save on form changes (after hydration)
   useEffect(() => {
     if (existingApplication) {
       return
@@ -277,8 +377,14 @@ export function FormClient({
       return
     }
 
+    // Persist to sessionStorage immediately (local backup)
     persistDraft()
-  }, [draftHydrated, persistDraft, existingApplication])
+
+    // Trigger debounced save to database (if authenticated)
+    if (discordUser) {
+      debouncedSave()
+    }
+  }, [draftHydrated, persistDraft, existingApplication, discordUser, debouncedSave])
 
   function SubmitButton() {
     const { pending } = useFormStatus()
@@ -457,6 +563,46 @@ export function FormClient({
             ) : (
               <BlurIn delay={60} duration={800} amount={8}>
               <div className="rounded-xl border border-white/10 bg-neutral-900/80 px-6 py-8 md:px-8 md:py-10">
+                {/* Draft Status Indicator */}
+                {discordUser && draftStatus !== 'idle' && (
+                  <div
+                    className={`
+                      mb-6 flex items-center gap-2 px-3 py-2 rounded-lg text-sm
+                      ${draftStatus === 'saving' ? 'bg-white/5 text-white/60' : ''}
+                      ${draftStatus === 'saved' ? 'bg-emerald-500/10 text-emerald-400' : ''}
+                      ${draftStatus === 'error' ? 'bg-amber-500/10 text-amber-400' : ''}
+                      transition-all duration-300
+                    `}
+                    role="status"
+                    aria-live="polite"
+                  >
+                    {draftStatus === 'saving' && (
+                      <>
+                        <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeDasharray="32" strokeLinecap="round" />
+                        </svg>
+                        <span>Saving draft...</span>
+                      </>
+                    )}
+                    {draftStatus === 'saved' && (
+                      <>
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
+                          <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                        <span>Draft saved</span>
+                      </>
+                    )}
+                    {draftStatus === 'error' && (
+                      <>
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
+                          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+                          <path d="M12 8v4m0 4h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                        </svg>
+                        <span>Saved locally</span>
+                      </>
+                    )}
+                  </div>
+                )}
                 <form action={formAction} className="space-y-8">
                   {/* Email */}
                   <div>

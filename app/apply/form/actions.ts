@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
-import { createApplication, getApplicationByDiscordId } from '@/lib/db'
+import { createApplication, getApplicationByDiscordId, deleteDraft } from '@/lib/db'
 import { validateApplicationForm } from '@/lib/validations'
 import { parseDiscordUserCookie } from '@/lib/current-user'
 
@@ -75,6 +75,14 @@ export async function submitApplication(prevState: ApplyFormState | undefined, f
       social_links: JSON.stringify(socialLinksRaw),
       project_links: JSON.stringify(projectLinksRaw),
     })
+
+    // Clear the draft after successful submission
+    try {
+      await deleteDraft(discordUser.id)
+    } catch {
+      // Non-critical - log and continue
+      console.error('Failed to clear draft after submission')
+    }
 
     // Clear the temporary cookie to prevent state reuse after successful submission
     // This removes the Discord OAuth data, ensuring users can't accidentally submit
