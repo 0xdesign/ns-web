@@ -108,6 +108,23 @@ export interface Admin {
   created_at: string
 }
 
+export interface ApplicationDraft {
+  id: string
+  discord_user_id: string
+  form_data: ApplicationDraftData
+  updated_at: string
+  created_at: string
+}
+
+export interface ApplicationDraftData {
+  email: string
+  why_join: string
+  what_building: string
+  experience_level: string
+  social_links: Array<{ type: string; value: string }>
+  project_links: string[]
+}
+
 /**
  * Helper functions
  */
@@ -573,4 +590,63 @@ export async function getAllSubscriptions(): Promise<
   if (error) throw error
   const rows = (data ?? []) as Array<Subscription & { customer: Customer | null }>
   return rows.filter((row): row is Subscription & { customer: Customer } => row.customer !== null)
+}
+
+/**
+ * Application Draft Helpers
+ */
+
+/**
+ * Get draft by Discord user ID
+ */
+export async function getDraftByDiscordId(
+  discordUserId: string
+): Promise<ApplicationDraft | null> {
+  const { data, error } = await supabase
+    .from('application_drafts')
+    .select('*')
+    .eq('discord_user_id', discordUserId)
+    .single()
+
+  if (error) {
+    if (error.code === 'PGRST116') return null // Not found
+    throw error
+  }
+  return data
+}
+
+/**
+ * Upsert draft (create or update)
+ */
+export async function upsertDraft(
+  discordUserId: string,
+  formData: ApplicationDraftData
+): Promise<ApplicationDraft> {
+  const { data, error } = await supabase
+    .from('application_drafts')
+    .upsert(
+      {
+        discord_user_id: discordUserId,
+        form_data: formData,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'discord_user_id' }
+    )
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
+}
+
+/**
+ * Delete draft by Discord user ID
+ */
+export async function deleteDraft(discordUserId: string): Promise<void> {
+  const { error } = await supabase
+    .from('application_drafts')
+    .delete()
+    .eq('discord_user_id', discordUserId)
+
+  if (error) throw error
 }

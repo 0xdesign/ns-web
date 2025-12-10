@@ -22,7 +22,9 @@ export const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
+            WebkitBackdropFilter: `blur(${blurAmount})`,
             backdropFilter: `blur(${blurAmount})`,
+            WebkitFilter: filterUrl,
             filter: filterUrl,
             borderRadius: 'inherit',
             zIndex: 0,
