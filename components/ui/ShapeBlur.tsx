@@ -215,15 +215,6 @@ export const ShapeBlur: FC<ComponentProps> = ({
     const quad = new THREE.Mesh(geo, material);
     scene.add(quad);
 
-    const onPointerMove = (e: PointerEvent | MouseEvent) => {
-      if (!mount) return;
-      const rect = mount.getBoundingClientRect();
-      vMouse.set(e.clientX - rect.left, e.clientY - rect.top);
-    };
-
-    document.addEventListener('mousemove', onPointerMove);
-    document.addEventListener('pointermove', onPointerMove);
-
     const resize = () => {
       if (!mountRef.current) return;
       const container = mountRef.current;
@@ -256,7 +247,30 @@ export const ShapeBlur: FC<ComponentProps> = ({
     }
 
 
+    // Track visibility and animation state
+    let isVisible = false;
+    let isAnimating = false;
+    let mouseSettled = true;
+    const SETTLE_THRESHOLD = 0.5; // pixels
+
+    const startAnimation = () => {
+      if (isAnimating || !isVisible) return;
+      isAnimating = true;
+      animationFrameId = requestAnimationFrame(update);
+    };
+
+    const stopAnimation = () => {
+      if (!isAnimating) return;
+      isAnimating = false;
+      cancelAnimationFrame(animationFrameId);
+    };
+
     const update = () => {
+      if (!isVisible) {
+        isAnimating = false;
+        return;
+      }
+
       time = performance.now() * 0.001;
       const dt = time - lastTime;
       lastTime = time;
@@ -264,21 +278,61 @@ export const ShapeBlur: FC<ComponentProps> = ({
       vMouseDamp.x = THREE.MathUtils.damp(vMouseDamp.x, vMouse.x, 8, dt);
       vMouseDamp.y = THREE.MathUtils.damp(vMouseDamp.y, vMouse.y, 8, dt);
 
+      // Check if mouse animation has settled
+      const deltaX = Math.abs(vMouseDamp.x - vMouse.x);
+      const deltaY = Math.abs(vMouseDamp.y - vMouse.y);
+      mouseSettled = deltaX < SETTLE_THRESHOLD && deltaY < SETTLE_THRESHOLD;
+
       renderer.render(scene, camera);
-      animationFrameId = requestAnimationFrame(update);
+
+      // Only continue RAF if mouse is still animating
+      if (!mouseSettled) {
+        animationFrameId = requestAnimationFrame(update);
+      } else {
+        isAnimating = false;
+      }
     };
-    update();
+
+    // IntersectionObserver to pause when off-screen
+    const io = new IntersectionObserver(
+      (entries) => {
+        isVisible = entries.some((e) => e.isIntersecting);
+        if (isVisible && !mouseSettled) {
+          startAnimation();
+        } else if (!isVisible) {
+          stopAnimation();
+        }
+      },
+      { threshold: 0 }
+    );
+    io.observe(mount);
+
+    // Only listen on the element, not document (reduces overhead)
+    const onPointerMoveLocal = (e: PointerEvent | MouseEvent) => {
+      if (!mount || !isVisible) return;
+      const rect = mount.getBoundingClientRect();
+      vMouse.set(e.clientX - rect.left, e.clientY - rect.top);
+      mouseSettled = false;
+      startAnimation();
+    };
+
+    mount.addEventListener('mousemove', onPointerMoveLocal);
+    mount.addEventListener('pointermove', onPointerMoveLocal);
+
+    // Initial render
+    renderer.render(scene, camera);
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      stopAnimation();
+      io.disconnect();
       window.removeEventListener('resize', resize);
       if (ro) {
         ro.disconnect();
       }
-      document.removeEventListener('mousemove', onPointerMove);
-      document.removeEventListener('pointermove', onPointerMove);
+      mount.removeEventListener('mousemove', onPointerMoveLocal);
+      mount.removeEventListener('pointermove', onPointerMoveLocal);
       if (mount && renderer.domElement.parentNode === mount) {
-         mount.removeChild(renderer.domElement);
+        mount.removeChild(renderer.domElement);
       }
       renderer.dispose();
       material.dispose();
