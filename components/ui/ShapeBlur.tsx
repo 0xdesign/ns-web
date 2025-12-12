@@ -175,7 +175,7 @@ export const ShapeBlur: FC<ComponentProps> = ({
     const mount = mountRef.current;
     if (!mount) return;
 
-    let animationFrameId: number;
+    let animationFrameId = 0;
     let time = 0,
       lastTime = 0;
 
@@ -316,8 +316,8 @@ export const ShapeBlur: FC<ComponentProps> = ({
       startAnimation();
     };
 
-    mount.addEventListener('mousemove', onPointerMoveLocal);
-    mount.addEventListener('pointermove', onPointerMoveLocal);
+    // Prefer pointer events; avoids potential duplicate firing vs also listening to mousemove.
+    mount.addEventListener('pointermove', onPointerMoveLocal, { passive: true });
 
     // Initial render
     renderer.render(scene, camera);
@@ -329,7 +329,6 @@ export const ShapeBlur: FC<ComponentProps> = ({
       if (ro) {
         ro.disconnect();
       }
-      mount.removeEventListener('mousemove', onPointerMoveLocal);
       mount.removeEventListener('pointermove', onPointerMoveLocal);
       if (mount && renderer.domElement.parentNode === mount) {
         mount.removeChild(renderer.domElement);
