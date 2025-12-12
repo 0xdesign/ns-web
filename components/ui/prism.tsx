@@ -104,6 +104,7 @@ const Prism = ({
       width: "100%",
       height: "100%",
       display: "block",
+      zIndex: "0", // Explicit z-index for Safari WebGL stacking
     });
     container.appendChild(gl.canvas);
 
