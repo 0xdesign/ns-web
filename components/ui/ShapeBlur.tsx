@@ -186,6 +186,17 @@ export const ShapeBlur: FC<ComponentProps> = ({
     let w = 1,
       h = 1;
 
+    // Cache bounding rect to avoid layout thrashing on every mouse move
+    let mountRect: DOMRect | null = null;
+    const updateMountRect = () => {
+      if (mount) mountRect = mount.getBoundingClientRect();
+    };
+
+    // Check reduced motion preference
+    const prefersReducedMotion = typeof window !== 'undefined'
+      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      : false;
+
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera();
     camera.position.z = 1;
@@ -220,7 +231,7 @@ export const ShapeBlur: FC<ComponentProps> = ({
       const container = mountRef.current;
       w = container.clientWidth;
       h = container.clientHeight;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
 
       renderer.setSize(w, h);
       renderer.setPixelRatio(dpr);
@@ -234,6 +245,9 @@ export const ShapeBlur: FC<ComponentProps> = ({
       quad.scale.set(w, h, 1);
       vResolution.set(w, h).multiplyScalar(dpr);
       material.uniforms.u_pixelRatio.value = dpr;
+
+      // Update cached rect on resize
+      updateMountRect();
     };
 
 
@@ -251,7 +265,9 @@ export const ShapeBlur: FC<ComponentProps> = ({
     let isVisible = false;
     let isAnimating = false;
     let mouseSettled = true;
-    const SETTLE_THRESHOLD = 0.5; // pixels
+    const SETTLE_THRESHOLD = 0.01; // pixels (tighter threshold for proper stopping)
+    let lastMoveTime = 0;
+    const MAX_IDLE_SECONDS = 2; // Force stop after 2 seconds of no movement
 
     const startAnimation = () => {
       if (isAnimating || !isVisible) return;
@@ -271,6 +287,13 @@ export const ShapeBlur: FC<ComponentProps> = ({
         return;
       }
 
+      // Skip animation for users who prefer reduced motion
+      if (prefersReducedMotion) {
+        renderer.render(scene, camera);
+        isAnimating = false;
+        return;
+      }
+
       time = performance.now() * 0.001;
       const dt = time - lastTime;
       lastTime = time;
@@ -283,14 +306,16 @@ export const ShapeBlur: FC<ComponentProps> = ({
       const deltaY = Math.abs(vMouseDamp.y - vMouse.y);
       mouseSettled = deltaX < SETTLE_THRESHOLD && deltaY < SETTLE_THRESHOLD;
 
-      renderer.render(scene, camera);
-
-      // Only continue RAF if mouse is still animating
-      if (!mouseSettled) {
-        animationFrameId = requestAnimationFrame(update);
-      } else {
+      // Force stop after idle timeout to prevent infinite RAF
+      const idleTime = time - lastMoveTime;
+      if (mouseSettled || idleTime > MAX_IDLE_SECONDS) {
+        renderer.render(scene, camera);
         isAnimating = false;
+        return;
       }
+
+      renderer.render(scene, camera);
+      animationFrameId = requestAnimationFrame(update);
     };
 
     // IntersectionObserver to pause when off-screen
@@ -309,10 +334,10 @@ export const ShapeBlur: FC<ComponentProps> = ({
 
     // Only listen on the element, not document (reduces overhead)
     const onPointerMoveLocal = (e: PointerEvent | MouseEvent) => {
-      if (!mount || !isVisible) return;
-      const rect = mount.getBoundingClientRect();
-      vMouse.set(e.clientX - rect.left, e.clientY - rect.top);
+      if (!mount || !isVisible || !mountRect) return;
+      vMouse.set(e.clientX - mountRect.left, e.clientY - mountRect.top);
       mouseSettled = false;
+      lastMoveTime = performance.now() * 0.001;
       startAnimation();
     };
 
