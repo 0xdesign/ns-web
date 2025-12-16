@@ -12,30 +12,19 @@ interface MemberDockProps {
 
 export function MemberDock({ memberCount, topMembers, isBottomSheetOpen, onFacepileClick }: MemberDockProps) {
   return (
-    <>
-      {/* SVG Filter Definition for glass distortion effect */}
-      <svg className="absolute w-0 h-0" aria-hidden="true">
-        <defs>
-          <filter id="glass-distortion">
-            <feTurbulence type="fractalNoise" baseFrequency="0.01" numOctaves="3" result="noise" />
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" />
-          </filter>
-        </defs>
-      </svg>
-      <div
+    <div
       className={`
         md:hidden
         fixed left-1/2 -translate-x-1/2 z-[70]
         transition-all duration-300 ease-out
-        rounded-full
         ${isBottomSheetOpen ? 'bottom-[-200px] opacity-0' : 'bottom-6 opacity-100'}
       `}
     >
       {/* Dock Container with 4-layer glass effect */}
-      <div className="group relative rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
+      <div className="relative rounded-[28px] shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
         {/* Layer 1: Blur + Distortion */}
         <div
-          className="absolute inset-0 rounded-full pointer-events-none"
+          className="absolute inset-0 rounded-[28px] pointer-events-none"
           style={{
             backdropFilter: 'blur(3px)',
             filter: 'url(#glass-distortion)',
@@ -46,7 +35,7 @@ export function MemberDock({ memberCount, topMembers, isBottomSheetOpen, onFacep
 
         {/* Layer 2: Shine/Highlight */}
         <div
-          className="absolute inset-0 rounded-full pointer-events-none transition-all duration-300"
+          className="absolute inset-0 rounded-[28px] pointer-events-none transition-all duration-300"
           style={{
             boxShadow: 'inset 1px 1px 1px 0 rgba(255, 255, 255, 0.3)',
             zIndex: 1
@@ -55,7 +44,7 @@ export function MemberDock({ memberCount, topMembers, isBottomSheetOpen, onFacep
 
         {/* Layer 3: Brightness Overlay */}
         <div
-          className="absolute inset-0 rounded-full pointer-events-none transition-all duration-300 opacity-0 group-hover:opacity-[0.03]"
+          className="absolute inset-0 rounded-[28px] pointer-events-none transition-all duration-300 opacity-0 group-hover:opacity-[0.03]"
           style={{
             background: 'rgba(255, 255, 255, 1)',
             zIndex: 2
@@ -64,14 +53,14 @@ export function MemberDock({ memberCount, topMembers, isBottomSheetOpen, onFacep
 
         {/* Layer 4: Edge Glow Border */}
         <div
-          className="absolute inset-0 rounded-full pointer-events-none transition-all duration-300 border border-white/12"
+          className="absolute inset-0 rounded-[28px] pointer-events-none transition-all duration-300 border border-white/12"
           style={{
             zIndex: 3
           }}
         />
 
         {/* Content */}
-        <div className="relative flex items-center gap-4 px-4 py-3 rounded-full" style={{ zIndex: 20 }}>
+        <div className="relative flex items-center gap-4 p-3" style={{ zIndex: 20 }}>
           {/* Facepile Section (clickable) */}
           <button
             onClick={onFacepileClick}
@@ -125,6 +114,5 @@ export function MemberDock({ memberCount, topMembers, isBottomSheetOpen, onFacep
         </div>
       </div>
     </div>
-    </>
   )
 }

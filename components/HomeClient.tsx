@@ -160,7 +160,7 @@ export function HomeClient({ membersData, latestDigest, discordUser, discordAuth
             {/* Hero Section */}
             <section className="min-h-screen flex flex-col justify-center px-4 sm:px-6 md:px-8 lg:px-12 py-20 md:py-32 lg:py-40">
               <div className="content-container">
-                <h1 className="display text-white mb-6">
+                <h1 className="display text-[48px] md:text-[96px] text-white mb-6">
                   A home for next-gen creators
                 </h1>
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
