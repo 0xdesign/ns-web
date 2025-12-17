@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createApplication, getApplicationByDiscordId } from '@/lib/db'
 import { validateApplicationForm } from '@/lib/validations'
+import { sendNewApplicationNotification } from '@/lib/resend'
 
 export async function POST(request: NextRequest) {
   try {
@@ -68,6 +69,19 @@ export async function POST(request: NextRequest) {
       social_links: JSON.stringify(formData.social_links),
       project_links: JSON.stringify(formData.project_links),
     })
+
+    // Send admin notification email (non-blocking)
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    sendNewApplicationNotification({
+      username: discordUser.username,
+      email: formData.email,
+      whyJoin: formData.why_join,
+      whatBuilding: formData.what_building,
+      experienceLevel: formData.experience_level,
+      socialLinks: formData.social_links || [],
+      projectLinks: formData.project_links || [],
+      adminUrl: `${appUrl}/admin`,
+    }).catch((err) => console.error('Failed to send admin notification:', err))
 
     // Clear Discord user cookie
     cookieStore.delete('discord_user')
